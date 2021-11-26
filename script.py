@@ -80,7 +80,7 @@ class Render():
     """
     def update(self):
         pad = psp2d.Controller()
-        if pad.cross:
+        if pad.circle:
             print("exit")
             self.exit()
 
@@ -101,7 +101,8 @@ class Render():
         #        if (i%2 and (j+1)%2) or ((i+1)%2 and j%2):
         #            self.screen.fillRect(i*32,j*32,32,32, background_color_2)
         self.screen.blit(self.background, 0, 0, 480, 272, 0, 0, True)
-        font.drawText(self.screen, 0, 0, "(0,0) - Press X to exit")
+        player = self.agents[0]
+        font.drawText(self.screen, 0, 0, "(%d,%d) - Press O to exit" % (player.pos_x, player.pos_y))
         for agent in self.agents:
             agent.draw(self.screen)
         self.screen.swap()
@@ -121,63 +122,56 @@ class Player(Agent):
         self.direction = "DOWN"
         self.is_running = False
         self.animation_flow = 0
-        self.velocity = 4
-        self.pos_x = 10
-        self.pos_y = 170
+        self.velocity = 8
+        self.pos_x = 30
+        self.pos_y = 130
         self.shadow_with = 16
         self.shadow_height = 31
         self.lastPad = time()
-    
-    def update(self, walls):
+
+    def compute_new_position(self):
         pad = psp2d.Controller()
-        if pad.down and (not self.lastPad or time() - self.lastPad >= 0.05):
-            self.lastPad = time()
-            self.direction = "DOWN"
-            new_pos_y = min(self.pos_y + self.velocity, MAX_HEIGHT - self.height)
-            if not self.detect_collision(walls, 
-                                         self.pos_x + (self.shadow_with/2), 
-                                         new_pos_y + (self.shadow_height/2)):
-                self.pos_y = new_pos_y
-            if not self.is_running:
+        if pad.cross:
+            print("pad.analogX: %d // pad.analogY: %d" % (pad.analogX, pad.analogY))
+        dx = (pad.analogX / 127) * self.velocity
+        dy = (pad.analogY / 127) * self.velocity
+        new_pos_x = min(self.pos_x + dx, MAX_WIDTH - self.width)
+        new_pos_x = max(new_pos_x, 0)
+        new_pos_y = min(self.pos_y + dy, MAX_HEIGHT - self.height)
+        new_pos_y = max(new_pos_y, 0)
+
+        #if dx>0 and dy>0:
+        #    if dx > dy:
+        #        self.direction = "LEFT"
+        #    else:
+        #        self.direction = "UP"
+        #elsif:
+        #    if dx > dy:
+        #        self.direction = "LEFT"
+        #    else:
+        #        self.direction = "UP"
+
+        return (new_pos_x, new_pos_y)
+
+    def update(self, walls):
+        if (self.lastPad and time() - self.lastPad < 0.05):
+            # To short time between 2 events
+            return
+
+        self.lastPad = time()
+        (new_pos_x, new_pos_y) = self.compute_new_position()
+
+        if not self.detect_collision(walls, 
+                                     new_pos_x + (self.shadow_with/2), 
+                                     new_pos_y + (self.shadow_height/2)):
+            if not self.is_running and self.pos_x != new_pos_x and self.pos_y != new_pos_y :
                 self.is_running = True
                 # Force to restart the animation to frame #0
                 self.animation_flow = 0
-        elif pad.up and (not self.lastPad or time() - self.lastPad >= 0.05):
-            self.lastPad = time()
-            self.direction = "UP"
-            new_pos_y = max(self.pos_y - self.velocity, 0)
-            if not self.detect_collision(walls, 
-                                         self.pos_x + (self.shadow_with/2), 
-                                         new_pos_y + (self.shadow_height/2)):
-                self.pos_y = new_pos_y
-            if not self.is_running:
-                self.is_running = True
-                # Force to restart the animation to frame #0
-                self.animation_flow = 0
-        elif pad.left and (not self.lastPad or time() - self.lastPad >= 0.05):
-            self.lastPad = time()
-            self.direction = "LEFT"
-            new_pos_x = max(self.pos_x - self.velocity, 0)
-            if not self.detect_collision(walls, 
-                                         new_pos_x + (self.shadow_with/2), 
-                                         self.pos_y + (self.shadow_height/2)):
-                self.pos_x = new_pos_x
-            if not self.is_running:
-                self.is_running = True
-                # Force to restart the animation to frame #0
-                self.animation_flow = 0
-        elif pad.right and (not self.lastPad or time() - self.lastPad >= 0.05):
-            self.lastPad = time()
-            self.direction = "RIGHT"
-            new_pos_x = min(self.pos_x + self.velocity, MAX_WIDTH - self.width)
-            if not self.detect_collision(walls, 
-                                         new_pos_x + (self.shadow_with/2), 
-                                         self.pos_y + (self.shadow_height/2)):
-                self.pos_x = new_pos_x
-            if not self.is_running:
-                self.is_running = True
-                # Force to restart the animation to frame #0
-                self.animation_flow = 0
+
+            self.pos_x = new_pos_x
+            self.pos_y = new_pos_y
+            
         
     def draw(self, screen):
         image_bank = self.split[self.direction][int(self.animation_flow)]
