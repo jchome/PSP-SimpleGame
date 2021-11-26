@@ -1,2 +1,2 @@
 # PSP-SimpleGame
-Simple game on PSP, using Staskliess python + PSP2D
+Simple game on PSP, using Staskless python + PSP2D
