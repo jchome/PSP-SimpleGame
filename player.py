@@ -4,6 +4,8 @@ import psp2d
 from time import time
 import math
 
+from configparser import ConfigParser
+
 from agent import Agent
 
 ## screen size: 480 × 272 pixels
@@ -12,23 +14,30 @@ MAX_HEIGHT = 272
 
 class Player(Agent):
     def __init__(self):
-        Agent.__init__(self, 'assets/player.png')
-        self.split = {
-            "RIGHT": [[0,64], [0,32], [0,0], [0,32]],
-            "LEFT": [[96,64], [96,32], [96,0], [96,32]],
-            "UP": [[32,64], [32,32], [32,0], [32,32]],
-            "DOWN": [[64,64], [64,32], [64,0], [64,32]]
-            }
-        self.width = 32
-        self.height = 32
+        config = ConfigParser()
+        config.read('conf/player.ini')
+        Agent.__init__(self, config.get("ASSET", "source") )
+
+        sprite_directions = config.get("ASSET", "sprite_directions")
+        self.split = {}
+        for item in sprite_directions.split("\n"):
+            if len(item.strip()) == 0:
+                continue
+            data = item.strip().split("=")
+            direction = data[0].strip()
+            positions = eval(data[1].strip())
+            self.split[direction] = positions
+
+        self.width = config.getint("DIMENSION", "width")
+        self.height = config.getint("DIMENSION", "height")
         self.direction = "DOWN"
         self.is_running = False
         self.animation_flow = 0
         self.velocity = 8
-        self.pos_x = 30
-        self.pos_y = 130
-        self.shadow_with = 16
-        self.shadow_height = 31
+        self.pos_x = config.getint("DIMENSION", "pos_x")
+        self.pos_y = config.getint("DIMENSION", "pos_y")
+        self.shadow_width = config.getint("DIMENSION", "shadow_width")
+        self.shadow_height = config.getint("DIMENSION", "shadow_height")
         self.lastPad = time()
 
     def compute_new_position(self):
@@ -91,7 +100,7 @@ class Player(Agent):
         (new_pos_x, new_pos_y) = self.compute_new_position()
 
         if not self.detect_collision(walls, 
-                                     new_pos_x + (self.shadow_with/2), 
+                                     new_pos_x + (self.shadow_width/2), 
                                      new_pos_y + (self.shadow_height/2)):
             self.pos_x = new_pos_x
             self.pos_y = new_pos_y

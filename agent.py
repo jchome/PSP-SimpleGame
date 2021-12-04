@@ -6,7 +6,10 @@ Agent base class, mother class of every visible item on the screen.
 """
 class Agent(object):
     def __init__(self, sprite_file):
-        self.sprite = psp2d.Image(sprite_file)
+        try:
+            self.sprite = psp2d.Image(sprite_file)
+        except:
+            print("Cannot open file --%s--" % sprite_file)
 
         self.width = 32
         self.height = 32
