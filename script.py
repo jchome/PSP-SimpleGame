@@ -96,6 +96,10 @@ renderer = Render()
 player = Player()
 renderer.agents.append(player)
 
+coin = Agent()
+coin.load_config('conf/coin.ini')
+renderer.agents.append(coin)
+
 #Loads background music
 #pspmp3.init(1)
 #pspmp3.load("background-music.mp3")

@@ -19,14 +19,14 @@ class Player(Agent):
         Agent.__init__(self, config.get("ASSET", "source") )
 
         sprite_directions = config.get("ASSET", "sprite_directions")
-        self.split = {}
+        self.sprites = {}
         for item in sprite_directions.split("\n"):
             if len(item.strip()) == 0:
                 continue
             data = item.strip().split("=")
-            direction = data[0].strip()
+            key = data[0].strip()
             positions = eval(data[1].strip())
-            self.split[direction] = positions
+            self.sprites[key] = positions
 
         self.width = config.getint("DIMENSION", "width")
         self.height = config.getint("DIMENSION", "height")
@@ -107,14 +107,14 @@ class Player(Agent):
             
         
     def draw(self, screen):
-        image_bank = self.split[self.direction][int(self.animation_flow)]
+        image_bank = self.sprites[self.direction][int(self.animation_flow)]
         top = image_bank[0]
         left = image_bank[1]
         screen.blit(self.sprite, top, left, self.width, self.height, self.pos_x, self.pos_y, True)
         if self.is_running:
             # One more step of the animation
             self.animation_flow = self.animation_flow + 0.25
-            if self.animation_flow > len(self.split[self.direction])-1:
+            if self.animation_flow > len(self.sprites[self.direction])-1:
                 # Restart the animation from the beginning
                 self.animation_flow = 0
                 
