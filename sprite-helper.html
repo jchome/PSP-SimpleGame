@@ -1,0 +1,85 @@
+<html>
+<style>
+canvas{
+    background-image: url("coin-32.png");
+    background-position: center;
+    background-size: 100% 100%;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<body>
+<canvas id="canvas" width="256" height="96">
+    Your browser doesn't support canvas
+</canvas>
+
+</body>
+<script>
+	var width = 32;
+	var height = 32;
+    function drawBox(x, y){
+		ctx.rect(x,y,width, height-0.5);
+		ctx.stroke();
+    }
+	
+    var can = document.getElementById('canvas');
+    var ctx = can.getContext('2d');
+    var startX, startY;
+	ctx.strokeStyle = 'red';
+	ctx.lineWidth = 0.5;
+	
+	
+	var positions = "0 = [0, 0]\n"+
+    "1 = [32, 0]\n"+
+    "2 = [64, 0]\n"+
+    "3 = [96, 0]\n"+
+    "4 = [128, 0]\n"+
+    "5 = [160, 0]\n"+
+    "6 = [192, 0]\n"+
+    "7 = [224, 0]\n"+
+    "8 = [0, 32]\n"+
+    "9 = [32, 32]\n"+
+    "10 = [64, 32]\n"+
+    "11 = [96, 32]\n"+
+    "12 = [128, 32]\n"+
+    "13 = [160, 32]\n"+
+    "14 = [192, 32]\n"+
+    "15 = [224, 32]\n"+
+    "16 = [0, 64]\n"+
+    "17 = [32, 64]\n"+
+    "18 = [64, 64]\n"+
+    "19 = [96, 64]\n"+
+    "20 = [128, 64]\n"+
+    "21 = [160, 64]\n"+
+    "22 = [192, 64]\n"+
+    "23 = [224, 64]";
+
+	
+	var positionsArray = positions.split("\n");
+
+    ctx.clearRect (0, 0, can.width, can.height);
+	ctx.textAlign = 'start';
+	ctx.textBaseline='top';
+	ctx.fillStyle = "black";
+	
+	var rx = /(\d+)\s*=\s*\[(\d+),\s*(\d+)\]/g;
+	for(const positionData of positionsArray)
+	{
+	    var arr = rx.exec(positionData);
+		rx.lastIndex = 0;
+		
+		if(arr == null) {
+			continue;
+		}
+		var key = arr[1];
+		var start_x = arr[2];
+		var start_y = arr[3];
+		ctx.fillText(key, start_x, start_y);
+		
+		drawBox(start_x, start_y);
+		
+	}
+	
+
+</script>
+</html>
