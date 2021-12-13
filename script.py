@@ -68,14 +68,14 @@ class Render():
             print("exit")
             self.exit()
 
-        #for agent in self.agents:
-        #    agent.update(self.walls)
-
         ## Update agents considering all walls
         for agent in self.agents:
-            agent.update(self.walls)
+            agent.update(self.agents, self.walls)
 
     def draw(self):
+        # Sort agents
+        #TODO
+
         # Each frame the renderer apply the background,
         # writes the text and draws each registered agent.
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)

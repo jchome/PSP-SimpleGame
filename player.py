@@ -12,12 +12,14 @@ from agent import Agent
 MAX_WIDTH = 480
 MAX_HEIGHT = 272
 
+font = psp2d.Font('font.png')
+
 class Player(Agent):
     def __init__(self):
         config = ConfigParser()
         config.read('conf/player.ini')
+        self.name = config.get("ASSET", "name")
         Agent.__init__(self, config.get("ASSET", "source") )
-
         sprite_directions = config.get("ASSET", "sprite_directions")
         self.sprites = {}
         for item in sprite_directions.split("\n"):
@@ -36,9 +38,13 @@ class Player(Agent):
         self.velocity = 8
         self.pos_x = config.getint("DIMENSION", "pos_x")
         self.pos_y = config.getint("DIMENSION", "pos_y")
+        self.shadow_top = config.getint("DIMENSION", "shadow_top")
+        self.shadow_left = config.getint("DIMENSION", "shadow_left")
         self.shadow_width = config.getint("DIMENSION", "shadow_width")
         self.shadow_height = config.getint("DIMENSION", "shadow_height")
         self.lastPad = time()
+        #print("shadow player: %d %d %d %d" % (self.shadow_top, self.shadow_left, 
+        #    self.shadow_width, self.shadow_height) )
 
     def compute_new_position(self):
         pad = psp2d.Controller()
@@ -91,7 +97,7 @@ class Player(Agent):
 
         return (new_pos_x, new_pos_y)
 
-    def update(self, walls):
+    def update(self, agents, walls):
         if (self.lastPad and time() - self.lastPad < 0.05):
             # To short time between 2 events
             return
@@ -99,9 +105,9 @@ class Player(Agent):
         self.lastPad = time()
         (new_pos_x, new_pos_y) = self.compute_new_position()
 
-        if not self.detect_collision(walls, 
-                                     new_pos_x + (self.shadow_width/2), 
-                                     new_pos_y + (self.shadow_height/2)):
+        if not self.detect_collision(agents, walls, 
+                                     new_pos_x, 
+                                     new_pos_y):
             self.pos_x = new_pos_x
             self.pos_y = new_pos_y
             
@@ -111,6 +117,13 @@ class Player(Agent):
         top = image_bank[0]
         left = image_bank[1]
         screen.blit(self.sprite, top, left, self.width, self.height, self.pos_x, self.pos_y, True)
+
+        screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
+            self.shadow_width, self.shadow_height, psp2d.Color(0,0,255,128))
+        #screen.fillRect(self.pos_x, self.pos_y, 
+        #    self.width, self.height, psp2d.Color(0,0,255,128))
+        font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
+
         if self.is_running:
             # One more step of the animation
             self.animation_flow = self.animation_flow + 0.25

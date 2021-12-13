@@ -4,6 +4,9 @@ import psp2d
 from configparser import ConfigParser
 from time import time
 
+
+font = psp2d.Font('font.png')
+
 """
 Agent base class, mother class of every visible item on the screen.
 """
@@ -27,6 +30,7 @@ class Agent(object):
     def load_config(self, config_file):
         config = ConfigParser()
         config.read(config_file)
+        self.name = config.get("ASSET", "name")
         self.source = psp2d.Image(config.get("ASSET", "source"))
         sprites_definition = config.get("ASSET", "sprites")
         self.sprites = {}
@@ -44,14 +48,18 @@ class Agent(object):
         self.height = config.getint("DIMENSION", "height")
         self.pos_x = config.getint("DIMENSION", "pos_x")
         self.pos_y = config.getint("DIMENSION", "pos_y")
+        self.shadow_top = config.getint("DIMENSION", "shadow_top")
+        self.shadow_left = config.getint("DIMENSION", "shadow_left")
         self.shadow_width = config.getint("DIMENSION", "shadow_width")
         self.shadow_height = config.getint("DIMENSION", "shadow_height")
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
+        #print("shadow agent: %d %d %d %d" % (self.shadow_top, self.shadow_left, 
+        #    self.shadow_width, self.shadow_height) )
 
     """
     Update the visibility of the instance.
     """
-    def update(self, walls):
+    def update(self, agents, walls):
         if self.is_animated:
             # One more step of the animation
             self.animation_flow += self.animation_velocity
@@ -70,11 +78,37 @@ class Agent(object):
             src_top, src_left, self.width, self.height, 
             self.pos_x, self.pos_y,  
             True)
+        screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
+            self.shadow_width, self.shadow_height, psp2d.Color(255,0,0,128))
+        #screen.fillRect(self.pos_x, self.pos_y, 
+        #    self.width, self.height, psp2d.Color(255,0,0,128))
+
+        font.drawText(screen, 0, 32, "%s: (%d,%d)" % (self.name, self.pos_x, self.pos_y))
 
     """
-    Returns True if the agent is in collision with walls
+    Returns True if the agent is in collision with walls or any agent
     @param walls: the image of the walls. Transparent = no wall
     """
-    def detect_collision(self, walls, pos_x, pos_y):
-        pixel = walls.getPixel(pos_x, pos_y)
+    def detect_collision(self, agents, walls, pos_x, pos_y):
+        for agent in agents:
+            if agent == self:
+                ## Don't detect collision with myself
+                continue
+            if self.detect_collision_with_object(agent, pos_x, pos_y):
+                return True
+
+        ## No collision detected with any other agent
+        pixel = walls.getPixel(
+            pos_x + (self.shadow_width/2), 
+            pos_y + (self.shadow_height/2))
         return pixel.alpha != 0
+
+    def detect_collision_with_object(self, another_object, agent_pos_x, agent_pos_y):
+        player_pos_x = agent_pos_x + self.shadow_top
+        player_pos_y = agent_pos_y + self.shadow_left
+        another_object_pos_x = another_object.pos_x+another_object.shadow_top
+        another_object_pos_y = another_object.pos_y+another_object.shadow_left
+        if player_pos_x < another_object_pos_x+another_object.shadow_width and player_pos_x+self.shadow_width > another_object_pos_x:
+            if player_pos_y < another_object_pos_y+another_object.shadow_height and player_pos_y+self.shadow_height > another_object_pos_y:
+                return True
+        return False
