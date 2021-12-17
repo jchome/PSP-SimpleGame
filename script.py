@@ -4,7 +4,7 @@ import psp2d
 import stackless
 
 import helper
-from agent import Agent
+from interaction_object import InteractionObject
 from player import Player
 
 ## screen size: 480 × 272 pixels
@@ -80,9 +80,8 @@ class Render():
         # writes the text and draws each registered agent.
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         
-
         player = self.agents[0]
-        font.drawText(self.screen, 0, 0, "(%d,%d) - Press O to exit" % (player.pos_x, player.pos_y))
+        font.drawText(self.screen, 0, 0, "coins: %d - Press O to exit" % (player.bonus))
         for agent in self.agents:
             agent.draw(self.screen)
         self.screen.swap()
@@ -96,9 +95,16 @@ renderer = Render()
 player = Player()
 renderer.agents.append(player)
 
-coin = Agent()
-coin.load_config('conf/coin.ini')
+coin = InteractionObject('conf/coin.ini')
+coin.pos_x = 300
+coin.pos_y = 160
 renderer.agents.append(coin)
+
+building = InteractionObject('conf/tavern.ini')
+building.pos_x = 130
+building.pos_y = 0
+renderer.agents.append(building)
+
 
 #Loads background music
 #pspmp3.init(1)

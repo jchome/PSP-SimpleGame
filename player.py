@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+from interaction_object import InteractionObject
 import psp2d
 from time import time
 import math
@@ -38,13 +39,16 @@ class Player(Agent):
         self.velocity = 8
         self.pos_x = config.getint("DIMENSION", "pos_x")
         self.pos_y = config.getint("DIMENSION", "pos_y")
-        self.shadow_top = config.getint("DIMENSION", "shadow_top")
-        self.shadow_left = config.getint("DIMENSION", "shadow_left")
-        self.shadow_width = config.getint("DIMENSION", "shadow_width")
-        self.shadow_height = config.getint("DIMENSION", "shadow_height")
+        self.shadow_type = config.get("SHADOW", "shadow_type")
+        if self.shadow_type == "RECT":
+            self.shadow_top = config.getint("SHADOW", "shadow_top")
+            self.shadow_left = config.getint("SHADOW", "shadow_left")
+            self.shadow_width = config.getint("SHADOW", "shadow_width")
+            self.shadow_height = config.getint("SHADOW", "shadow_height")
+            
+        self.bonus = 0
         self.lastPad = time()
-        #print("shadow player: %d %d %d %d" % (self.shadow_top, self.shadow_left, 
-        #    self.shadow_width, self.shadow_height) )
+        self.debug = False
 
     def compute_new_position(self):
         pad = psp2d.Controller()
@@ -105,9 +109,28 @@ class Player(Agent):
         self.lastPad = time()
         (new_pos_x, new_pos_y) = self.compute_new_position()
 
-        if not self.detect_collision(agents, walls, 
+        collitioned_agents = self.detect_collision(agents, walls, 
                                      new_pos_x, 
-                                     new_pos_y):
+                                     new_pos_y)
+        player_is_blocked = False
+        for agent in collitioned_agents:
+            if agent == walls:
+                ## The user is blocked by the wall layer
+                player_is_blocked = True
+                break
+
+            if isinstance(agent, InteractionObject):
+                if agent.bonus is not None:
+                    ## Take the bonus
+                    player_is_blocked = False
+                    self.bonus += agent.bonus
+                    agents.remove(agent)
+                else:
+                    ## Collision with InteractionObject
+                    player_is_blocked = True
+                    break
+
+        if not player_is_blocked:
             self.pos_x = new_pos_x
             self.pos_y = new_pos_y
             
@@ -118,11 +141,10 @@ class Player(Agent):
         left = image_bank[1]
         screen.blit(self.sprite, top, left, self.width, self.height, self.pos_x, self.pos_y, True)
 
-        screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
-            self.shadow_width, self.shadow_height, psp2d.Color(0,0,255,128))
-        #screen.fillRect(self.pos_x, self.pos_y, 
-        #    self.width, self.height, psp2d.Color(0,0,255,128))
-        font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
+        if self.debug:
+            screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
+                self.shadow_width, self.shadow_height, psp2d.Color(0,0,255,128))
+            font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
 
         if self.is_running:
             # One more step of the animation

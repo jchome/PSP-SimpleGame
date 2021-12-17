@@ -142,9 +142,9 @@ class Image (pygame.Surface):
   def blit (self, src, sx = 0, sy = 0, w = -1, h = -1, dx = 0, dy = 0, blend = False):
     # TODO: Implement 'blend'
     if type(dx) is float:
-      print "dx is flota, should be integer"
+      print("dx is flota, should be integer")
     if type(dy) is float:
-      print "dx is flota, should be integer"
+      print("dx is flota, should be integer")
 
     if type(sx) is tuple:
       pygame.Surface.blit(self, src, sx)
