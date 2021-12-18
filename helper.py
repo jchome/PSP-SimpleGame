@@ -21,6 +21,18 @@ class Rect(Point):
     def __str__(self):
         return "Rect(%d, %d, %d, %d)" % (self.x, self.y, self.w, self.h)
 
+    def top_left(self):
+        return Point(self.x, self.y)
+
+    def top_right(self):
+        return Point(self.x + self.w, self.y)
+
+    def bottom_left(self):
+        return Point(self.x, self.y + self.h)
+    
+    def bottom_right(self):
+        return Point(self.x + self.w, self.y + self.h)
+
 """
 Load a sprite, splitting the image and the shadow
 width, height = final width and height of the sprite

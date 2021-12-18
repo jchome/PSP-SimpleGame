@@ -46,6 +46,11 @@ class Player(Agent):
             self.shadow_width = config.getint("SHADOW", "shadow_width")
             self.shadow_height = config.getint("SHADOW", "shadow_height")
             
+        if config.has_option("DIMENSION", "sort_position"):
+            self.sort_position = config.getint("DIMENSION", "sort_position")
+        else:
+            self.sort_position = int(self.shadow_height / 2)
+
         self.bonus = 0
         self.lastPad = time()
         self.debug = False

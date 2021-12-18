@@ -10,6 +10,8 @@ from player import Player
 ## screen size: 480 × 272 pixels
 MAX_WIDTH = 480
 MAX_HEIGHT = 272
+## X = left axis
+## Y = bottom axis
 
 """
 Main class of the game.
@@ -73,17 +75,16 @@ class Render():
             agent.update(self.agents, self.walls)
 
     def draw(self):
-        # Sort agents
-        #TODO
-
         # Each frame the renderer apply the background,
         # writes the text and draws each registered agent.
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         
-        player = self.agents[0]
-        font.drawText(self.screen, 0, 0, "coins: %d - Press O to exit" % (player.bonus))
-        for agent in self.agents:
+        #player = self.agents[0]
+        #font.drawText(self.screen, 0, 0, "coins: %d - Press O to exit" % (player.bonus))
+        # Sort agents before display
+        for agent in sorted(self.agents, key=lambda agent: agent.pos_y + agent.sort_position, reverse=False):
             agent.draw(self.screen)
+
         self.screen.swap()
 
 
