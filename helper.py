@@ -38,7 +38,10 @@ Load a sprite, splitting the image and the shadow
 width, height = final width and height of the sprite
 """
 def load_sprite(src_file, width, height):
-    asset = Image(src_file)
+    try:
+        asset = Image(src_file)
+    except:
+        print("Error while loading file %s" % src_file)
     #width = asset.get_width()
     #height = asset.get_height() / 2
     shadow = Image(width, height)

@@ -4,14 +4,39 @@ import helper
 import psp2d
 from configparser import ConfigParser
 from time import time
-
+import re
 
 font = psp2d.Font('font.png')
 
+class Conf_Renderer(object):
+
+    def __init__(self, conf_string):
+        self.renderer_name = None
+        self.renderer_color = None
+        self.position_in_renderer = None
+        open_renderer_regex = re.search('\(([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\)\s*,\s*"(.*)"\s*->\s*\(([0-9]+)\s*,\s*([0-9]+)\).*', conf_string, re.IGNORECASE)
+        
+        print("open_renderer_regex: ")
+        print(open_renderer_regex)
+        if open_renderer_regex:
+            print("open_renderer_regex.group(1)")
+            print(open_renderer_regex.group(1))
+            self.renderer_color = psp2d.Color(int(open_renderer_regex.group(1)), int(open_renderer_regex.group(2)), int(open_renderer_regex.group(3)), 255)
+            self.renderer_name = open_renderer_regex.group(4)
+            self.position_in_renderer = helper.Point(int(open_renderer_regex.group(5)), int(open_renderer_regex.group(6)) )
+ 
 """
 Agent base class, mother class of every visible item on the screen.
 """
 class Agent(object):
+
+    ## Black transparent for "no collision"
+    NO_COLLISION = psp2d.Color(0,0,0,0)
+    ## Pink for wall-collision
+    WALL_COLLISION = psp2d.Color(255,0,255,255)
+    ## White for other-agent-collision
+    AGENT_COLLISION = psp2d.Color(255,255,255,255)
+
     def __init__(self, sprite_file = None):
         if sprite_file is not None:
             try:
@@ -27,7 +52,8 @@ class Agent(object):
         self.animation_flow = 0
         self.is_animated = True
         self.animation_velocity = 0.25
-        self.debug = False
+        self.debug = True
+        self.current_renderer = None
 
     def get_rectangle(self):
         return helper.Rect(self.pos_x, self.pos_y, self.width, self.height)
@@ -58,8 +84,6 @@ class Agent(object):
 
         self.width = config.getint("DIMENSION", "width")
         self.height = config.getint("DIMENSION", "height")
-        self.pos_x = config.getint("DIMENSION", "pos_x")
-        self.pos_y = config.getint("DIMENSION", "pos_y")
 
         self.shadow_type = config.get("SHADOW", "shadow_type")
         if self.shadow_type == "RECT":
@@ -81,11 +105,30 @@ class Agent(object):
         else:
             self.sort_position = int(self.shadow_height / 2)
 
+        if config.has_option("COLLISION", "open_renderer"):
+            self.conf_renderers = []
+            open_renderer_conf = config.get("COLLISION", "open_renderer")
+            renderer_conf = Conf_Renderer(open_renderer_conf)
+            if renderer_conf.renderer_name is not None:
+                self.conf_renderers.append(renderer_conf)
+            
         #print("%s: %d, %d, %d, %d" % (self.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
 
         self.load_custom_config(config)
         
+    """
+    @return Conf_Renderer instance
+    """
+    def get_conf_renderer(self, color_to_match):
+        if self.conf_renderers is None:
+            return None
+        for renderer_conf in self.conf_renderers:
+            color = renderer_conf.renderer_color
+            if color_to_match.red == color.red and color_to_match.green == color.green and color_to_match.blue == color.blue:
+                return renderer_conf
+        return None
+
 
     """
     To override for sub classes
@@ -95,6 +138,7 @@ class Agent(object):
 
     """
     Update the visibility of the instance.
+    agents is a dict of agent.name -> agent object
     """
     def update(self, agents, walls):
         if self.is_animated:
@@ -148,10 +192,12 @@ class Agent(object):
             if agent == self:
                 ## Don't detect collision with myself
                 continue
-            if self.detect_collision_with_object(agent, future_pos_x, future_pos_y):
+            color_of_collision = self.detect_collision_with_object(agent, future_pos_x, future_pos_y)
+            if color_of_collision != Agent.NO_COLLISION:
                 #print("%s collision with %s" % (self.name, agent.name))
                 #print("at position %d,%d" % (future_pos_x, future_pos_y))
-                all_collision_objects.append(agent)
+                collision_with_agent = (agent, color_of_collision)
+                all_collision_objects.append(collision_with_agent)
 
         if len(all_collision_objects) == 0:
             ## No collision detected with any other agent
@@ -159,7 +205,8 @@ class Agent(object):
                 future_pos_x + (self.shadow_width/2), 
                 future_pos_y + (self.shadow_height/2))
             if pixel.alpha != 0:
-                all_collision_objects.append(walls)
+                collision_with_wall = (walls, Agent.WALL_COLLISION)
+                all_collision_objects.append(collision_with_wall)
 
         return all_collision_objects
 
@@ -198,7 +245,7 @@ class Agent(object):
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
-                    return True
+                    return pixel
             if helper.point_in_rect(player_top_right, another_object_rect):
                 #print("player_top_right point_in_rect: %s" % player_top_right)
                 pixel = another_object.source.getPixel(
@@ -207,7 +254,7 @@ class Agent(object):
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
-                    return True
+                    return pixel
             if helper.point_in_rect(player_bottom_left, another_object_rect):
                 #print("player_bottom_left point_in_rect: %s" % player_bottom_left)
                 pixel = another_object.source.getPixel(
@@ -216,7 +263,7 @@ class Agent(object):
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
-                    return True
+                    return pixel
             if helper.point_in_rect(player_bottom_right, another_object_rect):
                 #print("player_bottom_right point_in_rect: %s" % player_bottom_right)
                 pixel = another_object.source.getPixel(
@@ -225,8 +272,11 @@ class Agent(object):
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
-                    return True
+                    return pixel
             
-            return False
-        return rectangle_collision
+            return Agent.NO_COLLISION
+        if rectangle_collision:
+            return Agent.AGENT_COLLISION
+        else:
+            return Agent.NO_COLLISION
     

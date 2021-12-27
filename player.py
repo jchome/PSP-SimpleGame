@@ -53,7 +53,7 @@ class Player(Agent):
 
         self.bonus = 0
         self.lastPad = time()
-        self.debug = False
+        self.debug = True
 
     def compute_new_position(self):
         pad = psp2d.Controller()
@@ -106,6 +106,9 @@ class Player(Agent):
 
         return (new_pos_x, new_pos_y)
 
+    """
+    agents is a dict of agent.name -> agent object
+    """
     def update(self, agents, walls):
         if (self.lastPad and time() - self.lastPad < 0.05):
             # To short time between 2 events
@@ -114,32 +117,62 @@ class Player(Agent):
         self.lastPad = time()
         (new_pos_x, new_pos_y) = self.compute_new_position()
 
-        collitioned_agents = self.detect_collision(agents, walls, 
+        collisioned_agents = self.detect_collision(agents.values(), walls, 
                                      new_pos_x, 
                                      new_pos_y)
         player_is_blocked = False
-        for agent in collitioned_agents:
-            if agent == walls:
+        for (agent, color) in collisioned_agents:
+            if color == Agent.NO_COLLISION:
+                continue
+            elif color == Agent.WALL_COLLISION:
                 ## The user is blocked by the wall layer
                 player_is_blocked = True
                 break
 
-            if isinstance(agent, InteractionObject):
-                if agent.bonus is not None:
-                    ## Take the bonus
-                    player_is_blocked = False
-                    self.bonus += agent.bonus
-                    agents.remove(agent)
-                else:
-                    ## Collision with InteractionObject
-                    player_is_blocked = True
-                    break
+            elif color == Agent.AGENT_COLLISION or color.alpha != 0:
+                if isinstance(agent, InteractionObject):
+                    if agent.bonus is not None:
+                        ## Take the bonus
+                        player_is_blocked = False
+                        self.bonus += agent.bonus
+                        self.current_renderer.remove_agent(agent)
+                    else:
+                        if not (color.red == 0 and color.green == 0 and color.blue == 255):
+                            ## Collision with InteractionObject
+                            player_is_blocked = True
+                            break
+                        elif agent.conf_renderers is not None :
+                            #print("agent.conf_renderers")
+                            #print(agent.conf_renderers)
+                            ## Open a new renderer
+                            ## Get the game to update the renderer
+                            renderer_conf = agent.get_conf_renderer(color)
+                            if renderer_conf is not None:
+                                ## Remove the player from the renderer
+                                self.current_renderer.remove_agent(self)
+                                ## Set the next active renderer
+                                self.current_renderer.game.set_active_renderer(renderer_conf.renderer_name)
+                                self.current_renderer = self.current_renderer.game.active_renderer
+                                ## Add the player to the next renderer
+                                self.current_renderer.add_agent(self)
+                                new_position = renderer_conf.position_in_renderer
+                                print("new_position: %s" % new_position)
+                                new_pos_x = new_position.x
+                                new_pos_y = new_position.y
+                        else:
+                            ## Collision with InteractionObject
+                            player_is_blocked = True
+                            break
+            
+            else:
+                ## There is a specific collision with an agent
+                pass
 
         if not player_is_blocked:
             self.pos_x = new_pos_x
             self.pos_y = new_pos_y
             
-        
+
     def draw(self, screen):
         image_bank = self.sprites[self.direction][int(self.animation_flow)]
         top = image_bank[0]
