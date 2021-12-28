@@ -63,6 +63,18 @@ def point_in_rect(point, rect):
             return True
     return False
 
+def match_one_color(list_of_colors, color2):
+    for color1 in list_of_colors:
+        if match_colors(color1, color2):
+            return True
+    return False
+
+def match_colors(color1, color2):
+    if color1.red == color2.red and color1.green == color2.green and color1.blue == color2.blue:
+        return True
+    else:
+        return False
+
 ## test
 if __name__ == "__main__":
     point_5_5 = Point(5,5)

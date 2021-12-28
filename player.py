@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+from conf_renderer import ConfRenderer
 from interaction_object import InteractionObject
 import psp2d
 from time import time
@@ -8,6 +9,7 @@ import math
 from configparser import ConfigParser
 
 from agent import Agent
+from renderer import Render
 
 ## screen size: 480 × 272 pixels
 MAX_WIDTH = 480
@@ -53,7 +55,7 @@ class Player(Agent):
 
         self.bonus = 0
         self.lastPad = time()
-        self.debug = True
+        self.debug = False
 
     def compute_new_position(self):
         pad = psp2d.Controller()
@@ -122,6 +124,10 @@ class Player(Agent):
                                      new_pos_y)
         player_is_blocked = False
         for (agent, color) in collisioned_agents:
+            #print("collisioned_agents:")
+            #print(collisioned_agents)
+            #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+                
             if color == Agent.NO_COLLISION:
                 continue
             elif color == Agent.WALL_COLLISION:
@@ -130,6 +136,7 @@ class Player(Agent):
                 break
 
             elif color == Agent.AGENT_COLLISION or color.alpha != 0:
+                #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
                 if isinstance(agent, InteractionObject):
                     if agent.bonus is not None:
                         ## Take the bonus
@@ -148,22 +155,21 @@ class Player(Agent):
                             ## Get the game to update the renderer
                             renderer_conf = agent.get_conf_renderer(color)
                             if renderer_conf is not None:
-                                ## Remove the player from the renderer
-                                self.current_renderer.remove_agent(self)
-                                ## Set the next active renderer
-                                self.current_renderer.game.set_active_renderer(renderer_conf.renderer_name)
-                                self.current_renderer = self.current_renderer.game.active_renderer
-                                ## Add the player to the next renderer
-                                self.current_renderer.add_agent(self)
-                                new_position = renderer_conf.position_in_renderer
-                                print("new_position: %s" % new_position)
+                                new_position = self.go_to_renderer(renderer_conf)
+                                #print("new_position: %s" % new_position)
                                 new_pos_x = new_position.x
                                 new_pos_y = new_position.y
                         else:
                             ## Collision with InteractionObject
                             player_is_blocked = True
                             break
-            
+                elif isinstance(agent, ConfRenderer):
+                    #print(">>>>> collision with agent %s" % agent.renderer_name)
+                    new_position = self.go_to_renderer(agent)
+                    #print(">>>>> new_position: %s" % new_position)
+                    new_pos_x = new_position.x
+                    new_pos_y = new_position.y
+
             else:
                 ## There is a specific collision with an agent
                 pass
@@ -172,6 +178,15 @@ class Player(Agent):
             self.pos_x = new_pos_x
             self.pos_y = new_pos_y
             
+    def go_to_renderer(self, renderer_conf):
+        ## Remove the player from the renderer
+        self.current_renderer.remove_agent(self)
+        ## Set the next active renderer
+        self.current_renderer.game.set_active_renderer(renderer_conf.renderer_name)
+        self.current_renderer = self.current_renderer.game.active_renderer
+        ## Add the player to the next renderer
+        self.current_renderer.add_agent(self)
+        return renderer_conf.position_in_renderer
 
     def draw(self, screen):
         image_bank = self.sprites[self.direction][int(self.animation_flow)]

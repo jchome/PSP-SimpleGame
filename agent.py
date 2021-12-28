@@ -1,30 +1,13 @@
 # -*- coding: iso-8859-1 -*-
 
+from conf_renderer import ConfRenderer
 import helper
 import psp2d
 from configparser import ConfigParser
 from time import time
-import re
 
 font = psp2d.Font('font.png')
 
-class Conf_Renderer(object):
-
-    def __init__(self, conf_string):
-        self.renderer_name = None
-        self.renderer_color = None
-        self.position_in_renderer = None
-        open_renderer_regex = re.search('\(([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\)\s*,\s*"(.*)"\s*->\s*\(([0-9]+)\s*,\s*([0-9]+)\).*', conf_string, re.IGNORECASE)
-        
-        print("open_renderer_regex: ")
-        print(open_renderer_regex)
-        if open_renderer_regex:
-            print("open_renderer_regex.group(1)")
-            print(open_renderer_regex.group(1))
-            self.renderer_color = psp2d.Color(int(open_renderer_regex.group(1)), int(open_renderer_regex.group(2)), int(open_renderer_regex.group(3)), 255)
-            self.renderer_name = open_renderer_regex.group(4)
-            self.position_in_renderer = helper.Point(int(open_renderer_regex.group(5)), int(open_renderer_regex.group(6)) )
- 
 """
 Agent base class, mother class of every visible item on the screen.
 """
@@ -52,8 +35,9 @@ class Agent(object):
         self.animation_flow = 0
         self.is_animated = True
         self.animation_velocity = 0.25
-        self.debug = True
         self.current_renderer = None
+        self.conf_renderers = None
+        self.debug = False
 
     def get_rectangle(self):
         return helper.Rect(self.pos_x, self.pos_y, self.width, self.height)
@@ -108,7 +92,7 @@ class Agent(object):
         if config.has_option("COLLISION", "open_renderer"):
             self.conf_renderers = []
             open_renderer_conf = config.get("COLLISION", "open_renderer")
-            renderer_conf = Conf_Renderer(open_renderer_conf)
+            renderer_conf = ConfRenderer(open_renderer_conf)
             if renderer_conf.renderer_name is not None:
                 self.conf_renderers.append(renderer_conf)
             
@@ -125,7 +109,7 @@ class Agent(object):
             return None
         for renderer_conf in self.conf_renderers:
             color = renderer_conf.renderer_color
-            if color_to_match.red == color.red and color_to_match.green == color.green and color_to_match.blue == color.blue:
+            if helper.match_colors(color, color_to_match):
                 return renderer_conf
         return None
 
@@ -201,12 +185,30 @@ class Agent(object):
 
         if len(all_collision_objects) == 0:
             ## No collision detected with any other agent
-            pixel = walls.getPixel(
-                future_pos_x + (self.shadow_width/2), 
-                future_pos_y + (self.shadow_height/2))
-            if pixel.alpha != 0:
-                collision_with_wall = (walls, Agent.WALL_COLLISION)
-                all_collision_objects.append(collision_with_wall)
+            corner_pixels = self.get_pixels_alpha_on_shadow(future_pos_x, future_pos_y, walls)
+            if corner_pixels[0].alpha != 0 or corner_pixels[1].alpha != 0 or corner_pixels[2].alpha != 0 or corner_pixels[3].alpha != 0:
+                if helper.match_one_color(corner_pixels, Agent.WALL_COLLISION):
+                    #print("Collision with wall")
+                    collision_with_wall = (walls, Agent.WALL_COLLISION)
+                    all_collision_objects.append(collision_with_wall)
+                else:
+                    #print("collision with renderer ?")
+                    ## try to get the destination renderer from the renderer
+                    color = [c for c in corner_pixels if c.alpha != 0][0]
+                    #print(" color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+            
+                    ## Try to get the renderer of the agent
+                    renderer_conf = agent.get_conf_renderer(color)
+                    #print("renderer_conf(1): %s" % str(renderer_conf))
+
+                    if renderer_conf is None:
+                        ## Try to get the renderer of the current renderer
+                        renderer_conf = agent.current_renderer.get_conf_renderer(color)
+                        #print("renderer_conf(2): %s" % str(renderer_conf))
+                        
+                    if renderer_conf is not None:
+                        collision_with_renderer = (renderer_conf, color)
+                        all_collision_objects.append(collision_with_renderer)
 
         return all_collision_objects
 
@@ -280,3 +282,22 @@ class Agent(object):
         else:
             return Agent.NO_COLLISION
     
+    """
+    Return the set of 4 pixels on the image on the corners of the agent
+    """
+    def get_pixels_alpha_on_shadow(self, future_pos_x, future_pos_y, image):
+        agent_rect = helper.Rect(
+                future_pos_x + self.shadow_left, 
+                future_pos_y + self.shadow_top,
+                self.shadow_width, 
+                self.shadow_height)
+        player_top_left     = agent_rect.top_left()
+        player_top_right    = agent_rect.top_right()
+        player_bottom_left  = agent_rect.bottom_left()
+        player_bottom_right = agent_rect.bottom_right()
+        pixel_top_left      = image.getPixel(player_top_left.x, player_top_left.y)
+        pixel_top_right     = image.getPixel(player_top_right.x, player_top_right.y)
+        pixel_bottom_left   = image.getPixel(player_bottom_left.x, player_bottom_left.y)
+        pixel_bottom_right  = image.getPixel(player_bottom_right.x, player_bottom_right.y)
+        return (pixel_top_left, pixel_top_right, pixel_bottom_left, pixel_bottom_right)
+        
