@@ -24,6 +24,9 @@ class Player(Agent):
         self.name = config.get("ASSET", "name")
         Agent.__init__(self, config.get("ASSET", "source") )
         sprite_directions = config.get("ASSET", "sprite_directions")
+
+        self.velocity = config.getint("ASSET", "velocity")
+        
         self.sprites = {}
         for item in sprite_directions.split("\n"):
             if len(item.strip()) == 0:
@@ -38,7 +41,6 @@ class Player(Agent):
         self.direction = "DOWN"
         self.is_running = False
         self.animation_flow = 0
-        self.velocity = 8
         self.pos_x = config.getint("DIMENSION", "pos_x")
         self.pos_y = config.getint("DIMENSION", "pos_y")
         self.shadow_type = config.get("SHADOW", "shadow_type")
