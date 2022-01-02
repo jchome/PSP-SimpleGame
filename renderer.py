@@ -14,6 +14,8 @@ MAX_HEIGHT = 272
 ## X = left axis
 ## Y = bottom axis
 
+font = psp2d.Font('font.png')
+
 """
 Main class of the game.
 Every item is resistered in this container.
@@ -33,6 +35,11 @@ class Render():
         self.final_walls = psp2d.Image(MAX_WIDTH, MAX_HEIGHT)
         self.final_walls.blit(self.walls, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         self.add_interaction_objects(config.get("ASSET", "sprites"))
+
+        ## Visual effect to change the renderer
+        self.curtain_value = 0
+        self.curtain_mode = "OPEN"
+
         self.debug = False
 
         if config.has_option("COLLISION", "open_renderer"):
@@ -124,5 +131,18 @@ class Render():
         # Sort agents before display
         for agent in sorted(self.agents.values(), key=lambda agent: agent.pos_y + agent.sort_position, reverse=False):
             agent.draw(self.screen)
+
+        if self.curtain_mode == "CLOSING":
+            ## Close the curtain
+            black = psp2d.Color(0,0,0)
+            self.screen.fillRect(0, MAX_HEIGHT/2, MAX_WIDTH, MAX_HEIGHT/2, black)
+            self.curtain_value += 10
+            if self.curtain_value == 100:
+                self.curtain_mode = "CLOSED"
+            
+        ## Draw the player's coins
+        font.drawText(self.screen, 0,0, "coins: %d" % self.game.player.bonus)
+
+        #self.screen.drawLine(10,20,200,300, black)
 
         self.screen.swap()

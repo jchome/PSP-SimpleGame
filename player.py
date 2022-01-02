@@ -26,6 +26,7 @@ class Player(Agent):
         sprite_directions = config.get("ASSET", "sprite_directions")
 
         self.velocity = config.getint("ASSET", "velocity")
+        self.animation_velocity = config.getint("ASSET", "animation_velocity")
         
         self.sprites = {}
         for item in sprite_directions.split("\n"):
@@ -114,7 +115,7 @@ class Player(Agent):
     agents is a dict of agent.name -> agent object
     """
     def update(self, agents, walls):
-        if (self.lastPad and time() - self.lastPad < 0.05):
+        if (self.lastPad and time() - self.lastPad < 0.005):
             # To short time between 2 events
             return
 
@@ -203,7 +204,7 @@ class Player(Agent):
 
         if self.is_running:
             # One more step of the animation
-            self.animation_flow = self.animation_flow + 0.25
+            self.animation_flow = self.animation_flow + self.animation_velocity
             if self.animation_flow > len(self.sprites[self.direction])-1:
                 # Restart the animation from the beginning
                 self.animation_flow = 0
