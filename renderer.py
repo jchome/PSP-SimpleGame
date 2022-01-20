@@ -42,8 +42,8 @@ class Render():
 
         self.debug = False
 
+        self.conf_renderers = []
         if config.has_option("COLLISION", "open_renderer"):
-            self.conf_renderers = []
             open_renderer_conf = config.get("COLLISION", "open_renderer")
             renderer_conf = ConfRenderer(open_renderer_conf)
             if renderer_conf.renderer_name is not None:
@@ -55,8 +55,6 @@ class Render():
     @return Conf_Renderer instance
     """
     def get_conf_renderer(self, color_to_match):
-        if self.conf_renderers is None:
-            return None
         for renderer_conf in self.conf_renderers:
             color = renderer_conf.renderer_color
             if helper.match_colors(color, color_to_match):
@@ -73,13 +71,18 @@ class Render():
             number = data[0]
             definition = data[1].strip()
             #print("  definition: %s" % definition)
-            conf_item = re.search('\'(.*)\'\s*:\s*\(([0-9]+)\s*,\s*([0-9]+)\).*', definition, re.IGNORECASE)
+            conf_item = re.search('\'(.*)\'\s*:\s*\((-?\d+)\s*,\s*(-?\d+)\).*', definition, re.IGNORECASE)
             if conf_item:
                 source = conf_item.group(1)
                 pos_x = int(conf_item.group(2))
                 pos_y = int(conf_item.group(3))
+                print("%s: (%d,%d)" % (source, pos_x, pos_y))
                 object_on_renderer = InteractionObject(source, pos_x, pos_y)
+                ## Update the agent name to have unique objects name
+                object_on_renderer.name += "_#" + number
                 self.add_agent(object_on_renderer)
+            else:
+                print("Cannot get position from string <%s>" % definition)
 
     """
     Add the static agent with its wall

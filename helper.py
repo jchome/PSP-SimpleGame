@@ -33,6 +33,7 @@ class Rect(Point):
     def bottom_right(self):
         return Point(self.x + self.w, self.y + self.h)
 
+
 """
 Load a sprite, splitting the image and the shadow
 width, height = final width and height of the sprite

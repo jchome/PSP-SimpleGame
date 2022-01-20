@@ -22,8 +22,8 @@ meadow_001.add_agent(player)
 game.add_renderer(meadow_001)
 game.set_active_renderer("meadow_001")
 
-tavern_interior_001 = Render("conf/renderers/tavern-interior.ini")
-game.add_renderer(tavern_interior_001)
+#tavern_interior_001 = Render("conf/renderers/tavern-interior.ini")
+#game.add_renderer(tavern_interior_001)
 
 game.start()
 

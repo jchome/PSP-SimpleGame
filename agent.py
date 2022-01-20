@@ -143,10 +143,21 @@ class Agent(object):
         #    src_top, src_left, self.width, self.height, 
         #    self.pos_x, self.pos_y,  
         #    True)
+        src_pos = helper.Point(src_left, src_top)
+        screen_pos = helper.Point(self.pos_x, self.pos_y)
+
+        if screen_pos.x < 0 :
+            src_pos.x = src_pos.x - screen_pos.x
+            screen_pos.x = 0
+        if screen_pos.y < 0:
+            src_pos.y = src_pos.y - screen_pos.y
+            screen_pos.y = 0
+        
         screen.blit(self.source, 
-            src_left, src_top, self.width, self.height, 
-            self.pos_x, self.pos_y, 
-            True)
+                src_pos.x, src_pos.y, self.width, self.height, 
+                screen_pos.x, screen_pos.y, 
+                True)
+
         if self.debug:
             #print("Debug on " + self.name)
             if self.shadow_type == "RECT":
