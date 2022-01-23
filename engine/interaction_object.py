@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import psp2d
-from agent import Agent
+from engine.agent import Agent
 
 """
 Agent base class, mother class of every visible item on the screen.

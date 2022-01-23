@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+from engine.renderer import Render
 import stackless
 import psp2d
 
@@ -15,10 +16,9 @@ class Game():
         if self.active_renderer is not None:
             self.active_renderer.active = False
         
-        if self.renderers[renderer_name] is None:
-            print("No renderer in ")
-            print(self.renderers)
-            return
+        ## If the renderer is not already loaded
+        if renderer_name not in self.renderers:
+            self.add_renderer(Render(renderer_name))
 
         self.active_renderer = self.renderers[renderer_name]
         self.active_renderer.active = True

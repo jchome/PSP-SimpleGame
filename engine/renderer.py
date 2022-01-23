@@ -1,9 +1,9 @@
 # -*- coding: iso-8859-1 -*-
 
-from conf_renderer import ConfRenderer
-from interaction_object import InteractionObject
+from engine.conf_renderer import ConfRenderer
+from engine.interaction_object import InteractionObject
 import psp2d
-import helper
+import engine.helper as helper
 from configparser import ConfigParser
 import re
 
@@ -25,7 +25,7 @@ class Render():
         self.screen = psp2d.Screen()
         config = ConfigParser()
         config.read(config_file)
-        self.name = config.get("ASSET", "name")
+        self.name = config_file
         self.game = None
         self.agents = {}
         self.active = False 
@@ -45,11 +45,12 @@ class Render():
         self.conf_renderers = []
         if config.has_option("COLLISION", "open_renderer"):
             open_renderer_conf = config.get("COLLISION", "open_renderer")
+            #print("Getting COLLISION / open_renderer from %s" % open_renderer_conf)
             renderer_conf = ConfRenderer(open_renderer_conf)
             if renderer_conf.renderer_name is not None:
-                #print(self.name)
                 #print(renderer_conf)
                 self.conf_renderers.append(renderer_conf)
+                
                 
     """
     @return Conf_Renderer instance
@@ -76,7 +77,7 @@ class Render():
                 source = conf_item.group(1)
                 pos_x = int(conf_item.group(2))
                 pos_y = int(conf_item.group(3))
-                print("%s: (%d,%d)" % (source, pos_x, pos_y))
+                #print("%s: (%d,%d)" % (source, pos_x, pos_y))
                 object_on_renderer = InteractionObject(source, pos_x, pos_y)
                 ## Update the agent name to have unique objects name
                 object_on_renderer.name += "_#" + number
@@ -108,6 +109,11 @@ class Render():
             if self.game is not None:
                 self.game.is_finished = True
 
+    """
+    Get the wall's color at the position
+    """
+    def get_color_at_position(self, position):
+        return self.final_walls.getPixel(position.x, position.y)
 
     """
     Update all registered agents, then draw all
@@ -144,7 +150,7 @@ class Render():
                 self.curtain_mode = "CLOSED"
             
         ## Draw the player's coins
-        font.drawText(self.screen, 0,0, "coins: %d" % self.game.player.bonus)
+        #font.drawText(self.screen, 0,0, "coins: %d" % self.game.player.bonus)
 
         #self.screen.drawLine(10,20,200,300, black)
 

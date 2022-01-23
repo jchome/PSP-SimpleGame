@@ -1,7 +1,8 @@
 # -*- coding: iso-8859-1 -*-
 
-from conf_renderer import ConfRenderer
-import helper
+import os
+from engine.conf_renderer import ConfRenderer
+import engine.helper as helper
 import psp2d
 from configparser import ConfigParser
 from time import time
@@ -50,6 +51,10 @@ class Agent(object):
             return helper.Rect(0, 0, self.width, self.height)
 
     def load_config(self, config_file):
+        ## Check that config file exists
+        if not os.path.isfile(config_file):
+            raise ValueError("File not found: %d" % config_file)
+
         config = ConfigParser()
         config.read(config_file)
         self.name = config.get("ASSET", "name")
@@ -193,11 +198,12 @@ class Agent(object):
                 #print("at position %d,%d" % (future_pos_x, future_pos_y))
                 collision_with_agent = (agent, color_of_collision)
                 all_collision_objects.append(collision_with_agent)
-
+        
         if len(all_collision_objects) == 0:
             ## No collision detected with any other agent
             corner_pixels = self.get_pixels_alpha_on_shadow(future_pos_x, future_pos_y, walls)
             if corner_pixels[0].alpha != 0 or corner_pixels[1].alpha != 0 or corner_pixels[2].alpha != 0 or corner_pixels[3].alpha != 0:
+                #print("corner_pixels collision with something...")
                 if helper.match_one_color(corner_pixels, Agent.WALL_COLLISION):
                     #print("Collision with wall")
                     collision_with_wall = (walls, Agent.WALL_COLLISION)
@@ -209,15 +215,16 @@ class Agent(object):
                     #print(" color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
             
                     ## Try to get the renderer of the agent
-                    renderer_conf = agent.get_conf_renderer(color)
+                    renderer_conf = self.get_conf_renderer(color)
                     #print("renderer_conf(1): %s" % str(renderer_conf))
 
                     if renderer_conf is None:
                         ## Try to get the renderer of the current renderer
-                        renderer_conf = agent.current_renderer.get_conf_renderer(color)
+                        renderer_conf = self.current_renderer.get_conf_renderer(color)
                         #print("renderer_conf(2): %s" % str(renderer_conf))
                         
                     if renderer_conf is not None:
+                        #print("found %s" % renderer_conf)
                         collision_with_renderer = (renderer_conf, color)
                         all_collision_objects.append(collision_with_renderer)
 

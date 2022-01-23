@@ -71,10 +71,24 @@ def match_one_color(list_of_colors, color2):
     return False
 
 def match_colors(color1, color2):
+    if color1 is None or color2 is None:
+        return False
     if color1.red == color2.red and color1.green == color2.green and color1.blue == color2.blue:
         return True
     else:
         return False
+        
+def color_not_alpha_0(list_of_colors):
+    for color in list_of_colors:
+        if color.alpha != 0:
+            return color
+    return None
+
+"""
+Convert a color as String
+"""
+def str_color(color):
+    return "Color(%d,%d,%d)" % (color.red, color.green, color.blue)
 
 ## test
 if __name__ == "__main__":

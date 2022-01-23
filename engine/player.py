@@ -1,15 +1,16 @@
 # -*- coding: iso-8859-1 -*-
 
-from conf_renderer import ConfRenderer
-from interaction_object import InteractionObject
+from engine.conf_renderer import ConfRenderer
+from engine.helper import color_not_alpha_0, match_colors, str_color
+from engine.interaction_object import InteractionObject
 import psp2d
 from time import time
 import math
 
 from configparser import ConfigParser
 
-from agent import Agent
-from renderer import Render
+from engine.agent import Agent
+from engine.renderer import Render
 
 ## screen size: 480 × 272 pixels
 MAX_WIDTH = 480
@@ -104,10 +105,10 @@ class Player(Agent):
                 # Force to restart the animation to frame #0
                 self.animation_flow = 0
 
-        new_pos_x = min(self.pos_x + dx, MAX_WIDTH - self.width)
-        new_pos_x = max(new_pos_x, 0)
-        new_pos_y = min(self.pos_y + dy, MAX_HEIGHT - self.height)
-        new_pos_y = max(new_pos_y, 0)
+        new_pos_x = min(self.pos_x + dx, MAX_WIDTH)
+        new_pos_x = max(new_pos_x, 0 - self.width)
+        new_pos_y = min(self.pos_y + dy, MAX_HEIGHT)
+        new_pos_y = max(new_pos_y, 0 - self.height)
 
         return (new_pos_x, new_pos_y)
 
@@ -130,7 +131,7 @@ class Player(Agent):
             #print("collisioned_agents:")
             #print(collisioned_agents)
             #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
-                
+            
             if color == Agent.NO_COLLISION:
                 continue
             elif color == Agent.WALL_COLLISION:
@@ -157,21 +158,27 @@ class Player(Agent):
                             ## Open a new renderer
                             ## Get the game to update the renderer
                             renderer_conf = agent.get_conf_renderer(color)
+
                             if renderer_conf is not None:
                                 new_position = self.go_to_renderer(renderer_conf)
                                 #print("new_position: %s" % new_position)
                                 new_pos_x = new_position.x
                                 new_pos_y = new_position.y
+                                break
                         else:
                             ## Collision with InteractionObject
                             player_is_blocked = True
                             break
+                        
+                ## The player goes into a new zone
                 elif isinstance(agent, ConfRenderer):
                     #print(">>>>> collision with agent %s" % agent.renderer_name)
                     new_position = self.go_to_renderer(agent)
                     #print(">>>>> new_position: %s" % new_position)
                     new_pos_x = new_position.x
                     new_pos_y = new_position.y
+
+                    break
 
             else:
                 ## There is a specific collision with an agent
@@ -181,6 +188,17 @@ class Player(Agent):
             self.pos_x = new_pos_x
             self.pos_y = new_pos_y
             
+    def get_new_position_in_new_renderer(self, renderer_conf):
+        pointToNewRenderer = renderer_conf.position_in_renderer
+
+        ## If the new position is < 0, keep the same position of the user
+        if pointToNewRenderer.x < 0:
+            pointToNewRenderer.x = self.pos_x
+        if pointToNewRenderer.y < 0:
+            pointToNewRenderer.y = self.pos_y
+
+        return pointToNewRenderer
+
     def go_to_renderer(self, renderer_conf):
         ## Remove the player from the renderer
         self.current_renderer.remove_agent(self)
@@ -189,7 +207,10 @@ class Player(Agent):
         self.current_renderer = self.current_renderer.game.active_renderer
         ## Add the player to the next renderer
         self.current_renderer.add_agent(self)
-        return renderer_conf.position_in_renderer
+
+        pointToNewRenderer = self.get_new_position_in_new_renderer(renderer_conf)
+
+        return pointToNewRenderer
 
     def draw(self, screen):
         image_bank = self.sprites[self.direction][int(self.animation_flow)]
