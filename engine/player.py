@@ -26,8 +26,8 @@ class Player(Agent):
         Agent.__init__(self, config.get("ASSET", "source") )
         sprite_directions = config.get("ASSET", "sprite_directions")
 
-        self.velocity = config.getint("ASSET", "velocity")
-        self.animation_velocity = config.getint("ASSET", "animation_velocity")
+        self.velocity = config.getfloat("ASSET", "velocity")
+        self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
         
         self.sprites = {}
         for item in sprite_directions.split("\n"):
