@@ -1,6 +1,8 @@
 # PSP-SimpleGame
 This is a quite simple game on PSP, using Staskless python + PSP2D.
 
+Contact: julien.coron@gmail.com
+
 I would like to try on a some small hardware the game creation. I've started with the fantasy-console Pyxel ("Pyxel is a retro game engine for Python" - https://github.com/kitao/pyxel), but the result was too limited.
 
 ## About the content of this repo
@@ -13,9 +15,35 @@ In this reposory, you will find:
 
 ## Objects of the game
 ### Goals of each object
+There is 3 main classes in the engine, to build the game:
+- Agent: Any object in the game (a sprite)
+- Player: The player of the game (user's avatar)
+- Renderer: The playground where the player and agents are placed
 
+The main script of the game have to instantiate the first renderer and put the player into.
 
 ### Agent
+Link to [Class Agent](https://github.com/jchome/PSP-SimpleGame/blob/main/engine/agent.py)
+
+An agent is an object in the playground (like phyisical object). In will interact with the player in many ways:
+ - a simple wall or something that cannot be overlap by the player
+ - an ennemy that hurts the player
+ - a bonus (coins, gems, etc)
+ - a gate to a new renderer
+
+To detect the collision, the sprite has more data that the simple bounding box around the sprite. It have a "shadow". This can be a rectagle, or a set of pixels with a specific color (pink).
+
+Bush agent:
+![Bush with shadow](assets/trees/tree-01.png "Example of bush")
+
+As you see, a rectangle would not be precise enought to set the borders.
+
+This image is composed of 2 parts:
+1. The sprite that will be displayed
+2. The shadow of the sprite, to use for collision detection
+
+See configuration file of an agent to set this feature.
+
 
 ### Player
 Link to [Class Player](https://github.com/jchome/PSP-SimpleGame/blob/main/engine/player.py)
