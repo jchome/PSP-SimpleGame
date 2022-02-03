@@ -7,7 +7,7 @@ I would like to try on a some small hardware the game creation. I've started wit
 
 ## About the content of this repo
 In this reposory, you will find:
-* The binary file "EBOOT.PBP" (just copied from the strackless python port for PSP) ;
+* The binary file "EBOOT.PBP" (just copied from the strackless python port for PSP) - Find it here: https://code.google.com/archive/p/pspstacklesspython/downloads ;
 * The startup script "script.py" ;
 * A set of files in the folder "engine". This is the game-engine I've created to provide a kind of framework, to build a RPG game (a zelda-like game) ;
 * The "asset" folder contains pictures for the game - See the chapter dedicated to this part, for collision detection ;
