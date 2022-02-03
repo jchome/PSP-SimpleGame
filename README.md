@@ -57,10 +57,16 @@ We can imagin an "automatic" game, that have no player, a list of agents, intera
 So, the collision detection for this agent is managed by a heavy method in this class.
 
 ### Renderer
-This section have to be filled...
-I have to explain the Player, the Agent, the Renderer.
+The renderer is the playground for agents. It is the container, where each instance of agent have a position. Only one renderer is displayed (where the player is) and take the whole screen.
+
+Each renderer where the user goes is loaded if it's not already done, and is stored in memory, keeping position of all agents. Like that, when the player goes from one renderer to another, agents have the same position than before. Agents are not updated in non-displayed renderers.
+
 
 ## Assets (pitures)
 This section have to be filled...
 About "shadow", for collision detection.
 
+## Configuration
+### Agent
+### Player
+### Renderer
