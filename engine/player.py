@@ -128,9 +128,9 @@ class Player(Agent):
                                      new_pos_y)
         player_is_blocked = False
         for (agent, color) in collisioned_agents:
-            #print("collisioned_agents:")
-            #print(collisioned_agents)
-            #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+            print("collisioned_agents:")
+            print(collisioned_agents)
+            print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
             
             if color == Agent.NO_COLLISION:
                 continue
@@ -140,7 +140,7 @@ class Player(Agent):
                 break
 
             elif color == Agent.AGENT_COLLISION or color.alpha != 0:
-                #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+                print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
                 if isinstance(agent, InteractionObject):
                     if agent.bonus is not None:
                         ## Take the bonus
@@ -172,9 +172,9 @@ class Player(Agent):
                         
                 ## The player goes into a new zone
                 elif isinstance(agent, ConfRenderer):
-                    #print(">>>>> collision with agent %s" % agent.renderer_name)
+                    print(">>>>> collision with ConfRenderer %s" % agent.renderer_name)
                     new_position = self.go_to_renderer(agent)
-                    #print(">>>>> new_position: %s" % new_position)
+                    print(">>>>> new_position: %s" % new_position)
                     new_pos_x = new_position.x
                     new_pos_y = new_position.y
 
@@ -200,6 +200,7 @@ class Player(Agent):
         return pointToNewRenderer
 
     def go_to_renderer(self, renderer_conf):
+        print("Going to renderer %s" % renderer_conf.renderer_name)
         ## Remove the player from the renderer
         self.current_renderer.remove_agent(self)
         ## Set the next active renderer
@@ -209,6 +210,7 @@ class Player(Agent):
         self.current_renderer.add_agent(self)
 
         pointToNewRenderer = self.get_new_position_in_new_renderer(renderer_conf)
+        print(" ... at position %s" % pointToNewRenderer)
 
         return pointToNewRenderer
 
@@ -216,6 +218,7 @@ class Player(Agent):
         image_bank = self.sprites[self.direction][int(self.animation_flow)]
         top = image_bank[0]
         left = image_bank[1]
+        
         screen.blit(self.sprite, top, left, self.width, self.height, self.pos_x, self.pos_y, True)
 
         if self.debug:

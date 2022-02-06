@@ -43,24 +43,34 @@ class Render():
         self.debug = False
 
         self.conf_renderers = []
-        if config.has_option("COLLISION", "open_renderer"):
-            open_renderer_conf = config.get("COLLISION", "open_renderer")
-            #print("Getting COLLISION / open_renderer from %s" % open_renderer_conf)
-            renderer_conf = ConfRenderer(open_renderer_conf)
-            if renderer_conf.renderer_name is not None:
-                #print(renderer_conf)
-                self.conf_renderers.append(renderer_conf)
+        self.add_renderer_conf(config.get("COLLISION", "open_renderer"))
                 
                 
     """
     @return Conf_Renderer instance
     """
     def get_conf_renderer(self, color_to_match):
+        print("Renderer.get_conf_renderer()")
         for renderer_conf in self.conf_renderers:
             color = renderer_conf.renderer_color
+            print("renderer_conf.renderer_color = %s" % helper.str_color(color))
             if helper.match_colors(color, color_to_match):
+                print("renderer found: %s" % renderer_conf.renderer_name)
                 return renderer_conf
+        print("No renderer matched...")
         return None
+
+
+    def add_renderer_conf(self, raw_conf):
+        for open_renderer_conf in raw_conf.split("\n"):
+            if len(open_renderer_conf.strip()) == 0:
+                continue
+            #print("Getting COLLISION / open_renderer from %s" % open_renderer_conf)
+            renderer_conf = ConfRenderer(open_renderer_conf)
+            if renderer_conf.renderer_name is not None:
+                self.conf_renderers.append(renderer_conf)
+                print("Added renderer %s" % renderer_conf.renderer_name)
+
 
     def add_interaction_objects(self, raw_conf):
         #print("Reading %s" % raw_conf)

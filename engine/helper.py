@@ -8,16 +8,16 @@ from psp2d import Image, Color
 
 class Point(object):
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.x = int(x)
+        self.y = int(y)
     def __str__(self):
         return "Point(%d, %d)" % (self.x, self.y)
 
 class Rect(Point):
     def __init__(self, x, y, w, h):
         Point.__init__(self, x, y)
-        self.w = w
-        self.h = h
+        self.w = int(w)
+        self.h = int(h)
     def __str__(self):
         return "Rect(%d, %d, %d, %d)" % (self.x, self.y, self.w, self.h)
 
