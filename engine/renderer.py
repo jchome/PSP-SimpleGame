@@ -69,7 +69,7 @@ class Render():
             renderer_conf = ConfRenderer(open_renderer_conf)
             if renderer_conf.renderer_name is not None:
                 self.conf_renderers.append(renderer_conf)
-                print("Added renderer %s" % renderer_conf.renderer_name)
+                #print("Added renderer %s" % renderer_conf)
 
 
     def add_interaction_objects(self, raw_conf):

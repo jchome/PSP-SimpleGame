@@ -1,2 +1,5 @@
 __pycache__
 assets/work_in_progress
+**/*.pyc
+python/
+pytrace.txt

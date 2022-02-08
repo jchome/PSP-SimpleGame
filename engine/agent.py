@@ -1,11 +1,12 @@
 # -*- coding: iso-8859-1 -*-
 
 import os
+import psp2d
+from time import time
+from configparser import ConfigParser
+
 from engine.conf_renderer import ConfRenderer
 import engine.helper as helper
-import psp2d
-from configparser import ConfigParser
-from time import time
 
 font = psp2d.Font('font.png')
 
@@ -209,22 +210,22 @@ class Agent(object):
                     collision_with_wall = (walls, Agent.WALL_COLLISION)
                     all_collision_objects.append(collision_with_wall)
                 else:
-                    print("collision with renderer ?")
+                    #print("collision with renderer ?")
                     ## try to get the destination renderer from the renderer
                     color = [c for c in corner_pixels if c.alpha != 0][0]
-                    print(" color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+                    #print(" color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
             
                     ## Try to get the renderer of the agent
                     renderer_conf = self.get_conf_renderer(color)
-                    print("renderer_conf(1): %s" % str(renderer_conf))
+                    #print("renderer_conf(1): %s" % str(renderer_conf))
 
                     if renderer_conf is None:
                         ## Try to get the renderer of the current renderer
                         renderer_conf = self.current_renderer.get_conf_renderer(color)
-                        print("renderer_conf(2): %s" % str(renderer_conf))
+                        #print("renderer_conf(2): %s" % str(renderer_conf))
                         
                     if renderer_conf is not None:
-                        print("found %s" % renderer_conf)
+                        #print("found %s" % renderer_conf)
                         collision_with_renderer = (renderer_conf, color)
                         all_collision_objects.append(collision_with_renderer)
 

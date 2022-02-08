@@ -10,6 +10,13 @@ class Point(object):
     def __init__(self, x, y):
         self.x = int(x)
         self.y = int(y)
+
+    """
+    Create a copy of this point to update x and y values
+    """
+    def copy(self):
+        return Point(self.x, self.y)
+
     def __str__(self):
         return "Point(%d, %d)" % (self.x, self.y)
 

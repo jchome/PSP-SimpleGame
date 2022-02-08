@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 from engine.conf_renderer import ConfRenderer
-from engine.helper import color_not_alpha_0, match_colors, str_color
+from engine.helper import Point, color_not_alpha_0, match_colors, str_color
 from engine.interaction_object import InteractionObject
 import psp2d
 from time import time
@@ -128,9 +128,9 @@ class Player(Agent):
                                      new_pos_y)
         player_is_blocked = False
         for (agent, color) in collisioned_agents:
-            print("collisioned_agents:")
-            print(collisioned_agents)
-            print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+            #print("collisioned_agents:")
+            #print(collisioned_agents)
+            #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
             
             if color == Agent.NO_COLLISION:
                 continue
@@ -140,7 +140,7 @@ class Player(Agent):
                 break
 
             elif color == Agent.AGENT_COLLISION or color.alpha != 0:
-                print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+                #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
                 if isinstance(agent, InteractionObject):
                     if agent.bonus is not None:
                         ## Take the bonus
@@ -172,9 +172,9 @@ class Player(Agent):
                         
                 ## The player goes into a new zone
                 elif isinstance(agent, ConfRenderer):
-                    print(">>>>> collision with ConfRenderer %s" % agent.renderer_name)
+                    #print(">>>>> collision with ConfRenderer %s" % agent.renderer_name)
                     new_position = self.go_to_renderer(agent)
-                    print(">>>>> new_position: %s" % new_position)
+                    print(">>>>> from %d,%d to new_position: %s" % (self.pos_x, self.pos_y, new_position))
                     new_pos_x = new_position.x
                     new_pos_y = new_position.y
 
@@ -189,18 +189,19 @@ class Player(Agent):
             self.pos_y = new_pos_y
             
     def get_new_position_in_new_renderer(self, renderer_conf):
-        pointToNewRenderer = renderer_conf.position_in_renderer
+        pointToNewRenderer = renderer_conf.position_in_renderer.copy()
 
         ## If the new position is < 0, keep the same position of the user
         if pointToNewRenderer.x < 0:
             pointToNewRenderer.x = self.pos_x
+
         if pointToNewRenderer.y < 0:
             pointToNewRenderer.y = self.pos_y
 
         return pointToNewRenderer
 
     def go_to_renderer(self, renderer_conf):
-        print("Going to renderer %s" % renderer_conf.renderer_name)
+        #print("Going to renderer %s" % renderer_conf.renderer_name)
         ## Remove the player from the renderer
         self.current_renderer.remove_agent(self)
         ## Set the next active renderer
@@ -210,7 +211,7 @@ class Player(Agent):
         self.current_renderer.add_agent(self)
 
         pointToNewRenderer = self.get_new_position_in_new_renderer(renderer_conf)
-        print(" ... at position %s" % pointToNewRenderer)
+        print(" ... at position %s" % str(pointToNewRenderer))
 
         return pointToNewRenderer
 
