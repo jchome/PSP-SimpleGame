@@ -1,18 +1,13 @@
 # -*- coding: iso-8859-1 -*-
 
 from engine.conf_renderer import ConfRenderer
+from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.interaction_object import InteractionObject
 import psp2d
 import engine.helper as helper
 from configparser import ConfigParser
 import re
 
-
-## screen size: 480 × 272 pixels
-MAX_WIDTH = 480
-MAX_HEIGHT = 272
-## X = left axis
-## Y = bottom axis
 
 font = psp2d.Font('font.png')
 
@@ -33,6 +28,7 @@ class Render():
         (self.background, self.walls) = helper.load_sprite(background_image, 
             MAX_WIDTH, MAX_HEIGHT)
         self.final_walls = psp2d.Image(MAX_WIDTH, MAX_HEIGHT)
+        self.final_walls.clear(psp2d.Color(0,0,0,0))
         self.final_walls.blit(self.walls, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         self.add_interaction_objects(config.get("ASSET", "sprites"))
 
@@ -50,12 +46,12 @@ class Render():
     @return Conf_Renderer instance
     """
     def get_conf_renderer(self, color_to_match):
-        print("Renderer.get_conf_renderer()")
+        #print("Renderer.get_conf_renderer()")
         for renderer_conf in self.conf_renderers:
             color = renderer_conf.renderer_color
-            print("renderer_conf.renderer_color = %s" % helper.str_color(color))
+            #print("renderer_conf.renderer_color = %s" % helper.str_color(color))
             if helper.match_colors(color, color_to_match):
-                print("renderer found: %s" % renderer_conf.renderer_name)
+                #print("renderer found: %s" % renderer_conf.renderer_name)
                 return renderer_conf
         print("No renderer matched...")
         return None
@@ -99,9 +95,9 @@ class Render():
     Add the static agent with its wall
     """
     def add_static_agent(self, agent):
-        self.final_walls.blit(agent.walls, 0, 0, 
-            agent.width, agent.height, 
-            agent.pos_x, agent.pos_y, True)
+        #self.final_walls.blit(agent.walls, 0, 0, 
+        #    agent.width, agent.height, 
+        #    agent.pos_x, agent.pos_y, True)
         self.add_agent(agent)
     
     def add_agent(self, agent):
@@ -136,16 +132,17 @@ class Render():
 
         ## Update agents considering all walls
         for agent in self.agents.values():
-            agent.update(self.agents, self.walls)
+            agent.update(self.agents, self.final_walls)
 
     def draw(self):
         # Each frame the renderer apply the background,
         # writes the text and draws each registered agent.
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
+        #self.screen.clear(psp2d.Color(0,0,0,0))
         if self.debug:
             self.screen.blit(self.final_walls, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
+            #print("color at (478,177): %s" % helper.str_color(self.get_color_at_position(helper.Point(478,177))) )
         
-        #player = self.agents[0]
         #font.drawText(self.screen, 0, 0, "coins: %d - Press O to exit" % (player.bonus))
         # Sort agents before display
         for agent in sorted(self.agents.values(), key=lambda agent: agent.pos_y + agent.sort_position, reverse=False):

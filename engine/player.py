@@ -1,6 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 from engine.conf_renderer import ConfRenderer
+from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.helper import Point, color_not_alpha_0, match_colors, str_color
 from engine.interaction_object import InteractionObject
 import psp2d
@@ -12,9 +13,6 @@ from configparser import ConfigParser
 from engine.agent import Agent
 from engine.renderer import Render
 
-## screen size: 480 × 272 pixels
-MAX_WIDTH = 480
-MAX_HEIGHT = 272
 
 font = psp2d.Font('font.png')
 
@@ -130,7 +128,7 @@ class Player(Agent):
         for (agent, color) in collisioned_agents:
             #print("collisioned_agents:")
             #print(collisioned_agents)
-            #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
+            #print(">>>>> collision with color %s" % str_color(color))
             
             if color == Agent.NO_COLLISION:
                 continue
@@ -174,7 +172,7 @@ class Player(Agent):
                 elif isinstance(agent, ConfRenderer):
                     #print(">>>>> collision with ConfRenderer %s" % agent.renderer_name)
                     new_position = self.go_to_renderer(agent)
-                    print(">>>>> from %d,%d to new_position: %s" % (self.pos_x, self.pos_y, new_position))
+                    #print(">>>>> from %d,%d to new_position: %s" % (self.pos_x, self.pos_y, new_position))
                     new_pos_x = new_position.x
                     new_pos_y = new_position.y
 
@@ -185,8 +183,8 @@ class Player(Agent):
                 pass
 
         if not player_is_blocked:
-            self.pos_x = new_pos_x
-            self.pos_y = new_pos_y
+            self.pos_x = int(new_pos_x)
+            self.pos_y = int(new_pos_y)
             
     def get_new_position_in_new_renderer(self, renderer_conf):
         pointToNewRenderer = renderer_conf.position_in_renderer.copy()
@@ -201,7 +199,7 @@ class Player(Agent):
         return pointToNewRenderer
 
     def go_to_renderer(self, renderer_conf):
-        #print("Going to renderer %s" % renderer_conf.renderer_name)
+        #print("Going to renderer %s" % renderer_conf)
         ## Remove the player from the renderer
         self.current_renderer.remove_agent(self)
         ## Set the next active renderer
@@ -211,7 +209,7 @@ class Player(Agent):
         self.current_renderer.add_agent(self)
 
         pointToNewRenderer = self.get_new_position_in_new_renderer(renderer_conf)
-        print(" ... at position %s" % str(pointToNewRenderer))
+        #print(" ... at position %s" % str(pointToNewRenderer))
 
         return pointToNewRenderer
 

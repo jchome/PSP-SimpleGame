@@ -202,7 +202,7 @@ class Agent(object):
         
         if len(all_collision_objects) == 0:
             ## No collision detected with any other agent
-            corner_pixels = self.get_pixels_alpha_on_shadow(future_pos_x, future_pos_y, walls)
+            corner_pixels = self.get_pixels_alpha_on_shadow(future_pos_x, future_pos_y)
             if corner_pixels[0].alpha != 0 or corner_pixels[1].alpha != 0 or corner_pixels[2].alpha != 0 or corner_pixels[3].alpha != 0:
                 #print("corner_pixels collision with something...")
                 if helper.match_one_color(corner_pixels, Agent.WALL_COLLISION):
@@ -304,7 +304,7 @@ class Agent(object):
     """
     Return the set of 4 pixels on the image on the corners of the agent
     """
-    def get_pixels_alpha_on_shadow(self, future_pos_x, future_pos_y, image):
+    def get_pixels_alpha_on_shadow(self, future_pos_x, future_pos_y):
         agent_rect = helper.Rect(
                 future_pos_x + self.shadow_left, 
                 future_pos_y + self.shadow_top,
@@ -314,9 +314,14 @@ class Agent(object):
         player_top_right    = agent_rect.top_right()
         player_bottom_left  = agent_rect.bottom_left()
         player_bottom_right = agent_rect.bottom_right()
+        image = self.current_renderer.final_walls
         pixel_top_left      = image.getPixel(player_top_left.x, player_top_left.y)
         pixel_top_right     = image.getPixel(player_top_right.x, player_top_right.y)
         pixel_bottom_left   = image.getPixel(player_bottom_left.x, player_bottom_left.y)
         pixel_bottom_right  = image.getPixel(player_bottom_right.x, player_bottom_right.y)
+        #print("top_left: %s" % helper.str_color(pixel_top_left))
+        #print("top_right at %s: %s" % (player_top_right, helper.str_color(pixel_top_right)))
+        #print("bottom_left: %s" % helper.str_color(pixel_bottom_left))
+        #print("bottom_right: %s" % helper.str_color(pixel_bottom_right))
         return (pixel_top_left, pixel_top_right, pixel_bottom_left, pixel_bottom_right)
         

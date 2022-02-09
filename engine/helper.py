@@ -52,11 +52,14 @@ def load_sprite(src_file, width, height):
         print("Error while loading file %s" % src_file)
     #width = asset.get_width()
     #height = asset.get_height() / 2
-    shadow = Image(width, height)
     sprite = Image(width, height)
     sprite.clear(Color(0,0,0,0))
-    shadow.blit(asset, 0,height, width, height, 0, 0, True)
     sprite.blit(asset, 0,0, width, height, 0, 0, True)
+ 
+    shadow = Image(width, height)
+    shadow.clear(Color(0,0,0,0))
+    shadow.blit(asset, 0,height, width, height, 0, 0, True)
+    
     return (sprite, shadow)
 
 def collision_on_rectangles(rect1, rect2):
@@ -95,7 +98,7 @@ def color_not_alpha_0(list_of_colors):
 Convert a color as String
 """
 def str_color(color):
-    return "Color(%d,%d,%d)" % (color.red, color.green, color.blue)
+    return "Color(%d,%d,%d, %d)" % (color.red, color.green, color.blue, color.alpha)
 
 ## test
 if __name__ == "__main__":
