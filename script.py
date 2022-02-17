@@ -9,10 +9,9 @@ sys.path.insert(0,'.')
 sys.path.insert(0,'./python')
 
 import engine
+import engine.widgets.debug_widget
+import engine.widgets.controls_widget
 
-
-# Loads the font
-font = psp2d.Font('font.png')
 
 game = engine.Game()
 # Creates the renderer object
@@ -23,6 +22,12 @@ meadow_001.add_agent(player)
 
 game.add_renderer(meadow_001)
 game.set_active_renderer(meadow_001.name)
+
+#debug = engine.widgets.debug_widget.DebugWidget()
+#game.add_widget(debug)
+
+control = engine.widgets.controls_widget.ControlsWidget()
+game.add_widget(control)
 
 game.start()
 

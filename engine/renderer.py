@@ -161,4 +161,4 @@ class Render():
 
         #self.screen.drawLine(10,20,200,300, black)
 
-        self.screen.swap()
+        

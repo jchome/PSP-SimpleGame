@@ -10,6 +10,7 @@ class Game():
         self.active_renderer = None
         self.is_finished = False
         self.player = None
+        self.widgets = []
     
     def set_active_renderer(self, renderer_name):
         ## De-active the current active renderer 
@@ -27,6 +28,9 @@ class Game():
     def add_renderer(self, renderer):
         renderer.game = self
         self.renderers[renderer.name] = renderer
+
+    def add_widget(self, widget):
+        self.widgets.append(widget)
 
     def start(self):
         self.is_finished = False
@@ -50,8 +54,20 @@ class Game():
             # Update the instance
             self.active_renderer.update()
 
+            # Update the widgets
+            for widget in self.widgets:
+                widget.update()
+
             # Draw the instance
             self.active_renderer.draw()
+
+            # At the end, draw the widgets (to be on top of all sprites)
+            for widget in self.widgets:
+                if widget.visible:
+                    widget.draw()
+
+            ## Everything is draw
+            self.active_renderer.screen.swap()
 
             # Give other tasklets its turn
             stackless.schedule()

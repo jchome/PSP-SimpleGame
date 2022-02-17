@@ -5,10 +5,10 @@ import psp2d
 from time import time
 from configparser import ConfigParser
 
-from engine.conf_renderer import ConfRenderer
 import engine.helper as helper
+from engine.conf_renderer import ConfRenderer
+from engine.agent_action import AgentAction
 
-font = psp2d.Font('font.png')
 
 """
 Agent base class, mother class of every visible item on the screen.
@@ -95,13 +95,19 @@ class Agent(object):
         else:
             self.sort_position = int(self.shadow_height / 2)
 
+        self.conf_renderers = []
         if config.has_option("COLLISION", "open_renderer"):
-            self.conf_renderers = []
             open_renderer_conf = config.get("COLLISION", "open_renderer")
             renderer_conf = ConfRenderer(open_renderer_conf)
             if renderer_conf.renderer_name is not None:
                 self.conf_renderers.append(renderer_conf)
-            
+        
+        self.actions = []
+        if config.has_option("COLLISION", "actions"):
+            actions_conf = config.get("COLLISION", "actions")
+            self.actions = AgentAction.parse(actions_conf)
+            #print(self.actions)
+
         #print("%s: %d, %d, %d, %d" % (self.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
 

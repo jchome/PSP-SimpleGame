@@ -55,6 +55,7 @@ class Player(Agent):
         else:
             self.sort_position = int(self.shadow_height / 2)
 
+        self.player_interact_with_agent = None
         self.bonus = 0
         self.lastPad = time()
         self.debug = False
@@ -125,6 +126,7 @@ class Player(Agent):
                                      new_pos_x, 
                                      new_pos_y)
         player_is_blocked = False
+        self.player_interact_with_agent = None
         for (agent, color) in collisioned_agents:
             #print("collisioned_agents:")
             #print(collisioned_agents)
@@ -149,6 +151,7 @@ class Player(Agent):
                         if not (color.red == 0 and color.green == 0 and color.blue == 255):
                             ## Collision with InteractionObject
                             player_is_blocked = True
+                            self.player_interact_with_agent = agent
                             break
                         elif agent.conf_renderers is not None :
                             #print("agent.conf_renderers")
@@ -231,4 +234,9 @@ class Player(Agent):
             if self.animation_flow > len(self.sprites[self.direction])-1:
                 # Restart the animation from the beginning
                 self.animation_flow = 0
-                
+
+        if self.player_interact_with_agent is not None:
+            ## Get the actions of the agent
+            actions = self.player_interact_with_agent.actions
+            ## Display the control widget
+            
