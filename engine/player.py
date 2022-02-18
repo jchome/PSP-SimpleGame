@@ -1,15 +1,15 @@
 # -*- coding: iso-8859-1 -*-
 
+import psp2d
+from time import time
+import math
+from configparser import ConfigParser
+
 from engine.conf_renderer import ConfRenderer
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.helper import Point, color_not_alpha_0, match_colors, str_color
 from engine.interaction_object import InteractionObject
-import psp2d
-from time import time
-import math
-
-from configparser import ConfigParser
-
+from engine.widgets.controls_widget import Button, ControlsWidget
 from engine.agent import Agent
 from engine.renderer import Render
 
@@ -139,7 +139,7 @@ class Player(Agent):
                 player_is_blocked = True
                 break
 
-            elif color == Agent.AGENT_COLLISION or color.alpha != 0:
+            elif color.alpha != 0:
                 #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
                 if isinstance(agent, InteractionObject):
                     if agent.bonus is not None:
@@ -148,28 +148,23 @@ class Player(Agent):
                         self.bonus += agent.bonus
                         self.current_renderer.remove_agent(agent)
                     else:
-                        if not (color.red == 0 and color.green == 0 and color.blue == 255):
-                            ## Collision with InteractionObject
-                            player_is_blocked = True
-                            self.player_interact_with_agent = agent
-                            break
-                        elif agent.conf_renderers is not None :
+                        ## Collision with InteractionObject having a conf_renderers
+                        renderer_conf = agent.get_conf_renderer(color)
+                        if renderer_conf is not None :
                             #print("agent.conf_renderers")
                             #print(agent.conf_renderers)
                             ## Open a new renderer
                             ## Get the game to update the renderer
-                            renderer_conf = agent.get_conf_renderer(color)
-
-                            if renderer_conf is not None:
-                                new_position = self.go_to_renderer(renderer_conf)
-                                #print("new_position: %s" % new_position)
-                                new_pos_x = new_position.x
-                                new_pos_y = new_position.y
-                                break
-                        else:
-                            ## Collision with InteractionObject
-                            player_is_blocked = True
+                            new_position = self.go_to_renderer(renderer_conf)
+                            #print("new_position: %s" % new_position)
+                            new_pos_x = new_position.x
+                            new_pos_y = new_position.y
                             break
+                        else:
+                            player_is_blocked = True
+                            self.player_interact_with_agent = agent
+                            break
+                        
                         
                 ## The player goes into a new zone
                 elif isinstance(agent, ConfRenderer):
@@ -178,12 +173,8 @@ class Player(Agent):
                     #print(">>>>> from %d,%d to new_position: %s" % (self.pos_x, self.pos_y, new_position))
                     new_pos_x = new_position.x
                     new_pos_y = new_position.y
-
                     break
 
-            else:
-                ## There is a specific collision with an agent
-                pass
 
         if not player_is_blocked:
             self.pos_x = int(new_pos_x)
@@ -237,6 +228,13 @@ class Player(Agent):
 
         if self.player_interact_with_agent is not None:
             ## Get the actions of the agent
-            actions = self.player_interact_with_agent.actions
+            print("player_interact_with_agent: %s" % self.player_interact_with_agent)
+            #actions = self.player_interact_with_agent.actions
             ## Display the control widget
+            control = ControlsWidget()
+            ## Todo: get the best position
+            control.pos_x = self.pos_x
+            control.pos_y = self.pos_y
+            control.labels[Button.TRIANGLE] = "AAAAAAAAAA"
+            self.current_renderer.game.add_widget(control)
             

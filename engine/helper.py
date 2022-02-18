@@ -62,6 +62,9 @@ def load_sprite(src_file, width, height):
     
     return (sprite, shadow)
 
+"""
+Returns True if the both rectangles are in collision
+"""
 def collision_on_rectangles(rect1, rect2):
     if rect1.x < rect2.x+rect2.w and rect1.x+rect1.w > rect2.x:
         if rect1.y < rect2.y+rect2.h and rect1.y+rect1.h > rect2.y:
@@ -99,6 +102,28 @@ Convert a color as String
 """
 def str_color(color):
     return "Color(%d,%d,%d, %d)" % (color.red, color.green, color.blue, color.alpha)
+
+class FontHelper:
+    all_width = {"!": 5, '\"': 6, "#": 10, "$": 8, "%": 13, "&": 10, "\'": 3, "(": 5, ")": 5, "*": 7,
+        "+": 9, ",": 4, "-": 6, ".": 3, "/": 7, "0": 8, "1": 7, "2": 8, "3": 8, "4": 9, "5": 8, "6": 8, "7": 8, "8": 8, "9": 8, 
+        ":": 3, ";": 4, "<": 9, "=": 9, ">": 9, "?": 7, "@": 12,
+        "A": 10, "B": 8, "C": 9, "D": 9, "E": 8, "F": 8, "G": 9, "H": 9, "I": 5, "J": 6, "K": 8, "L": 8, "M": 10, "N": 9,
+        "O": 8, "P": 8, "Q": 10, "R": 9, "S": 8, "T": 8, "U": 9, "V": 10, "W": 13, "X": 8, "Y": 9, "Z" : 8,
+        "[": 5, "\\": 7, "]": 5, "^": 10, "_": 10, "`": 4,
+        "a": 8, "b": 8, "c": 7, "d": 8, "e": 8, "f": 6, "g": 8, "h": 8, "i": 3, "j": 5, "k": 7, "l": 3, "m": 11, "n": 8, 
+        "o": 8, "p": 8, "q": 8, "r": 6, "s": 7, "t": 7, "u": 8, "v": 7, "w": 11, "x": 7, "y": 7, "z": 7
+    }
+
+    @staticmethod
+    def width_for_text(text):
+        width = 0
+        for letter in text:
+            if letter  not in FontHelper.all_width:
+                ## default width
+                width += 8
+            else:
+                width += FontHelper.all_width[letter]
+        return width
 
 ## test
 if __name__ == "__main__":

@@ -19,7 +19,8 @@ class Agent(object):
     NO_COLLISION = psp2d.Color(0, 0, 0, 0)
     ## Pink for wall-collision
     WALL_COLLISION = psp2d.Color(255, 0, 255, 255)
-    ## White for other-agent-collision
+
+    ## In case of generic agent collision
     AGENT_COLLISION = psp2d.Color(255, 255, 255, 255)
 
     def __init__(self, sprite_file = None):

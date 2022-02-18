@@ -26,9 +26,6 @@ game.set_active_renderer(meadow_001.name)
 #debug = engine.widgets.debug_widget.DebugWidget()
 #game.add_widget(debug)
 
-control = engine.widgets.controls_widget.ControlsWidget()
-game.add_widget(control)
-
 game.start()
 
 #Loads background music
