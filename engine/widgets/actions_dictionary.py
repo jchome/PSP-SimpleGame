@@ -1,19 +1,29 @@
-## Define all actions of player on all agents
-all_actions = {}
+"""
+Helper class to manage actions on an agent
+"""
+class ActionsOnAgent:
+    def __init__(self, agent_name):
+        self.agent_name = agent_name
+        self.all_actions = []
 
-## -- PALM-01 -- start
-def cut_tree_palm001(player, action, agent):
-    print("The player have to do %s on agent %s" % (action, agent.name))
-    
-def take_leaf(player, action, agent):
-    print("The player have to do %s on agent %s" % (action, agent.name))
-    
-def cancel(player, action, agent):
-    player.current_renderer.exit()
+    def add_action(self, button, label, callback):
+        action = ActionButton(button, label, callback)
+        self.all_actions.append(action)
 
-all_actions["PALM-01"] = {}
-all_actions["PALM-01"]["Cut the tree"] = cut_tree_palm001
-all_actions["PALM-01"]["Cancel"] = cancel
-all_actions["PALM-01"]["Take a leaf"] = take_leaf
+    def contains_action_with_label(self, label):
+        for action in self.all_actions:
+            if action.label == label:
+                return True
+        return False
 
-## -- PALM-01 -- end
+    def get_callback_for_label(self, label):
+        for action in self.all_actions:
+            if action.label == label:
+                return action.callback
+        return None
+
+class ActionButton:
+    def __init__(self, button, label, callback):
+        self.button = button
+        self.label = label
+        self.callback = callback

@@ -28,17 +28,11 @@ class ControlsWidget(Widget):
 
     def set_agent(self, agent):
         self.agent = agent
-        for action in agent.actions:
-            if action.button == "TRIANGLE":
-                self.labels[Button.TRIANGLE] = action.label
-            if action.button == "CIRCLE":
-                self.labels[Button.CIRCLE] = action.label
-            if action.button == "CROSS":
-                self.labels[Button.CROSS] = action.label
-            if action.button == "SQUARE":
-                self.labels[Button.SQUARE] = action.label
+        for action in self.agent.actions.all_actions:
+            self.labels[action.button] = action.label
 
     def update(self):
+        ## Listen to inputs
         pad = psp2d.Controller()
 
         if pad.triangle and self.labels[Button.TRIANGLE] is not None:
@@ -79,13 +73,14 @@ class ControlsWidget(Widget):
 
 
     def do_action_on_agent(self, action_label):
-        if self.agent.name not in actions_dictionary.all_actions:
+        if self.agent.actions is None:
             print("Agent's actions reference is missing for agent %s" % self.agent.name)
             return
-        if action_label not in actions_dictionary.all_actions[self.agent.name]:
+        callback = self.agent.actions.get_callback_for_label(action_label)
+        if callback is None:
             print("No action reference found for agent %s and action <%s>" % (self.agent.name, action_label))
             return
-        callback = actions_dictionary.all_actions[self.agent.name][action_label]
         callback(self.player, action_label, self.agent)
         ## Close this controls widget
         self.player.current_renderer.game.remove_widget(self)
+        

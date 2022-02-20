@@ -6,7 +6,7 @@ from configparser import ConfigParser
 
 import engine.helper as helper
 from engine.conf_renderer import ConfRenderer
-from engine.agent_action import AgentAction
+from engine.agent_actions_reader import AgentActionsReader
 
 
 """
@@ -105,8 +105,7 @@ class Agent(object):
         self.actions = []
         if config.has_option("COLLISION", "actions"):
             actions_conf = config.get("COLLISION", "actions")
-            self.actions = AgentAction.parse(actions_conf)
-            #print(self.actions)
+            self.actions = AgentActionsReader.parse(actions_conf)
 
         #print("%s: %d, %d, %d, %d" % (self.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
