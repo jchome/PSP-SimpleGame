@@ -56,8 +56,8 @@ class Player(Agent):
             self.sort_position = int(self.shadow_height / 2)
 
         self.player_interact_with_agent = None
+        self.controls_widget = None
         self.bonus = 0
-        self.lastPad = time()
         self.debug = False
 
     def compute_new_position(self):
@@ -104,22 +104,17 @@ class Player(Agent):
                 # Force to restart the animation to frame #0
                 self.animation_flow = 0
 
-        new_pos_x = min(self.pos_x + dx, MAX_WIDTH)
-        new_pos_x = max(new_pos_x, 0 - self.width)
-        new_pos_y = min(self.pos_y + dy, MAX_HEIGHT)
-        new_pos_y = max(new_pos_y, 0 - self.height)
+        #print("dx, dy = %d, %d" % (dx,dy))
+        new_pos_x = max( min(self.pos_x + dx, MAX_WIDTH), 0 - self.width)
+        new_pos_y = max( min(self.pos_y + dy, MAX_HEIGHT), 0 - self.height)
 
+        #print("position: %d,%d -> %d,%d" % (self.pos_x, self.pos_y, new_pos_x, new_pos_y))
         return (new_pos_x, new_pos_y)
 
     """
     agents is a dict of agent.name -> agent object
     """
     def update(self, agents, walls):
-        if (self.lastPad and time() - self.lastPad < 0.005):
-            # To short time between 2 events
-            return
-
-        self.lastPad = time()
         (new_pos_x, new_pos_y) = self.compute_new_position()
 
         collisioned_agents = self.detect_collision(agents.values(), walls, 
@@ -162,7 +157,7 @@ class Player(Agent):
                             break
                         else:
                             player_is_blocked = True
-                            self.player_interact_with_agent = agent
+                            self.set_controls_widget_from_agent(agent)
                             break
                         
                         
@@ -177,6 +172,7 @@ class Player(Agent):
 
 
         if not player_is_blocked:
+            #print("position: %d,%d -> %d,%d" % (self.pos_x, self.pos_y, new_pos_x, new_pos_y))
             self.pos_x = int(new_pos_x)
             self.pos_y = int(new_pos_y)
             
@@ -226,15 +222,13 @@ class Player(Agent):
                 # Restart the animation from the beginning
                 self.animation_flow = 0
 
-        if self.player_interact_with_agent is not None:
-            ## Get the actions of the agent
-            print("player_interact_with_agent: %s" % self.player_interact_with_agent)
-            #actions = self.player_interact_with_agent.actions
-            ## Display the control widget
-            control = ControlsWidget()
-            ## Todo: get the best position
-            control.pos_x = self.pos_x
-            control.pos_y = self.pos_y
-            control.labels[Button.TRIANGLE] = "AAAAAAAAAA"
-            self.current_renderer.game.add_widget(control)
-            
+
+    def set_controls_widget_from_agent(self, agent):
+        ## Get the actions of the agent
+        #print("player_interact_with_agent: %s" % self.player_interact_with_agent)
+        
+        ## Display the control widget
+        self.controls_widget = ControlsWidget(self, (MAX_WIDTH / 2) - 25, (MAX_HEIGHT / 2) - 25)
+        self.controls_widget.set_agent(agent)
+        self.current_renderer.game.add_widget(self.controls_widget)
+

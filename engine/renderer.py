@@ -75,7 +75,7 @@ class Render():
                 continue
             #print("  item: %s" % item)
             data = item.strip().split("=")
-            number = data[0]
+            #number = data[0]
             definition = data[1].strip()
             #print("  definition: %s" % definition)
             conf_item = re.search('\'(.*)\'\s*:\s*\((-?\d+)\s*,\s*(-?\d+)\).*', definition, re.IGNORECASE)
@@ -86,7 +86,6 @@ class Render():
                 #print("%s: (%d,%d)" % (source, pos_x, pos_y))
                 object_on_renderer = InteractionObject(source, pos_x, pos_y)
                 ## Update the agent name to have unique objects name
-                object_on_renderer.name += "_#" + number
                 self.add_agent(object_on_renderer)
             else:
                 print("Cannot get position from string <%s>" % definition)
@@ -94,18 +93,20 @@ class Render():
     """
     Add the static agent with its wall
     """
-    def add_static_agent(self, agent):
-        #self.final_walls.blit(agent.walls, 0, 0, 
-        #    agent.width, agent.height, 
-        #    agent.pos_x, agent.pos_y, True)
-        self.add_agent(agent)
+    #def add_static_agent(self, agent):
+    #    #self.final_walls.blit(agent.walls, 0, 0, 
+    #    #    agent.width, agent.height, 
+    #    #    agent.pos_x, agent.pos_y, True)
+    #    self.add_agent(agent)
     
     def add_agent(self, agent):
-        self.agents[agent.name] = agent
+        number = len(self.agents)
+        agent.id = "%s_#%d" % (agent.name, number)
+        self.agents[agent.id] = agent
         agent.current_renderer = self
 
     def remove_agent(self, agent):
-        del(self.agents[agent.name])
+        del(self.agents[agent.id])
 
     def exit(self):
         # When the player calls the exit, tell all Agents to stop running
@@ -125,11 +126,7 @@ class Render():
     Update all registered agents, then draw all
     """
     def update(self):
-        pad = psp2d.Controller()
-        if pad.circle:
-            print("exit")
-            self.exit()
-
+        
         ## Update agents considering all walls
         for agent in self.agents.values():
             agent.update(self.agents, self.final_walls)

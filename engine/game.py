@@ -1,8 +1,10 @@
 # -*- coding: iso-8859-1 -*-
 
-from engine.renderer import Render
 import stackless
+from time import time
 import psp2d
+
+from engine.renderer import Render
 
 class Game():
     def __init__(self):
@@ -11,6 +13,7 @@ class Game():
         self.is_finished = False
         self.player = None
         self.widgets = []
+        self.lastPad = time()
     
     def set_active_renderer(self, renderer_name):
         ## De-active the current active renderer 
@@ -32,6 +35,9 @@ class Game():
     def add_widget(self, widget):
         self.widgets.append(widget)
 
+    def remove_widget(self, widget):
+        self.widgets.remove(widget)
+
     def start(self):
         self.is_finished = False
         stackless.tasklet(self.tasklet_renderer)() # Creates the agent tasklet
@@ -43,13 +49,14 @@ class Game():
     def tasklet_renderer(self):
         pad = psp2d.Controller()
         while not self.is_finished:
-            if pad.circle:
-                print("exit")
-                self.exit()
-
             if self.active_renderer is None:
                 print("self.active_renderer is None")
                 return
+
+            if (self.lastPad and time() - self.lastPad < 0.005):
+                # To short time between 2 events
+                continue
+            self.lastPad = time()
 
             # Update the instance
             self.active_renderer.update()
@@ -63,11 +70,11 @@ class Game():
 
             # At the end, draw the widgets (to be on top of all sprites)
             for widget in self.widgets:
-                if widget.visible:
-                    widget.draw()
+                widget.draw()
 
             ## Everything is draw
             self.active_renderer.screen.swap()
 
             # Give other tasklets its turn
             stackless.schedule()
+            

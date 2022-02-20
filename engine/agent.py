@@ -2,7 +2,6 @@
 
 import os
 import psp2d
-from time import time
 from configparser import ConfigParser
 
 import engine.helper as helper
@@ -34,13 +33,13 @@ class Agent(object):
         self.height = 32
         self.pos_x = 0
         self.pos_y = 0
-        self.last_animation_timestamp = time()
         self.animation_flow = 0
         self.is_animated = True
         self.animation_velocity = 0.25
         self.current_renderer = None
         self.conf_renderers = None
         self.debug = False
+        self.id = "String defined by the renderer"
 
     def get_rectangle(self):
         return helper.Rect(self.pos_x, self.pos_y, self.width, self.height)
