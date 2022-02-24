@@ -59,26 +59,26 @@ class Player(Agent):
         self.controls_widget = None
         self.bonus = 0
         self.debug = False
+        self.controller = None
 
     def compute_new_position(self):
-        pad = psp2d.Controller()
         (dx, dy) = (0, 0)
-        if pad.down:
+        if self.controller.down:
             dy = 1 * self.velocity
             self.direction = "DOWN"
-        elif pad.up:
+        elif self.controller.up:
             dy = -1 * self.velocity
             self.direction = "UP"
-        elif pad.left:
+        elif self.controller.left:
             dx = -1 * self.velocity
             self.direction = "LEFT"
-        elif pad.right:
+        elif self.controller.right:
             dx = 1 * self.velocity
             self.direction = "RIGHT"
         else:
             pass
-            """dx = (pad.analogX / 127) * self.velocity
-            dy = (pad.analogY / 127) * self.velocity
+            """dx = (self.controller.analogX / 127) * self.velocity
+            dy = (self.controller.analogY / 127) * self.velocity
             if dx == 0 and dy == 0:
                 self.animation_flow = 0
             else:
@@ -115,6 +115,13 @@ class Player(Agent):
     agents is a dict of agent.name -> agent object
     """
     def update(self, agents, walls):
+        self.controller = psp2d.Controller()
+        
+        if self.controls_widget is not None:
+            ## Don't allow to move when the controls-widget is present
+            self.is_running = False
+            return
+
         (new_pos_x, new_pos_y) = self.compute_new_position()
 
         collisioned_agents = self.detect_collision(agents.values(), walls, 

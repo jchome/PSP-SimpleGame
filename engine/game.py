@@ -47,7 +47,6 @@ class Game():
     Run the action() method while the instance is running.
     """
     def tasklet_renderer(self):
-        pad = psp2d.Controller()
         while not self.is_finished:
             if self.active_renderer is None:
                 print("self.active_renderer is None")

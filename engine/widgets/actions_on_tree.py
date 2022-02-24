@@ -11,10 +11,13 @@ class ActionsOnTree(ActionsOnAgent):
 
     def cut_tree(self, player, action, agent):
         print("The player have to do %s on agent %s" % (action, agent.name))
+        player.controls_widget = None
         
     def take_leaf(self, player, action, agent):
         print("The player have to do %s on agent %s" % (action, agent.name))
+        player.controls_widget = None
         
     def cancel(self, player, action, agent):
+        player.controls_widget = None
         player.current_renderer.exit()
 

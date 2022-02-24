@@ -102,7 +102,7 @@ class Agent(object):
             if renderer_conf.renderer_name is not None:
                 self.conf_renderers.append(renderer_conf)
         
-        self.actions = []
+        self.actions = None
         if config.has_option("COLLISION", "actions"):
             actions_conf = config.get("COLLISION", "actions")
             self.actions = AgentActionsReader.parse(actions_conf)

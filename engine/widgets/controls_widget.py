@@ -28,12 +28,13 @@ class ControlsWidget(Widget):
 
     def set_agent(self, agent):
         self.agent = agent
-        for action in self.agent.actions.all_actions:
-            self.labels[action.button] = action.label
+        if self.agent.actions is not None:
+            for action in self.agent.actions.all_actions:
+                self.labels[action.button] = action.label
 
     def update(self):
         ## Listen to inputs
-        pad = psp2d.Controller()
+        pad = self.player.controller
 
         if pad.triangle and self.labels[Button.TRIANGLE] is not None:
             self.do_action_on_agent(self.labels[Button.TRIANGLE])
@@ -60,7 +61,7 @@ class ControlsWidget(Widget):
             self.draw_text(triangle_pos, self.labels[Button.CIRCLE])
 
         if self.labels[Button.CROSS] is not None:
-            triangle_pos = Point(self.pos_x + 35, self.pos_y + 34)
+            triangle_pos = Point(self.pos_x + 35, self.pos_y + 35)
             self.draw_text(triangle_pos, self.labels[Button.CROSS])
 
         if self.labels[Button.SQUARE] is not None:
@@ -68,7 +69,7 @@ class ControlsWidget(Widget):
             self.draw_text(triangle_pos, self.labels[Button.SQUARE])
 
     def draw_text(self, point, label):
-        self.screen.fillRect(point.x, point.y, FontHelper.width_for_text(label) + 2, 16, psp2d.Color(0,0,0,128))
+        self.screen.fillRect(point.x, point.y, FontHelper.width_for_text(label) + 2, 15, psp2d.Color(0,0,0,128))
         self.font.drawText(self.screen, point.x + 1, point.y, label)
 
 
