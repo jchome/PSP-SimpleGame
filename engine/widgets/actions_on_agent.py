@@ -1,3 +1,5 @@
+# -*- coding: iso-8859-1 -*-
+
 """
 Helper class to manage actions on an agent
 """

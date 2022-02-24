@@ -11,6 +11,7 @@ sys.path.insert(0,'./python')
 import engine
 import engine.widgets.debug_widget
 import engine.widgets.controls_widget
+import engine.widgets.inventory_widget
 
 
 game = engine.Game()
@@ -22,6 +23,9 @@ meadow_001.add_agent(player)
 
 game.add_renderer(meadow_001)
 game.set_active_renderer(meadow_001.name)
+
+inventory = engine.widgets.inventory_widget.InventoryWidget(player)
+game.add_widget(inventory)
 
 #debug = engine.widgets.debug_widget.DebugWidget()
 #game.add_widget(debug)

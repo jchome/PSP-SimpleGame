@@ -9,9 +9,11 @@ from engine.conf_renderer import ConfRenderer
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.helper import Point, color_not_alpha_0, match_colors, str_color
 from engine.interaction_object import InteractionObject
-from engine.widgets.controls_widget import Button, ControlsWidget
 from engine.agent import Agent
 from engine.renderer import Render
+
+from engine.widgets.controls_widget import Button, ControlsWidget
+from engine.inventory.inventory import Inventory
 
 
 font = psp2d.Font('font.png')
@@ -20,8 +22,8 @@ class Player(Agent):
     def __init__(self):
         config = ConfigParser()
         config.read('conf/player.ini')
-        self.name = config.get("ASSET", "name")
         Agent.__init__(self, config.get("ASSET", "source") )
+        self.metadata.name = config.get("ASSET", "name")
         sprite_directions = config.get("ASSET", "sprite_directions")
 
         self.velocity = config.getfloat("ASSET", "velocity")
@@ -36,8 +38,8 @@ class Player(Agent):
             positions = eval(data[1].strip())
             self.sprites[key] = positions
 
-        self.width = config.getint("DIMENSION", "width")
-        self.height = config.getint("DIMENSION", "height")
+        self.metadata.width = config.getint("DIMENSION", "width")
+        self.metadata.height = config.getint("DIMENSION", "height")
         self.direction = "DOWN"
         self.is_running = False
         self.animation_flow = 0
@@ -60,6 +62,7 @@ class Player(Agent):
         self.bonus = 0
         self.debug = False
         self.controller = None
+        self.inventory = Inventory()
 
     def compute_new_position(self):
         (dx, dy) = (0, 0)
@@ -105,8 +108,8 @@ class Player(Agent):
                 self.animation_flow = 0
 
         #print("dx, dy = %d, %d" % (dx,dy))
-        new_pos_x = max( min(self.pos_x + dx, MAX_WIDTH), 0 - self.width)
-        new_pos_y = max( min(self.pos_y + dy, MAX_HEIGHT), 0 - self.height)
+        new_pos_x = max( min(self.pos_x + dx, MAX_WIDTH), 0 - self.metadata.width)
+        new_pos_y = max( min(self.pos_y + dy, MAX_HEIGHT), 0 - self.metadata.height)
 
         #print("position: %d,%d -> %d,%d" % (self.pos_x, self.pos_y, new_pos_x, new_pos_y))
         return (new_pos_x, new_pos_y)
@@ -116,7 +119,7 @@ class Player(Agent):
     """
     def update(self, agents, walls):
         self.controller = psp2d.Controller()
-        
+
         if self.controls_widget is not None:
             ## Don't allow to move when the controls-widget is present
             self.is_running = False
@@ -215,7 +218,7 @@ class Player(Agent):
         top = image_bank[0]
         left = image_bank[1]
         
-        screen.blit(self.sprite, top, left, self.width, self.height, self.pos_x, self.pos_y, True)
+        screen.blit(self.sprite, top, left, self.metadata.width, self.metadata.height, self.pos_x, self.pos_y, True)
 
         if self.debug:
             screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
@@ -239,3 +242,9 @@ class Player(Agent):
         self.controls_widget.set_agent(agent)
         self.current_renderer.game.add_widget(self.controls_widget)
 
+    def close_controls_widget(self):
+        self.controls_widget = None
+
+    def add_to_inventory(self, agent):
+        self.inventory.add_item(agent)
+        

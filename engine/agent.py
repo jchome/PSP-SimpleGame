@@ -1,6 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import os
+from engine.metadata import Metadata
 import psp2d
 from configparser import ConfigParser
 
@@ -29,8 +30,11 @@ class Agent(object):
             except:
                 print("Cannot open file --%s--" % sprite_file)
 
-        self.width = 32
-        self.height = 32
+        self.metadata = Metadata()
+        self.metadata.sprite_file = sprite_file
+        self.metadata.width = 32
+        self.metadata.height = 32
+
         self.pos_x = 0
         self.pos_y = 0
         self.animation_flow = 0
@@ -42,14 +46,14 @@ class Agent(object):
         self.id = "String defined by the renderer"
 
     def get_rectangle(self):
-        return helper.Rect(self.pos_x, self.pos_y, self.width, self.height)
+        return helper.Rect(self.pos_x, self.pos_y, self.metadata.width, self.metadata.height)
 
     def get_shadow_rect(self):
         if self.shadow_type == "RECT":
             return helper.Rect(self.pos_x + self.shadow_top, self.pos_y + self.shadow_left, 
                 self.pos_x + self.shadow_width, self.pos_y + self.shadow_height)
         elif self.shadow_type == "SPRITE":
-            return helper.Rect(0, 0, self.width, self.height)
+            return helper.Rect(0, 0, self.metadata.width, self.metadata.height)
 
     def load_config(self, config_file):
         ## Check that config file exists
@@ -58,7 +62,7 @@ class Agent(object):
 
         config = ConfigParser()
         config.read(config_file)
-        self.name = config.get("ASSET", "name")
+        self.metadata.name = config.get("ASSET", "name")
         self.source = psp2d.Image(config.get("ASSET", "source"))
         sprites_definition = config.get("ASSET", "sprites")
         self.sprites = {}
@@ -72,8 +76,8 @@ class Agent(object):
         
         self.is_animated = len(self.sprites) > 0
 
-        self.width = config.getint("DIMENSION", "width")
-        self.height = config.getint("DIMENSION", "height")
+        self.metadata.width = config.getint("DIMENSION", "width")
+        self.metadata.height = config.getint("DIMENSION", "height")
 
         self.shadow_type = config.get("SHADOW", "shadow_type")
         if self.shadow_type == "RECT":
@@ -87,8 +91,8 @@ class Agent(object):
             ## So, at least, the basical shadow is the full image
             self.shadow_top = 0
             self.shadow_left = 0
-            self.shadow_width = self.width
-            self.shadow_height = self.height
+            self.shadow_width = self.metadata.width
+            self.shadow_height = self.metadata.height
 
         if config.has_option("DIMENSION", "sort_position"):
             self.sort_position = config.getint("DIMENSION", "sort_position")
@@ -107,7 +111,7 @@ class Agent(object):
             actions_conf = config.get("COLLISION", "actions")
             self.actions = AgentActionsReader.parse(actions_conf)
 
-        #print("%s: %d, %d, %d, %d" % (self.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
+        #print("%s: %d, %d, %d, %d" % (self.metadata.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
 
         self.load_custom_config(config)
@@ -151,7 +155,7 @@ class Agent(object):
         positions = self.sprites[int(self.animation_flow)]
         (src_left, src_top) = positions
         #screen.blit(self.source, 
-        #    src_top, src_left, self.width, self.height, 
+        #    src_top, src_left, self.metadata.width, self.metadata.height, 
         #    self.pos_x, self.pos_y,  
         #    True)
         src_pos = helper.Point(src_left, src_top)
@@ -165,22 +169,22 @@ class Agent(object):
             screen_pos.y = 0
         
         screen.blit(self.source, 
-                src_pos.x, src_pos.y, self.width, self.height, 
+                src_pos.x, src_pos.y, self.metadata.width, self.metadata.height, 
                 screen_pos.x, screen_pos.y, 
                 True)
 
         if self.debug:
-            #print("Debug on " + self.name)
+            #print("Debug on " + self.metadata.name)
             if self.shadow_type == "RECT":
                 screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
                     self.shadow_width, self.shadow_height, psp2d.Color(255,0,0,128))
                 screen.fillRect(self.pos_x, self.pos_y, 
-                    self.width, self.height, psp2d.Color(255,0,0,128))
-                #font.drawText(screen, 0, 32, "%s: (%d,%d)" % (self.name, self.pos_x, self.pos_y))
+                    self.metadata.width, self.metadata.height, psp2d.Color(255,0,0,128))
+                #font.drawText(screen, 0, 32, "%s: (%d,%d)" % (self.metadata.name, self.pos_x, self.pos_y))
             elif self.shadow_type == "SPRITE":
-                top_of_shadow_sprite = int(src_top) + int(self.height)
+                top_of_shadow_sprite = int(src_top) + int(self.metadata.height)
                 screen.blit(self.source, 
-                    src_left, top_of_shadow_sprite, self.width, self.height, 
+                    src_left, top_of_shadow_sprite, self.metadata.width, self.metadata.height, 
                     self.pos_x, self.pos_y, 
                     True)
 
@@ -200,7 +204,7 @@ class Agent(object):
                 continue
             color_of_collision = self.detect_collision_with_object(agent, future_pos_x, future_pos_y)
             if color_of_collision != Agent.NO_COLLISION:
-                #print("%s collision with %s" % (self.name, agent.name))
+                #print("%s collision with %s" % (self.metadata.name, agent.name))
                 #print("at position %d,%d" % (future_pos_x, future_pos_y))
                 collision_with_agent = (agent, color_of_collision)
                 all_collision_objects.append(collision_with_agent)

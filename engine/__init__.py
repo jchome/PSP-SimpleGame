@@ -10,4 +10,4 @@ from renderer import Render
 from engine.agent_actions_reader import AgentActionsReader
 from widget import Widget
 
-from widgets import DebugWidget, ControlsWidget, Button
+from widgets import *

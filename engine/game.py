@@ -2,7 +2,6 @@
 
 import stackless
 from time import time
-import psp2d
 
 from engine.renderer import Render
 

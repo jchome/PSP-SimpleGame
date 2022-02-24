@@ -101,7 +101,7 @@ class Render():
     
     def add_agent(self, agent):
         number = len(self.agents)
-        agent.id = "%s_#%d" % (agent.name, number)
+        agent.id = "%s_#%d" % (agent.metadata.name, number)
         self.agents[agent.id] = agent
         agent.current_renderer = self
 

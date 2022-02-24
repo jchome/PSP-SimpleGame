@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 from engine.helper import FontHelper, Point
-from engine.widgets import actions_dictionary
+from engine.widgets import actions_on_agent
 import psp2d
 
 from engine.widget import Widget
@@ -14,7 +14,6 @@ class Button:
 class ControlsWidget(Widget):
     def __init__(self, player, pos_x, pos_y):
         Widget.__init__(self, "assets/controls.png", pos_x, pos_y)
-        self.font = psp2d.Font('font.png')
         (self.width, self.height) = (50,50)
         self.labels = {
             Button.TRIANGLE: None,
@@ -67,10 +66,6 @@ class ControlsWidget(Widget):
         if self.labels[Button.SQUARE] is not None:
             triangle_pos = Point(self.pos_x - 50, self.pos_y + 17)
             self.draw_text(triangle_pos, self.labels[Button.SQUARE])
-
-    def draw_text(self, point, label):
-        self.screen.fillRect(point.x, point.y, FontHelper.width_for_text(label) + 2, 15, psp2d.Color(0,0,0,128))
-        self.font.drawText(self.screen, point.x + 1, point.y, label)
 
 
     def do_action_on_agent(self, action_label):
