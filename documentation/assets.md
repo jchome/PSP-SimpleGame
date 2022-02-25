@@ -1,0 +1,3 @@
+## Assets (pictures)
+This section have to be filled...
+About "shadow", for collision detection.
