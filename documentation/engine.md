@@ -24,7 +24,7 @@ Please note that for the moment, any agent is static. It does not move in the re
 To detect the collision, the sprite has more data that the simple bounding box around the sprite. It have a "shadow". This can be a rectagle, or a set of pixels with a specific color (pink).
 
 Bush agent:
-![Bush with shadow](assets/trees/tree-01.png "Example of bush")
+![Bush with shadow](../assets/trees/tree-01.png "Example of bush")
 
 As you see, a rectangle would not be precise enought to set the borders.
 
