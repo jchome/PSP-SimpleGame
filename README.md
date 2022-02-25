@@ -5,6 +5,10 @@ Contact: julien.coron@gmail.com
 
 I would like to try on a some small hardware the game creation. I've started with the fantasy-console Pyxel ("Pyxel is a retro game engine for Python" - https://github.com/kitao/pyxel), but the result was too limited.
 
+Screenshot of the recent update:
+![screenshot](documentation/screenshot-01.png "Recent screenshot")
+
+
 ## About the content of this repo
 In this reposory, you will find:
 * The binary file "EBOOT.PBP" (just copied from the strackless python port for PSP) - Find it here: https://code.google.com/archive/p/pspstacklesspython/downloads ;
