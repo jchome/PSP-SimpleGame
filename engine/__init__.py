@@ -7,6 +7,7 @@ from helper import *
 from interaction_object import InteractionObject
 from player import Player
 from engine.board import Board
+from engine.display import Display
 from engine.agent_actions_reader import AgentActionsReader
 from widget import Widget
 

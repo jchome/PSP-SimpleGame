@@ -2,6 +2,7 @@
 
 from engine.conf_board import ConfBoard
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
+from engine.display import Display
 from engine.interaction_object import InteractionObject
 import psp2d
 import engine.helper as helper
@@ -13,25 +14,21 @@ import re
 Main class of the game.
 Every item is resistered in this container.
 """
-class Board():
+class Board(Display):
     def __init__(self, config_file):
-        self.screen = psp2d.Screen()
+        ## Set the name: use the config file
+        Display.__init__(self, config_file)
         config = ConfigParser()
         config.read(config_file)
-        self.name = config_file
-        self.game = None
         self.agents = {}
-        self.active = False 
         background_image = config.get("ASSET", "source")
         (self.background, self.walls) = helper.load_sprite(background_image, 
             MAX_WIDTH, MAX_HEIGHT)
         self.add_interaction_objects(config.get("ASSET", "sprites"))
 
-        self.debug = False
-
         self.conf_boards = []
         self.add_board_conf(config.get("COLLISION", "open_board"))
-                
+        
                 
     """
     @return Conf_Board instance
@@ -95,8 +92,8 @@ class Board():
         self.active = False
         for agent in self.agents.values():
             agent.running = False
-            if self.game is not None:
-                self.game.is_finished = True
+        if self.game is not None:
+            self.game.is_finished = True
 
     """
     Get the wall's color at the position
@@ -127,5 +124,3 @@ class Board():
             agent.draw(self.screen)
 
         #self.screen.drawLine(10,20,200,300, black)
-
-        

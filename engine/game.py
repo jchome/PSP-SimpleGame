@@ -4,6 +4,7 @@ import stackless
 from time import time
 
 from engine.board import Board
+from engine.inventory_display import InventoryDisplay
 
 class Game():
     def __init__(self):
@@ -13,6 +14,7 @@ class Game():
         self.player = None
         self.widgets = []
         self.lastPad = time()
+        self.previous_display = None
     
     def set_active_display(self, display_name):
         ## De-active the current active board 
@@ -21,6 +23,7 @@ class Game():
         
         ## If the display is not already loaded
         if display_name not in self.displays:
+            ## By default, the display is a board
             self.add_display(Board(display_name))
 
         self.active_display = self.displays[display_name]
@@ -41,9 +44,26 @@ class Game():
         self.is_finished = False
         stackless.tasklet(self.tasklet_display)() # Creates the agent tasklet
 
-    def open_inventory(self):
-        print("open_inventory !!")
 
+    def open_inventory(self):
+        ## Hide all widgets
+        for widget in self.widgets:
+            widget.is_visible = False
+
+        inventory_display_name = "InventoryDisplay"
+        if inventory_display_name not in self.displays:
+            inventory_display = InventoryDisplay(inventory_display_name)
+        else:
+            inventory_display = self.displays[inventory_display_name]
+
+        self.previous_display = self.active_display
+        self.add_display(inventory_display)
+        self.set_active_display(inventory_display_name)
+
+
+    def close_inventory(self):
+        self.set_active_display(self.previous_display)
+        
     """
     Main action of the agent.
     Run the action() method while the instance is running.
@@ -64,14 +84,16 @@ class Game():
 
             # Update the widgets
             for widget in self.widgets:
-                widget.update()
+                if widget.is_visible:
+                    widget.update()
 
             # Draw the instance
             self.active_display.draw()
 
             # At the end, draw the widgets (to be on top of all sprites)
             for widget in self.widgets:
-                widget.draw()
+                if widget.is_visible:
+                    widget.draw()
 
             ## Everything is draw
             self.active_display.screen.swap()

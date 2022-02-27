@@ -12,6 +12,7 @@ class Widget:
         (self.width, self.height) = (50,50)
         self.sprite = psp2d.Image(sprite_path)
         self.screen = psp2d.Screen()
+        self.is_visible = True
     
 
     def draw_text(self, point, label):

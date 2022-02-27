@@ -172,7 +172,6 @@ class Player(Agent):
                             break
                         elif agent.inventory_open_color is not None:
                             player_is_blocked = True
-                            print("inventory_open_color !!")
                             self.current_board.game.open_inventory()
                             break
                         else:
