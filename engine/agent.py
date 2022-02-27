@@ -6,7 +6,7 @@ import psp2d
 from configparser import ConfigParser
 
 import engine.helper as helper
-from engine.conf_renderer import ConfRenderer
+from engine.conf_board import ConfBoard
 from engine.agent_actions_reader import AgentActionsReader
 
 
@@ -40,10 +40,10 @@ class Agent(object):
         self.animation_flow = 0
         self.is_animated = True
         self.animation_velocity = 0.25
-        self.current_renderer = None
-        self.conf_renderers = None
+        self.current_board = None
+        self.conf_boards = None
         self.debug = False
-        self.id = "String defined by the renderer"
+        self.id = "String defined by the board"
 
     def get_rectangle(self):
         return helper.Rect(self.pos_x, self.pos_y, self.metadata.width, self.metadata.height)
@@ -58,7 +58,7 @@ class Agent(object):
     def load_config(self, config_file):
         ## Check that config file exists
         if not os.path.isfile(config_file):
-            raise ValueError("File not found: %d" % config_file)
+            raise ValueError("File not found: %s" % config_file)
 
         config = ConfigParser()
         config.read(config_file)
@@ -75,6 +75,7 @@ class Agent(object):
             self.sprites[key] = positions
         
         self.is_animated = len(self.sprites) > 0
+        self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
 
         self.metadata.width = config.getint("DIMENSION", "width")
         self.metadata.height = config.getint("DIMENSION", "height")
@@ -94,38 +95,40 @@ class Agent(object):
             self.shadow_width = self.metadata.width
             self.shadow_height = self.metadata.height
 
+        #print("%s: %d, %d, %d, %d" % (self.metadata.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
         if config.has_option("DIMENSION", "sort_position"):
             self.sort_position = config.getint("DIMENSION", "sort_position")
         else:
             self.sort_position = int(self.shadow_height / 2)
 
-        self.conf_renderers = []
-        if config.has_option("COLLISION", "open_renderer"):
-            open_renderer_conf = config.get("COLLISION", "open_renderer")
-            renderer_conf = ConfRenderer(open_renderer_conf)
-            if renderer_conf.renderer_name is not None:
-                self.conf_renderers.append(renderer_conf)
+        self.conf_boards = []
+        if config.has_option("COLLISION", "open_board"):
+            open_board_conf = config.get("COLLISION", "open_board")
+            board_conf = ConfBoard(open_board_conf)
+            if board_conf.board_name is not None:
+                self.conf_boards.append(board_conf)
         
         self.actions = None
         if config.has_option("COLLISION", "actions"):
             actions_conf = config.get("COLLISION", "actions")
             self.actions = AgentActionsReader.parse(actions_conf)
 
-        #print("%s: %d, %d, %d, %d" % (self.metadata.name, self.shadow_top, self.shadow_left, self.shadow_width, self.shadow_height))
-        self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
+        self.inventory_open_color = None
+        if config.has_option("COLLISION", "open_inventory"):
+            self.inventory_open_color = config.get("COLLISION", "open_inventory")
 
         self.load_custom_config(config)
         
     """
-    @return Conf_Renderer instance
+    @return Conf_Board instance
     """
-    def get_conf_renderer(self, color_to_match):
-        if self.conf_renderers is None:
+    def get_conf_board(self, color_to_match):
+        if self.conf_boards is None:
             return None
-        for renderer_conf in self.conf_renderers:
-            color = renderer_conf.renderer_color
+        for board_conf in self.conf_boards:
+            color = board_conf.board_color
             if helper.match_colors(color, color_to_match):
-                return renderer_conf
+                return board_conf
         return None
 
 
@@ -219,24 +222,24 @@ class Agent(object):
                     collision_with_wall = (walls, Agent.WALL_COLLISION)
                     all_collision_objects.append(collision_with_wall)
                 else:
-                    #print("collision with renderer ?")
-                    ## try to get the destination renderer from the renderer
+                    #print("collision with board ?")
+                    ## try to get the destination board from the board
                     color = [c for c in corner_pixels if c.alpha != 0][0]
                     #print(" color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
             
-                    ## Try to get the renderer of the agent
-                    renderer_conf = self.get_conf_renderer(color)
-                    #print("renderer_conf(1): %s" % str(renderer_conf))
+                    ## Try to get the board of the agent
+                    board_conf = self.get_conf_board(color)
+                    #print("board_conf(1): %s" % str(board_conf))
 
-                    if renderer_conf is None:
-                        ## Try to get the renderer of the current renderer
-                        renderer_conf = self.current_renderer.get_conf_renderer(color)
-                        #print("renderer_conf(2): %s" % str(renderer_conf))
+                    if board_conf is None:
+                        ## Try to get the board of the current board
+                        board_conf = self.current_board.get_conf_board(color)
+                        #print("board_conf(2): %s" % str(board_conf))
                         
-                    if renderer_conf is not None:
-                        #print("found %s" % renderer_conf)
-                        collision_with_renderer = (renderer_conf, color)
-                        all_collision_objects.append(collision_with_renderer)
+                    if board_conf is not None:
+                        #print("found %s" % board_conf)
+                        collision_with_board = (board_conf, color)
+                        all_collision_objects.append(collision_with_board)
 
         return all_collision_objects
 
@@ -271,7 +274,7 @@ class Agent(object):
                 #print("player_top_left point_in_rect: %s" % player_top_left)
                 pixel = another_object.source.getPixel(
                     player_top_left.x - another_object.pos_x, 
-                    player_top_left.y - another_object.pos_y + another_object.height)
+                    player_top_left.y - another_object.pos_y + another_object.metadata.height)
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
@@ -280,7 +283,7 @@ class Agent(object):
                 #print("player_top_right point_in_rect: %s" % player_top_right)
                 pixel = another_object.source.getPixel(
                     player_top_right.x - another_object.pos_x, 
-                    player_top_right.y - another_object.pos_y + another_object.height)
+                    player_top_right.y - another_object.pos_y + another_object.metadata.height)
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
@@ -289,7 +292,7 @@ class Agent(object):
                 #print("player_bottom_left point_in_rect: %s" % player_bottom_left)
                 pixel = another_object.source.getPixel(
                     player_bottom_left.x - another_object.pos_x, 
-                    player_bottom_left.y - another_object.pos_y + another_object.height)
+                    player_bottom_left.y - another_object.pos_y + another_object.metadata.height)
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
@@ -298,7 +301,7 @@ class Agent(object):
                 #print("player_bottom_right point_in_rect: %s" % player_bottom_right)
                 pixel = another_object.source.getPixel(
                     player_bottom_right.x - another_object.pos_x, 
-                    player_bottom_right.y - another_object.pos_y + another_object.height)
+                    player_bottom_right.y - another_object.pos_y + another_object.metadata.height)
                 #print("pixel.alpha: %d" % pixel.alpha)
                 if pixel.alpha != 0:
                     #print("Collision detected !")
@@ -323,7 +326,7 @@ class Agent(object):
         player_top_right    = agent_rect.top_right()
         player_bottom_left  = agent_rect.bottom_left()
         player_bottom_right = agent_rect.bottom_right()
-        image = self.current_renderer.final_walls
+        image = self.current_board.walls
         pixel_top_left      = image.getPixel(player_top_left.x, player_top_left.y)
         pixel_top_right     = image.getPixel(player_top_right.x, player_top_right.y)
         pixel_bottom_left   = image.getPixel(player_bottom_left.x, player_bottom_left.y)

@@ -5,12 +5,12 @@ from time import time
 import math
 from configparser import ConfigParser
 
-from engine.conf_renderer import ConfRenderer
+from engine.conf_board import ConfBoard
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.helper import Point, color_not_alpha_0, match_colors, str_color
 from engine.interaction_object import InteractionObject
 from engine.agent import Agent
-from engine.renderer import Render
+from engine.board import Board
 
 from engine.widgets.controls_widget import Button, ControlsWidget
 from engine.inventory.inventory import Inventory
@@ -28,6 +28,9 @@ class Player(Agent):
 
         self.velocity = config.getfloat("ASSET", "velocity")
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
+
+        ## By default, the player is visible
+        self.is_visible = True
         
         self.sprites = {}
         for item in sprite_directions.split("\n"):
@@ -118,6 +121,8 @@ class Player(Agent):
     agents is a dict of agent.name -> agent object
     """
     def update(self, agents, walls):
+        if not self.is_visible:
+            return
         self.controller = psp2d.Controller()
 
         if self.controls_widget is not None:
@@ -151,19 +156,24 @@ class Player(Agent):
                         ## Take the bonus
                         player_is_blocked = False
                         self.bonus += agent.bonus
-                        self.current_renderer.remove_agent(agent)
+                        self.current_board.remove_agent(agent)
                     else:
-                        ## Collision with InteractionObject having a conf_renderers
-                        renderer_conf = agent.get_conf_renderer(color)
-                        if renderer_conf is not None :
-                            #print("agent.conf_renderers")
-                            #print(agent.conf_renderers)
-                            ## Open a new renderer
-                            ## Get the game to update the renderer
-                            new_position = self.go_to_renderer(renderer_conf)
+                        ## Collision with InteractionObject having a conf_boards
+                        board_conf = agent.get_conf_board(color)
+                        if board_conf is not None :
+                            #print("agent.conf_boards")
+                            #print(agent.conf_boards)
+                            ## Open a new board
+                            ## Get the game to update the board
+                            new_position = self.go_to_board(board_conf)
                             #print("new_position: %s" % new_position)
                             new_pos_x = new_position.x
                             new_pos_y = new_position.y
+                            break
+                        elif agent.inventory_open_color is not None:
+                            player_is_blocked = True
+                            print("inventory_open_color !!")
+                            self.current_board.game.open_inventory()
                             break
                         else:
                             player_is_blocked = True
@@ -172,9 +182,9 @@ class Player(Agent):
                         
                         
                 ## The player goes into a new zone
-                elif isinstance(agent, ConfRenderer):
-                    #print(">>>>> collision with ConfRenderer %s" % agent.renderer_name)
-                    new_position = self.go_to_renderer(agent)
+                elif isinstance(agent, ConfBoard):
+                    #print(">>>>> collision with ConfBoard %s" % agent.board_name)
+                    new_position = self.go_to_board(agent)
                     #print(">>>>> from %d,%d to new_position: %s" % (self.pos_x, self.pos_y, new_position))
                     new_pos_x = new_position.x
                     new_pos_y = new_position.y
@@ -186,34 +196,37 @@ class Player(Agent):
             self.pos_x = int(new_pos_x)
             self.pos_y = int(new_pos_y)
             
-    def get_new_position_in_new_renderer(self, renderer_conf):
-        pointToNewRenderer = renderer_conf.position_in_renderer.copy()
+    def get_new_position_in_new_board(self, board_conf):
+        point_to_new_board = board_conf.position_in_board.copy()
 
         ## If the new position is < 0, keep the same position of the user
-        if pointToNewRenderer.x < 0:
-            pointToNewRenderer.x = self.pos_x
+        if point_to_new_board.x < 0:
+            point_to_new_board.x = self.pos_x
 
-        if pointToNewRenderer.y < 0:
-            pointToNewRenderer.y = self.pos_y
+        if point_to_new_board.y < 0:
+            point_to_new_board.y = self.pos_y
 
-        return pointToNewRenderer
+        return point_to_new_board
 
-    def go_to_renderer(self, renderer_conf):
-        #print("Going to renderer %s" % renderer_conf)
-        ## Remove the player from the renderer
-        self.current_renderer.remove_agent(self)
-        ## Set the next active renderer
-        self.current_renderer.game.set_active_renderer(renderer_conf.renderer_name)
-        self.current_renderer = self.current_renderer.game.active_renderer
-        ## Add the player to the next renderer
-        self.current_renderer.add_agent(self)
+    def go_to_board(self, board_conf):
+        #print("Going to display %s" % board_conf)
+        ## Remove the player from the board
+        self.current_board.remove_agent(self)
+        ## Set the next active display
+        self.current_board.game.set_active_display(board_conf.board_name)
+        self.current_board = self.current_board.game.active_display
+        ## Add the player to the next board
+        self.current_board.add_agent(self)
 
-        pointToNewRenderer = self.get_new_position_in_new_renderer(renderer_conf)
-        #print(" ... at position %s" % str(pointToNewRenderer))
+        point_to_new_board = self.get_new_position_in_new_board(board_conf)
+        #print(" ... at position %s" % str(point_to_new_board))
 
-        return pointToNewRenderer
+        return point_to_new_board
 
     def draw(self, screen):
+        if not self.is_visible:
+            return
+
         image_bank = self.sprites[self.direction][int(self.animation_flow)]
         top = image_bank[0]
         left = image_bank[1]
@@ -240,7 +253,7 @@ class Player(Agent):
         ## Display the control widget
         self.controls_widget = ControlsWidget(self, (MAX_WIDTH / 2) - 25, (MAX_HEIGHT / 2) - 25)
         self.controls_widget.set_agent(agent)
-        self.current_renderer.game.add_widget(self.controls_widget)
+        self.current_board.game.add_widget(self.controls_widget)
 
     def close_controls_widget(self):
         self.controls_widget = None

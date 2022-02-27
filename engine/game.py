@@ -3,33 +3,33 @@
 import stackless
 from time import time
 
-from engine.renderer import Render
+from engine.board import Board
 
 class Game():
     def __init__(self):
-        self.renderers = {}
-        self.active_renderer = None
+        self.displays = {}
+        self.active_display = None
         self.is_finished = False
         self.player = None
         self.widgets = []
         self.lastPad = time()
     
-    def set_active_renderer(self, renderer_name):
-        ## De-active the current active renderer 
-        if self.active_renderer is not None:
-            self.active_renderer.active = False
+    def set_active_display(self, display_name):
+        ## De-active the current active board 
+        if self.active_display is not None:
+            self.active_display.active = False
         
-        ## If the renderer is not already loaded
-        if renderer_name not in self.renderers:
-            self.add_renderer(Render(renderer_name))
+        ## If the display is not already loaded
+        if display_name not in self.displays:
+            self.add_display(Board(display_name))
 
-        self.active_renderer = self.renderers[renderer_name]
-        self.active_renderer.active = True
-        #print("self.active_renderer : %s" % renderer_name)
+        self.active_display = self.displays[display_name]
+        self.active_display.active = True
+        #print("self.active_display : %s" % display_name)
 
-    def add_renderer(self, renderer):
-        renderer.game = self
-        self.renderers[renderer.name] = renderer
+    def add_display(self, display):
+        display.game = self
+        self.displays[display.name] = display
 
     def add_widget(self, widget):
         self.widgets.append(widget)
@@ -39,16 +39,19 @@ class Game():
 
     def start(self):
         self.is_finished = False
-        stackless.tasklet(self.tasklet_renderer)() # Creates the agent tasklet
+        stackless.tasklet(self.tasklet_display)() # Creates the agent tasklet
+
+    def open_inventory(self):
+        print("open_inventory !!")
 
     """
     Main action of the agent.
     Run the action() method while the instance is running.
     """
-    def tasklet_renderer(self):
+    def tasklet_display(self):
         while not self.is_finished:
-            if self.active_renderer is None:
-                print("self.active_renderer is None")
+            if self.active_display is None:
+                print("self.active_display is None")
                 return
 
             if (self.lastPad and time() - self.lastPad < 0.005):
@@ -57,21 +60,21 @@ class Game():
             self.lastPad = time()
 
             # Update the instance
-            self.active_renderer.update()
+            self.active_display.update()
 
             # Update the widgets
             for widget in self.widgets:
                 widget.update()
 
             # Draw the instance
-            self.active_renderer.draw()
+            self.active_display.draw()
 
             # At the end, draw the widgets (to be on top of all sprites)
             for widget in self.widgets:
                 widget.draw()
 
             ## Everything is draw
-            self.active_renderer.screen.swap()
+            self.active_display.screen.swap()
 
             # Give other tasklets its turn
             stackless.schedule()

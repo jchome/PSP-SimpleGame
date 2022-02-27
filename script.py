@@ -15,14 +15,14 @@ import engine.widgets.inventory_widget
 
 
 game = engine.Game()
-# Creates the renderer object
-meadow_001 = engine.Render("conf/renderers/meadow-001.ini")
+# Creates the boards object
+meadow_001 = engine.Board("conf/boards/meadow-001.ini")
 player = engine.Player()
 game.player = player
 meadow_001.add_agent(player)
 
-game.add_renderer(meadow_001)
-game.set_active_renderer(meadow_001.name)
+game.add_display(meadow_001)
+game.set_active_display(meadow_001.name)
 
 inventory = engine.widgets.inventory_widget.InventoryWidget(player)
 game.add_widget(inventory)

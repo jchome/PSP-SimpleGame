@@ -78,5 +78,5 @@ class ControlsWidget(Widget):
             return
         callback(self.player, action_label, self.agent)
         ## Close this controls widget
-        self.player.current_renderer.game.remove_widget(self)
+        self.player.current_board.game.remove_widget(self)
         

@@ -11,7 +11,7 @@ class ActionsOnSimpleObject(ActionsOnAgent):
 
     def take(self, player, action, simple_object):
         player.add_to_inventory(simple_object)
-        player.current_renderer.remove_agent(simple_object)
+        player.current_board.remove_agent(simple_object)
         player.close_controls_widget()
         
     def cancel(self, player, action, simple_object):
