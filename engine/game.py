@@ -16,19 +16,27 @@ class Game():
         self.lastPad = time()
         self.previous_display = None
     
-    def set_active_display(self, display_name):
+    def set_active_display(self, display_param):
         ## De-active the current active board 
         if self.active_display is not None:
             self.active_display.active = False
         
         ## If the display is not already loaded
-        if display_name not in self.displays:
-            ## By default, the display is a board
-            self.add_display(Board(display_name))
+        if type(display_param) is str:
+            display_name = display_param
+            if display_name not in self.displays:
+                ## By default, the display is a board
+                display = Board(display_name)
+                self.add_display(display)
+            else:
+                display = self.displays[display_name]
+        else:
+            display = display_param
+            self.add_display(display)
 
-        self.active_display = self.displays[display_name]
+        self.active_display = display
         self.active_display.active = True
-        #print("self.active_display : %s" % display_name)
+        #print("self.active_display : %s" % display.name)
 
     def add_display(self, display):
         display.game = self
