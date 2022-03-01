@@ -38,6 +38,11 @@ class Game():
         self.active_display.active = True
         #print("self.active_display : %s" % display.name)
 
+
+    def start_to_play_with(self, board):
+        self.set_active_display(board)
+        self.show_widgets()
+
     def add_display(self, display):
         display.game = self
         self.displays[display.name] = display
@@ -48,6 +53,11 @@ class Game():
     def remove_widget(self, widget):
         self.widgets.remove(widget)
 
+    def show_widgets(self, visibility = True):
+        for widget in self.widgets:
+            widget.is_visible = visibility
+
+
     def start(self):
         self.is_finished = False
         stackless.tasklet(self.tasklet_display)() # Creates the agent tasklet
@@ -55,8 +65,7 @@ class Game():
 
     def open_inventory(self):
         ## Hide all widgets
-        for widget in self.widgets:
-            widget.is_visible = False
+        self.show_widgets(False)
 
         inventory_display_name = "InventoryDisplay"
         if inventory_display_name not in self.displays:
@@ -71,6 +80,7 @@ class Game():
 
     def close_inventory(self):
         self.set_active_display(self.previous_display)
+        self.show_widgets()
         
     """
     Main action of the agent.

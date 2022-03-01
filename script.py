@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+import threading
 import psp2d
 import stackless
 
@@ -13,33 +14,55 @@ import engine.widgets.debug_widget
 import engine.widgets.controls_widget
 import engine.widgets.inventory_widget
 import engine.welcome_display
+import engine.menu_display
+
+
+def load_assets(game, welcome_display):
+    ## Create the menu
+    welcome.set_text("Create the menu...")
+    menu = engine.menu_display.MenuDisplay()
+    welcome.menu_display = menu
+
+    ## Create the boards object
+    welcome.set_text("Loading first board...")
+    meadow_001 = engine.Board("conf/boards/meadow-001.ini")
+    player = engine.Player()
+    meadow_001.add_agent(player)
+    menu.play_board = meadow_001
+    game.player = player
+
+    #game.add_display(meadow_001)
+    #game.set_active_display(meadow_001.name)
+
+    welcome.set_text("Loading widgets...")
+    inventory = engine.widgets.inventory_widget.InventoryWidget(player)
+    inventory.is_visible = False
+    game.add_widget(inventory)
+
+    #debug = engine.widgets.debug_widget.DebugWidget()
+    #game.add_widget(debug)
+
+    #Loads background music
+    #pspmp3.init(1)
+    #pspmp3.load("background-music.mp3")
+    #pspmp3.play()
+
+    welcome.set_text("Done !")
+    welcome_display.is_ready = True
+
 
 
 game = engine.Game()
-## Creates the boards object
-#meadow_001 = engine.Board("conf/boards/meadow-001.ini")
-#player = engine.Player()
-#game.player = player
-#meadow_001.add_agent(player)
 
-#game.add_display(meadow_001)
-#game.set_active_display(meadow_001.name)
+welcome = engine.welcome_display.WelcomeDisplay()
+welcome.draw()
+welcome.screen.swap()
 
-#inventory = engine.widgets.inventory_widget.InventoryWidget(player)
-#game.add_widget(inventory)
-
-#debug = engine.widgets.debug_widget.DebugWidget()
-#game.add_widget(debug)
-
-welcome = engine.welcome_display.WelcomeDisplay("Welcome")
-
-game.start()
 game.set_active_display(welcome)
+game.start()
 
-#Loads background music
-#pspmp3.init(1)
-#pspmp3.load("background-music.mp3")
-#pspmp3.play()
+loading_thread = threading.Thread(target=load_assets, args=(game,welcome,))
+loading_thread.start()
 
 # Starts the game loop
 stackless.run()

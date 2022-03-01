@@ -12,5 +12,6 @@ from widget import Widget
 
 from engine.display import Display
 from welcome_display import WelcomeDisplay
+from menu_display import MenuDisplay
 
 from widgets import *

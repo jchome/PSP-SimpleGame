@@ -4,23 +4,41 @@
 from engine.display import Display
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 
+import engine.helper as helper
+
 import psp2d
 
 class WelcomeDisplay(Display):
 
-    def __init__(self, name):
-        Display.__init__(self, name)
+    def __init__(self):
+        Display.__init__(self, "Welcome")
         self.font = psp2d.Font('font.png')
+        self.text = ""
+        self.is_ready = False
+        self.menu_display = None
+
+        (self.background, _) = helper.load_sprite("assets/displays/welcome.png", 
+            MAX_WIDTH, MAX_HEIGHT)
+
+
+    def set_text(self, text):
+        self.text = text
 
 
     def update(self):
+        if not self.is_ready:
+            return
         ## The update method is called only for active displays
         controller = psp2d.Controller()
         if controller.circle:
-            print("EXIT")
-            self.game.is_finished = True
-
+            self.game.set_active_display(self.menu_display)
+            
 
     def draw(self):
-        self.screen.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT, psp2d.Color(0,0,255,255))
-        self.font.drawText(self.screen, 0, 0, "Welcome")
+        self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
+        #self.screen.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT, psp2d.Color(0,0,0,255))
+        if self.is_ready:
+            self.font.drawText(self.screen, 130, 240, "Press X to start")
+
+        self.screen.fillRect(0, 0, 250, 16, psp2d.Color(0,0,0,128))
+        self.font.drawText(self.screen, 0, 0, self.text)
