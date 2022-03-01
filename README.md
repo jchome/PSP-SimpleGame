@@ -5,8 +5,12 @@ Contact: julien.coron@gmail.com
 
 I would like to try on a some small hardware the game creation. I've started with the fantasy-console Pyxel ("Pyxel is a retro game engine for Python" - https://github.com/kitao/pyxel), but the result was too limited.
 
-Screenshot of the recent update, taken from the PPSSPP emulator (https://www.ppsspp.org/):
-![screenshot](documentation/screenshot-01.png "Recent screenshot")
+Screenshots of the recent update, taken from the PPSSPP emulator (https://www.ppsspp.org/):
+![screenshot](documentation/screenshot-01.png "Recent screenshot #1")
+
+![screenshot](documentation/screenshot-02.png "Recent screenshot #2")
+
+![screenshot](documentation/screenshot-03.png "Recent screenshot #3")
 
 
 ## About the content of this repo
