@@ -25,3 +25,8 @@ In this reposory, you will find:
 - [Engine](documentation/engine.md)
 - [Assets](documentation/assets.md)
 - [Configuration](documentation/configuration.md)
+
+# Resources
+Thanks to:
+- https://opengameart.org/content/pixel-parchment-ui-kit
+- https://opengameart.org/content/items10
