@@ -63,7 +63,8 @@ class Agent(object):
         config = ConfigParser()
         config.read(config_file)
         self.metadata.name = config.get("ASSET", "name")
-        self.source = psp2d.Image(config.get("ASSET", "source"))
+        self.metadata.sprite_file = config.get("ASSET", "source")
+        self.source = psp2d.Image(self.metadata.sprite_file)
         sprites_definition = config.get("ASSET", "sprites")
         self.sprites = {}
         for item in sprites_definition.split("\n"):
