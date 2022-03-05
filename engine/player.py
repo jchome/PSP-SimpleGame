@@ -5,15 +5,15 @@ from time import time
 import math
 from configparser import ConfigParser
 
-from engine.conf_board import ConfBoard
+from engine.displays.conf_board import ConfBoard
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.helper import Point, color_not_alpha_0, match_colors, str_color
 from engine.interaction_object import InteractionObject
 from engine.agent import Agent
-from engine.board import Board
+from engine.displays.board import Board
 
 from engine.widgets.controls_widget import Button, ControlsWidget
-from engine.inventory.inventory import Inventory
+from engine.displays.inventory.inventory import Inventory
 
 
 font = psp2d.Font('font.png')

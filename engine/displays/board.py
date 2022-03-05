@@ -1,14 +1,14 @@
 # -*- coding: iso-8859-1 -*-
 
-from engine.conf_board import ConfBoard
-from engine.constants import MAX_HEIGHT, MAX_WIDTH
-from engine.display import Display
-from engine.interaction_object import InteractionObject
 import psp2d
-import engine.helper as helper
-from configparser import ConfigParser
 import re
+from configparser import ConfigParser
 
+import engine.helper as helper
+from engine.constants import MAX_HEIGHT, MAX_WIDTH
+from engine.displays.conf_board import ConfBoard
+from engine.displays.display import Display
+from engine.interaction_object import InteractionObject
 
 """
 Main class of the game.

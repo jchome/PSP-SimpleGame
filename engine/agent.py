@@ -1,12 +1,12 @@
 # -*- coding: iso-8859-1 -*-
 
 import os
-from engine.metadata import Metadata
 import psp2d
 from configparser import ConfigParser
 
 import engine.helper as helper
-from engine.conf_board import ConfBoard
+from engine.metadata import Metadata
+from engine.displays.conf_board import ConfBoard
 from engine.agent_actions_reader import AgentActionsReader
 
 

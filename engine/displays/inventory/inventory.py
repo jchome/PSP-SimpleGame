@@ -1,5 +1,5 @@
 
-from engine.inventory.inventory_item import InventoryItem
+from engine.displays.inventory.inventory_item import InventoryItem
 
 # -*- coding: iso-8859-1 -*-
 

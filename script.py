@@ -13,14 +13,14 @@ import engine
 import engine.widgets.debug_widget
 import engine.widgets.controls_widget
 import engine.widgets.inventory_widget
-import engine.welcome_display
-import engine.menu_display
+import engine.displays.welcome_display
+import engine.displays.menu_display
 
 
 def load_assets(game, welcome_display):
     ## Create the menu
     welcome.set_text("Create the menu...")
-    menu = engine.menu_display.MenuDisplay()
+    menu = engine.displays.menu_display.MenuDisplay()
     welcome.menu_display = menu
 
     ## Create the boards object

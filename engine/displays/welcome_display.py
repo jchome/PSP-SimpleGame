@@ -1,12 +1,12 @@
 # -*- coding: iso-8859-1 -*-
 
+import psp2d
 
-from engine.display import Display
+from engine.displays.display import Display
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 
 import engine.helper as helper
 
-import psp2d
 
 class WelcomeDisplay(Display):
 

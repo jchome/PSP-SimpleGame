@@ -3,8 +3,8 @@
 import stackless
 from time import time
 
-from engine.board import Board
-from engine.inventory_display import InventoryDisplay
+from engine.displays.board import Board
+from engine.displays.inventory_display import InventoryDisplay
 
 class Game():
     def __init__(self):

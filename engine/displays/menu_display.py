@@ -1,11 +1,10 @@
 # -*- coding: iso-8859-1 -*-
 
-
 from time import time
 
 import psp2d
 
-from engine.display import Display
+from engine.displays.display import Display
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
 
