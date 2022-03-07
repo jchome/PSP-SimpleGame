@@ -30,3 +30,7 @@ In this reposory, you will find:
 Thanks to:
 - https://opengameart.org/content/pixel-parchment-ui-kit
 - https://opengameart.org/content/items10
+- https://opengameart.org/content/resouces-pack-1
+
+# Reference
+Music API: https://code.google.com/archive/p/pspstacklesspython/wikis/MusicSupport.wiki

@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import threading
-import psp2d
+import psp2d, pspmp3
 import stackless
 
 import sys
@@ -18,6 +18,12 @@ import engine.displays.menu_display
 
 
 def load_assets(game, welcome_display):
+    welcome.set_text("Loading music...")
+    ## Loads background music
+    pspmp3.init(1)
+    pspmp3.load("assets/music/welcome.mp3")
+    pspmp3.play()
+
     ## Create the menu
     welcome.set_text("Create the menu...")
     menu = engine.displays.menu_display.MenuDisplay()
@@ -42,11 +48,6 @@ def load_assets(game, welcome_display):
     #debug = engine.widgets.debug_widget.DebugWidget()
     #game.add_widget(debug)
 
-    #Loads background music
-    #pspmp3.init(1)
-    #pspmp3.load("background-music.mp3")
-    #pspmp3.play()
-
     welcome.set_text("Done !")
     welcome_display.is_ready = True
 
@@ -66,4 +67,4 @@ loading_thread.start()
 
 # Starts the game loop
 stackless.run()
-#pspmp3.end()
+pspmp3.end()

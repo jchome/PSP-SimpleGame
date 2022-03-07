@@ -1,6 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import stackless
+import pspmp3
 from time import time
 
 from engine.displays.board import Board
@@ -41,6 +42,11 @@ class Game():
 
     def start_to_play_with(self, board):
         self.set_active_display(board)
+        #pspmp3.end()
+        #pspmp3.init(1)
+        #pspmp3.load("assets/music/game.mp3")
+        #pspmp3.play()
+
         self.show_widgets()
 
     def add_display(self, display):
@@ -96,6 +102,10 @@ class Game():
                 # To short time between 2 events
                 continue
             self.lastPad = time()
+
+            ## Loop the music
+            #if pspmp3.endofstream():
+            #    pspmp3.play()
 
             # Update the instance
             self.active_display.update()
