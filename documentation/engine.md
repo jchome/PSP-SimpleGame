@@ -2,13 +2,14 @@
 ## Objects of the game
 ### Goals of each object
 There is 3 main classes in the engine, to build the game:
-- Agent: Any object in the game (a sprite)
+- Agent: Any interactive object in the game (= a sprite)
 - Player: The player of the game (user's avatar)
-- Renderer: The playground where the player and agents are placed
+- Display: A background image, maybe some text and user interaction object. This is the case for the Welcome screen, the Menu screen, and boards.
+  - Board (extension of Display): The playground where the player and agents are placed
 
-The main script of the game have to instantiate the first renderer and put the player into.
+The main script of the game have to instantiate the first display.
 
-To ease the user interface, another object is used : Widget. This kind of object is rendered at the top of the game. The usual widget is the player's life, or the player inventory.
+To ease the user interface, another object is used : Widget. This kind of object is rendered at the top of the game. The usual widget is the player's life, or the player object's inventory.
 
 ### Agent
 Link to [Class Agent](https://github.com/jchome/PSP-SimpleGame/blob/main/engine/agent.py)
@@ -46,13 +47,17 @@ We can imagine an "automatic" game, that have no player, but only a list of agen
 
 So, the collision detection for this agent is managed by a heavy method in this class.
 
-### Renderer
-The renderer is the playground for agents, displayed to the user. It is the container, where each instance of agent have a position. Only one renderer is displayed (where the player is) and take the whole screen.
+### Display
+The display is used to crezate the Welcome screen, the menu, and the playground for agents. It is the container, where each instance of agent have a position. Only one display is rendered in the screen of the console and takes the whole screen.
 
-Each renderer where the user goes is loaded if it's not already done, and is stored in memory, keeping position of all agents. Like that, when the player goes from one renderer to another, agents have the same position than before. Agents are not updated in non-displayed renderers.
+Like written before, the Display class is extended in the Board class, to play the game, with the player's sprite.
+
+Each Board where the user goes is loaded if it's not already done, and is stored in memory, keeping position of all agents. Like that, when the player goes from one board to another, agents have the same position than before. Agents are not updated in non-displayed boards.
 
 ### Widget
-The widget is not a part of the renderer, but is global to the game. That's why each one is instantiated in the Game class.
+The widget is not a part of the Board, but is global to the game. That's why each one is instantiated in the Game class.
+
+Examples of widgets:
 
 * The "Controller widget" is used to ask the user how the player have to interact with an agent.
 
@@ -64,5 +69,9 @@ The widget is not a part of the renderer, but is global to the game. That's why 
 
 
 ### Game
-This section have to be filled...
-Talk about the renderers, all widgets, the player.
+The game is the global container of all used objects:
+ - the player
+ - the current Display (Welcone screen, menu or playing board)
+ - widgets
+
+At startup, the Welcome display is rendered, and a Thread is started to load other objects (the menu Display, the player, the first play board, the music, etc.)
