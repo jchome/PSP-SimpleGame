@@ -42,12 +42,12 @@ class Game():
 
     def start_to_play_with(self, board):
         self.set_active_display(board)
-        #pspmp3.end()
-        #pspmp3.init(1)
-        #pspmp3.load("assets/music/game.mp3")
-        #pspmp3.play()
-
         self.show_widgets()
+        ## Change music
+        pspmp3.load("assets/music/game.mp3")
+        pspmp3.stop()
+        pspmp3.play()
+
 
     def add_display(self, display):
         display.game = self
