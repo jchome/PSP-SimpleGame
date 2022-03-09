@@ -18,13 +18,20 @@ An agent is an object in the playground (like phyisical object). In will interac
  - a simple wall or something that cannot be overlap by the player
  - an ennemy that hurts the player
  - a bonus (coins, gems, etc)
- - a gate to a new renderer
+ - a gate to a new board
 
-Please note that for the moment, any agent is static. It does not move in the renderer.
+Please note that for the moment, any agent is static. It does not move in the Board.
 
-To detect the collision, the sprite has more data that the simple bounding box around the sprite. It have a "shadow". This can be a rectagle, or a set of pixels with a specific color (pink).
+#### Example of "Knife" agent:
+![Knife without shadow](../assets/objects/knife.png "Example of Knife")
 
-Bush agent:
+In this agent, the collision detection is not precise more that a rectangle defined in its configuration file.
+See https://github.com/jchome/PSP-SimpleGame/blob/main/documentation/configuration.md#agent for configuration options.
+
+To detect exactly the collision, the sprite has more data that the simple bounding box around the sprite. It have a "shadow". This can be a rectagle, or a set of pixels with a specific color (pink).
+
+
+#### Example of "Bush" agent:
 ![Bush with shadow](../assets/trees/tree-01.png "Example of bush")
 
 As you see, a rectangle would not be precise enought to set the borders.
@@ -34,6 +41,7 @@ This image is composed of 2 parts:
 2. The shadow of the sprite, to use for collision detection
 
 See configuration file of an agent to set this feature.
+See https://github.com/jchome/PSP-SimpleGame/blob/main/documentation/configuration.md#agent for configuration options.
 
 
 ### Player
@@ -55,6 +63,7 @@ Like written before, the Display class is extended in the Board class, to play t
 Each Board where the user goes is loaded if it's not already done, and is stored in memory, keeping position of all agents. Like that, when the player goes from one board to another, agents have the same position than before. Agents are not updated in non-displayed boards.
 
 ### Widget
+Link to [Class Widget](https://github.com/jchome/PSP-SimpleGame/blob/main/engine/widget.py)
 The widget is not a part of the Board, but is global to the game. That's why each one is instantiated in the Game class.
 
 Examples of widgets:
