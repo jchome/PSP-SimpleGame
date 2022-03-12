@@ -31,6 +31,8 @@ Thanks to:
 - https://opengameart.org/content/pixel-parchment-ui-kit
 - https://opengameart.org/content/items10
 - https://opengameart.org/content/resouces-pack-1
+- https://i.pinimg.com/originals/a0/3f/33/a03f338c53bce48999a7e73761bfa7bc.png
+
 
 # Reference
 Music API: https://code.google.com/archive/p/pspstacklesspython/wikis/MusicSupport.wiki

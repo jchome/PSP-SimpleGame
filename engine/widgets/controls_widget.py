@@ -5,6 +5,10 @@ import psp2d
 
 from engine.widget import Widget
 
+import engine.translation
+_ = engine.translation.translate
+
+
 class Button:
     TRIANGLE = 1
     CIRCLE = 2
@@ -24,6 +28,8 @@ class ControlsWidget(Widget):
         ## The agent to interact
         self.agent = None
         self.player = player
+        self.language = player.current_board.game.current_language
+        print("current_language : %s" % player.current_board.game.current_language)
 
     def set_agent(self, agent):
         self.agent = agent
@@ -53,19 +59,19 @@ class ControlsWidget(Widget):
         
         if self.labels[Button.TRIANGLE] is not None:
             triangle_pos = Point(self.pos_x + 35, self.pos_y)
-            self.draw_text(triangle_pos, self.labels[Button.TRIANGLE])
+            self.draw_text(triangle_pos, _(self.labels[Button.TRIANGLE], self.language))
         
         if self.labels[Button.CIRCLE] is not None:
             triangle_pos = Point(self.pos_x + 50, self.pos_y + 17)
-            self.draw_text(triangle_pos, self.labels[Button.CIRCLE])
+            self.draw_text(triangle_pos, _(self.labels[Button.CIRCLE], self.language))
 
         if self.labels[Button.CROSS] is not None:
             triangle_pos = Point(self.pos_x + 35, self.pos_y + 35)
-            self.draw_text(triangle_pos, self.labels[Button.CROSS])
+            self.draw_text(triangle_pos, _(self.labels[Button.CROSS], self.language))
 
         if self.labels[Button.SQUARE] is not None:
             triangle_pos = Point(self.pos_x - 50, self.pos_y + 17)
-            self.draw_text(triangle_pos, self.labels[Button.SQUARE])
+            self.draw_text(triangle_pos, _(self.labels[Button.SQUARE], self.language))
 
 
     def do_action_on_agent(self, action_label):

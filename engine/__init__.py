@@ -3,6 +3,7 @@ from constants import *
 #from agent import *
 from game import Game
 from helper import *
+from translation import *
 from interaction_object import InteractionObject
 from player import Player
 from widget import Widget

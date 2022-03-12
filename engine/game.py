@@ -16,6 +16,8 @@ class Game():
         self.widgets = []
         self.lastPad = time()
         self.previous_display = None
+        ## Default language is English
+        self.current_language = "en"
     
     def set_active_display(self, display_param):
         ## De-active the current active board 

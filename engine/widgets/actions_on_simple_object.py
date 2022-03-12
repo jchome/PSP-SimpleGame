@@ -3,11 +3,14 @@
 from engine.widgets.actions_on_agent import ActionsOnAgent
 from engine.widgets.controls_widget import Button
 
+import engine.translation
+_ = engine.translation.translate
+
 class ActionsOnSimpleObject(ActionsOnAgent):
     def __init__(self):
         ActionsOnAgent.__init__(self, "Object")
-        self.add_action(Button.TRIANGLE, "Take", self.take)
-        self.add_action(Button.CIRCLE, "Cancel", self.cancel)
+        self.add_action(Button.TRIANGLE, _("action.on_simple_object.take"), self.take)
+        self.add_action(Button.CIRCLE, _("action.on_simple_object.cancel"), self.cancel)
 
     def take(self, player, action, simple_object):
         player.add_to_inventory(simple_object)
