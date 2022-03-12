@@ -3,6 +3,8 @@
 from engine.helper import Point
 from engine.widget import Widget
 
+import engine.translation
+_ = engine.translation.translate
 
 class InventoryWidget(Widget):
     def __init__(self, player):
@@ -14,4 +16,9 @@ class InventoryWidget(Widget):
     def draw(self):
         ## Default drawing
         self.screen.blit(self.sprite, 0, 0, self.width, self.height, self.pos_x, self.pos_y, True)
-        self.draw_text(Point(27,17), "%d items" % self.player.inventory.size() )
+        
+        self.language = self.player.current_board.game.current_language
+        self.draw_text(Point(27,17), "%d %s" % 
+            (self.player.inventory.size(), 
+            _("inventory.widget.objects-count", self.language))
+        )

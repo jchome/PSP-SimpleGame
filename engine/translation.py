@@ -51,6 +51,10 @@ translations_dict = {
     "action.on_simple_object.cancel": {
         "fr": "Annuler",
         "en": "Cancel"
+    },
+    "inventory.widget.objects-count": {
+        "fr": "objets",
+        "en": "items"
     }
     
 }
