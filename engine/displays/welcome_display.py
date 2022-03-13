@@ -12,7 +12,7 @@ class WelcomeDisplay(Display):
 
     def __init__(self):
         Display.__init__(self, "Welcome")
-        self.font = psp2d.Font('font.png')
+        self.debug_font = psp2d.Font('font.png')
         self.text = ""
         self.is_ready = False
         self.menu_display = None
@@ -38,7 +38,7 @@ class WelcomeDisplay(Display):
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         #self.screen.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT, psp2d.Color(0,0,0,255))
         if self.is_ready:
-            self.font.drawText(self.screen, 130, 240, "Press X to start")
+            self.debug_font.drawText(self.screen, 130, 240, "Press X to start")
 
         self.screen.fillRect(0, 0, 250, 16, psp2d.Color(0,0,0,128))
-        self.font.drawText(self.screen, 0, 0, self.text)
+        self.debug_font.drawText(self.screen, 0, 0, self.text)

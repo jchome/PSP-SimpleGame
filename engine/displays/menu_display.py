@@ -8,6 +8,8 @@ from engine.displays.display import Display
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
 
+import engine.translation
+_ = engine.translation.translate
 
 class MenuDisplay(Display):
     PLAY = 0
@@ -22,7 +24,7 @@ class MenuDisplay(Display):
         self.choices = [MenuDisplay.PLAY, MenuDisplay.CREDITS, MenuDisplay.EXIT]
         self.user_choice = MenuDisplay.PLAY
         self.play_board = None
-        self.font = psp2d.Font('font.png')
+        self.menu_font = psp2d.Font('fonts/font-Karumbi-46-black.png')
         self.first_display_time = None
 
     def update(self):
@@ -55,8 +57,29 @@ class MenuDisplay(Display):
     def draw(self):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
+        
+        label = _("menu.item.play", self.game.current_language)
+        if self.user_choice == MenuDisplay.PLAY:
+            label = "> " + label + " <"
+        pos_x = (MAX_WIDTH - self.menu_font.textWidth(label)) / 2
+        pos_y = 50
+        self.menu_font.drawText(self.screen, pos_x, pos_y, label)
+
+        label = _("menu.item.credits", self.game.current_language)
+        if self.user_choice == MenuDisplay.CREDITS:
+            label = "> " + label + " <"
+        pos_x = (MAX_WIDTH - self.menu_font.textWidth(label)) / 2
+        pos_y = 120
+        self.menu_font.drawText(self.screen, pos_x, pos_y, label)
+
+        label = _("menu.item.exit", self.game.current_language)
+        if self.user_choice == MenuDisplay.EXIT:
+            label = "> " + label + " <"
+        pos_x = (MAX_WIDTH - self.menu_font.textWidth(label)) / 2
+        pos_y = 190
+        self.menu_font.drawText(self.screen, pos_x, pos_y, label)
 
         ## Draw the user's choice
-        pos_x = 110
-        pos_y = [63, 130, 202][self.user_choice]
-        self.font.drawText(self.screen, pos_x, pos_y, ">>")
+        #pos_x = 110
+        #pos_y = [63, 130, 202][self.user_choice]
+        #self.menu_font.drawText(self.screen, pos_x, pos_y, "abc")

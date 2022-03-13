@@ -1,5 +1,5 @@
 # -*- coding: iso-8859-1 -*-
-from engine.helper import FontHelper, Point
+from engine.helper import Point
 from engine.widgets import actions_on_agent
 import psp2d
 
@@ -58,7 +58,7 @@ class ControlsWidget(Widget):
         
         ## Draw title of the widget
         title_translated = _("action.on_simple_object.title", self.language) + _(self.agent.metadata.label, self.language)
-        width_of_title = FontHelper.width_for_text(title_translated)
+        width_of_title = self.font.textWidth(title_translated)
         title_pos = Point(self.pos_x - (width_of_title / 2) + 25, self.pos_y - 17)
         self.draw_text(title_pos, title_translated)
         

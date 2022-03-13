@@ -44,6 +44,18 @@ translations_dict = {
         "fr": "Termine !",
         "en": "Done !"
     },
+    "menu.item.play": {
+        "fr": "Jouer maintenant",
+        "en": "Play the game"
+    },
+    "menu.item.credits": {
+        "fr": "Credits",
+        "en": "Credits"
+    },
+    "menu.item.exit": {
+        "fr": "Sortir",
+        "en": "Exit"
+    },
     "action.on_simple_object.title": {
         "fr": "Actions sur ",
         "en": "Actions on "

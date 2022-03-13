@@ -56,9 +56,9 @@ class InventoryDisplay(Display):
             text_x = pos_x + 23
             text_y = pos_y + 18
             if item.count > 10 :
-                text_y += helper.FontHelper.width_for_text("0")
+                text_y += self.font.textWidth("0")
             if item.count > 100 :
-                text_y += helper.FontHelper.width_for_text("0")
+                text_y += self.font.textWidth("0")
             self.font.drawText(self.screen, text_x, text_y, str(item.count))
             
             ## Prepare next item

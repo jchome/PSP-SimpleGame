@@ -1,6 +1,5 @@
 # -*- coding: iso-8859-1 -*-
 
-from engine.helper import FontHelper
 import psp2d
 
 class Widget:
@@ -16,7 +15,7 @@ class Widget:
     
 
     def draw_text(self, point, label):
-        self.screen.fillRect(point.x, point.y, FontHelper.width_for_text(label) + 2, 15, psp2d.Color(0,0,0,128))
+        self.screen.fillRect(point.x, point.y, self.font.textWidth(label) + 2, 15, psp2d.Color(0,0,0,128))
         self.font.drawText(self.screen, point.x + 1, point.y, label)
 
 
