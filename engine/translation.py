@@ -44,6 +44,10 @@ translations_dict = {
         "fr": "Termine !",
         "en": "Done !"
     },
+    "action.on_simple_object.title": {
+        "fr": "Actions sur ",
+        "en": "Actions on "
+    },
     "action.on_simple_object.take": {
         "fr": "Prendre",
         "en": "Take"
@@ -55,6 +59,14 @@ translations_dict = {
     "inventory.widget.objects-count": {
         "fr": "objets",
         "en": "items"
+    },
+    "object.label.knife": {
+        "fr": "couteau",
+        "en": "knife"
+    },
+    "object.label.palm-01": {
+        "fr": "palmier",
+        "en": "palm tree"
     }
     
 }

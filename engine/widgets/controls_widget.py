@@ -55,8 +55,14 @@ class ControlsWidget(Widget):
 
     def draw(self):
         self.screen.blit(self.sprite, 0, 0, self.width, self.height, self.pos_x, self.pos_y, True)
-        ## Draw the text for actions
         
+        ## Draw title of the widget
+        title_translated = _("action.on_simple_object.title", self.language) + _(self.agent.metadata.label, self.language)
+        width_of_title = FontHelper.width_for_text(title_translated)
+        title_pos = Point(self.pos_x - (width_of_title / 2) + 25, self.pos_y - 17)
+        self.draw_text(title_pos, title_translated)
+        
+        ## Draw the text for actions
         if self.labels[Button.TRIANGLE] is not None:
             triangle_pos = Point(self.pos_x + 35, self.pos_y)
             self.draw_text(triangle_pos, _(self.labels[Button.TRIANGLE], self.language))
