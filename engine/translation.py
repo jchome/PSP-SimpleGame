@@ -48,20 +48,24 @@ translations_dict = {
         "fr": "Jouer maintenant",
         "en": "Play the game"
     },
+    "menu.item.options": {
+        "fr": "Options",
+        "en": "Options"
+    },
     "menu.item.credits": {
         "fr": "Credits",
         "en": "Credits"
     },
     "menu.item.exit": {
-        "fr": "Sortir",
-        "en": "Exit"
+        "fr": "Quitter",
+        "en": "Exit the game"
     },
     "action.on_simple_object.title": {
         "fr": "Actions sur ",
         "en": "Actions on "
     },
     "action.on_simple_object.take": {
-        "fr": "Prendre",
+        "fr": "Ramasser",
         "en": "Take"
     },
     "action.on_simple_object.cancel": {

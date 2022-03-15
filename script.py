@@ -14,7 +14,7 @@ import engine.widgets.debug_widget
 import engine.widgets.controls_widget
 import engine.widgets.inventory_widget
 import engine.displays.welcome_display
-import engine.displays.menu_display
+import engine.displays.main_menu
 
 import engine.translation
 _ = engine.translation.translate
@@ -28,7 +28,7 @@ def load_assets(game, welcome_display):
 
     ## Create the menu
     welcome_display.set_text(_("welcome.loading.menu", game.current_language))
-    menu = engine.displays.menu_display.MenuDisplay()
+    menu = engine.displays.main_menu.MainMenu()
     welcome_display.menu_display = menu
 
     ## Create the boards object
