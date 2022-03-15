@@ -7,3 +7,5 @@ from inventory_display import InventoryDisplay
 from welcome_display import WelcomeDisplay
 from menu import Menu
 from main_menu import MainMenu
+from language_menu import LanguageMenu
+

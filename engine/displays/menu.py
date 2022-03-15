@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
-from time import time
+from time import sleep, time
 
 import psp2d
 
@@ -37,8 +37,8 @@ class MenuItem():
 
 class Menu(Display):
 
-    def __init__(self, options):
-        Display.__init__(self, "Menu")
+    def __init__(self, name, options):
+        Display.__init__(self, name)
 
         (self.background, _) = helper.load_sprite("assets/displays/background-menu.png", 
             MAX_WIDTH, MAX_HEIGHT)
@@ -79,6 +79,8 @@ class Menu(Display):
         ## Slow down the update feature
         if self.first_display_time is None:
             self.first_display_time = time()
+            sleep(0.5)
+            return
         if time() - self.first_display_time < 0.1:
             return
         self.first_display_time = time()

@@ -5,6 +5,7 @@ import pspmp3
 from time import time
 
 from engine.displays.board import Board
+from engine.displays.menu import Menu
 from engine.displays.inventory_display import InventoryDisplay
 
 class Game():
@@ -19,6 +20,7 @@ class Game():
         ## Default language is English
         self.current_language = "en"
     
+
     def set_active_display(self, display_param):
         ## De-active the current active board 
         if self.active_display is not None:
@@ -39,6 +41,11 @@ class Game():
 
         self.active_display = display
         self.active_display.active = True
+        ## Reset the first display time to prepare the control input
+        if isinstance(display, Menu): 
+            display.first_display_time = None
+            ## Hide widgets
+            self.show_widgets(False)
         #print("self.active_display : %s" % display.name)
 
 

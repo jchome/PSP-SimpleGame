@@ -105,10 +105,10 @@ class Board(Display):
     Update all registered agents, then draw all
     """
     def update(self):
-        
         ## Update agents considering all walls
         for agent in self.agents.values():
             agent.update(self.agents, self.walls)
+
 
     def draw(self):
         # Each frame the board apply the background,

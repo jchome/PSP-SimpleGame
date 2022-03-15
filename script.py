@@ -54,9 +54,7 @@ def load_assets(game, welcome_display):
     welcome_display.is_ready = True
 
 
-
 game = engine.Game()
-game.current_language = "fr"
 
 welcome = engine.welcome_display.WelcomeDisplay()
 welcome.draw()

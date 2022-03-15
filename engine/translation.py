@@ -56,6 +56,22 @@ translations_dict = {
         "fr": "Credits",
         "en": "Credits"
     },
+    "menu.item.language": {
+        "fr": "Langue",
+        "en": "Language"
+    },
+    "menu.item.french": {
+        "fr": "Francais",
+        "en": "French"
+    },
+    "menu.item.english": {
+        "fr": "Anglais",
+        "en": "English"
+    },
+    "menu.item.back": {
+        "fr": "Retour",
+        "en": "Back"
+    },
     "menu.item.exit": {
         "fr": "Quitter",
         "en": "Exit the game"

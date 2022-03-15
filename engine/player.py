@@ -125,6 +125,13 @@ class Player(Agent):
             return
         self.controller = psp2d.Controller()
 
+        ## Capture the START key, to display the main menu
+        #controller = psp2d.Controller()
+        if self.controller.start:
+            self.current_board.game.set_active_display("MainMenu")
+            return
+        
+
         if self.controls_widget is not None:
             ## Don't allow to move when the controls-widget is present
             self.is_running = False
