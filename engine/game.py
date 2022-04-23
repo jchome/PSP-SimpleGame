@@ -2,11 +2,13 @@
 
 import stackless
 import pspmp3
+import psp2d
 from time import time
 
 from engine.displays.board import Board
 from engine.displays.menu import Menu
 from engine.displays.inventory_display import InventoryDisplay
+from engine.displays.display import Display
 
 class Game():
     def __init__(self):
@@ -19,6 +21,10 @@ class Game():
         self.previous_display = None
         ## Default language is English
         self.current_language = "en"
+
+        ## Manage update() method lifecycle
+        self.last_update = None
+        self.keydown = []
     
 
     def set_active_display(self, display_param):
@@ -42,8 +48,8 @@ class Game():
         self.active_display = display
         self.active_display.active = True
         ## Reset the first display time to prepare the control input
+        display.first_display = True
         if isinstance(display, Menu): 
-            display.first_display_time = None
             ## Hide widgets
             self.show_widgets(False)
         #print("self.active_display : %s" % display.name)
@@ -107,27 +113,29 @@ class Game():
                 print("self.active_display is None")
                 return
 
-            if (self.lastPad and time() - self.lastPad < 0.005):
-                # To short time between 2 events
+            controller = psp2d.Controller()
+
+            if controller.select:
+                ## Open the main menu, when the user press SELECT
+                self.set_active_display("MainMenu")
                 continue
-            self.lastPad = time()
 
             ## Loop the music
             #if pspmp3.endofstream():
             #    pspmp3.play()
 
-            # Update the instance
-            self.active_display.update()
+            ## Update the instance
+            self.active_display.update(controller)
 
-            # Update the widgets
+            ## Update the widgets
             for widget in self.widgets:
                 if widget.is_visible:
-                    widget.update()
+                    widget.update(controller)
 
-            # Draw the instance
+            ## Draw the instance
             self.active_display.draw()
 
-            # At the end, draw the widgets (to be on top of all sprites)
+            ## At the end, draw the widgets (to be on top of all sprites)
             for widget in self.widgets:
                 if widget.is_visible:
                     widget.draw()
@@ -135,6 +143,10 @@ class Game():
             ## Everything is draw
             self.active_display.screen.swap()
 
-            # Give other tasklets its turn
+            ## Prepare the next loop
+            self.last_update = time()
+
+            ## Give other tasklets its turn
             stackless.schedule()
-            
+
+        

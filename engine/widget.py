@@ -19,7 +19,7 @@ class Widget:
         self.font.drawText(self.screen, point.x + 1, point.y, label)
 
 
-    def update(self):
+    def update(self, controller):
         ## Override this method
         pass
 

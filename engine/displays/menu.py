@@ -1,10 +1,9 @@
 # -*- coding: iso-8859-1 -*-
 
-from time import sleep, time
-
+from time import sleep
 import psp2d
 
-from engine.displays.display import Display
+from engine.displays.selection_display import SelectionDisplay
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
 
@@ -35,10 +34,10 @@ class MenuItem():
         pos_x = (MAX_WIDTH - self.font.textWidth(label)) / 2
         self.font.drawText(screen, pos_x, self.pos_y, label)
 
-class Menu(Display):
+class Menu(SelectionDisplay):
 
     def __init__(self, name, options):
-        Display.__init__(self, name)
+        SelectionDisplay.__init__(self, name)
 
         (self.background, _) = helper.load_sprite("assets/displays/background-menu.png", 
             MAX_WIDTH, MAX_HEIGHT)
@@ -66,41 +65,32 @@ class Menu(Display):
         self.items[0].is_selected = True
         self.user_choice_index = 0
         self.play_board = None
-        self.first_display_time = None
-        self.key_down = False
 
-
+    """
+    To override
+    """
     def on_select(self, option_value):
-        ## To override
         pass
 
 
-    def update(self):
-        ## Slow down the update feature
-        if self.first_display_time is None:
-            self.first_display_time = time()
+    def update_for_selection(self, controller):
+        ## Slow down the update
+        if self.first_display:
+            self.first_display = False
             sleep(0.5)
             return
-        if time() - self.first_display_time < 0.1:
-            return
-        self.first_display_time = time()
 
         ## The update method is called only for active displays
-        controller = psp2d.Controller()
         ## Move up / down
-        if controller.down and not self.key_down:
+        if controller.down:
             self.update_selection( (self.user_choice_index + 1) % len(self.items) )
-            self.key_down = True
-        elif controller.up and not self.key_down:
+        elif controller.up:
             self.update_selection( (self.user_choice_index - 1) % len(self.items) )
-            self.key_down = True
         
         #print("self.user_choice: %d" % self.user_choice)
         ## Choice is done with the CIRCLE button
-        elif controller.circle and not self.key_down:
+        elif controller.circle:
             self.on_select(self.items[self.user_choice_index].label)
-        else:
-            self.key_down = False
     
     def update_selection(self, item_number):
         self.items[self.user_choice_index].is_selected = False

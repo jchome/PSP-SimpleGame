@@ -104,10 +104,10 @@ class Board(Display):
     """
     Update all registered agents, then draw all
     """
-    def update(self):
+    def update(self, controller):
         ## Update agents considering all walls
         for agent in self.agents.values():
-            agent.update(self.agents, self.walls)
+            agent.update(self.agents, self.walls, controller)
 
 
     def draw(self):

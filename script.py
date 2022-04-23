@@ -16,6 +16,7 @@ import engine.widgets.inventory_widget
 import engine.displays.welcome_display
 import engine.displays.main_menu
 
+
 import engine.translation
 _ = engine.translation.translate
 
@@ -53,6 +54,27 @@ def load_assets(game, welcome_display):
     welcome_display.set_text(_("welcome.loading.done", game.current_language))
     welcome_display.is_ready = True
 
+def test_inventory(game, welcome_display):
+    import engine.interaction_object
+    player = engine.Player()
+    game.player = player
+
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/knife.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/knife.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/knife2.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/knife3.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/ananas.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/ananas2.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/ananas3.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/ananas4.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/banana.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/crystal.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/metal.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/rope.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/stone.ini', 0, 0))
+    player.inventory.add_item(engine.interaction_object.InteractionObject('conf/wood.ini', 0, 0))
+
+    game.open_inventory()
 
 game = engine.Game()
 
@@ -64,6 +86,7 @@ game.set_active_display(welcome)
 game.start()
 
 loading_thread = threading.Thread(target=load_assets, args=(game, welcome, ))
+#loading_thread = threading.Thread(target=test_inventory, args=(game, welcome, ))
 loading_thread.start()
 
 # Starts the game loop

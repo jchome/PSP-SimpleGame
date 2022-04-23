@@ -18,6 +18,7 @@ class MainMenu(Menu):
         elif option_value == "menu.item.language":
             ## Open the "LanguageMenu"
             if "LanguageMenu" not in self.game.displays:
+                ## Create the language menu
                 language_menu = LanguageMenu()
                 self.game.set_active_display(language_menu)
             else:

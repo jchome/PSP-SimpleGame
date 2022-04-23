@@ -1,17 +1,16 @@
 # -*- coding: iso-8859-1 -*-
 
-from time import sleep, time
 import psp2d
 
-from engine.displays.display import Display
+from engine.displays.selection_display import SelectionDisplay
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
 
 
-class InventoryDisplay(Display):
+class InventoryDisplay(SelectionDisplay):
 
     def __init__(self, name):
-        Display.__init__(self, name)
+        SelectionDisplay.__init__(self, name)
         self.font = psp2d.Font('font.png')
         (self.background, _) = helper.load_sprite("assets/displays/inventory.png", 
             MAX_WIDTH, MAX_HEIGHT)
@@ -26,48 +25,33 @@ class InventoryDisplay(Display):
         ## Cache assets of inventory
         self.cached_assets = []
         self.assets_loaded = False
-        self.first_display_time = None
         
 
-    def update(self):
-        ## Slow down the update feature
-        if self.first_display_time is None:
-            self.first_display_time = time()
-            sleep(0.2)
-            return
-        if time() - self.first_display_time < 0.1:
-            return
-        self.first_display_time = time()
-        
-        
+    def update_for_selection(self, controller):
         ## The update method is called only for active displays
-        controller = psp2d.Controller()
-        if controller.down or controller.up or controller.left or controller.right:
-            if controller.down:
-                direction = "DOWN"
-            elif controller.up:
-                direction = "UP"
-            elif controller.left:
-                direction = "LEFT"
-            elif controller.right:
-                direction = "RIGHT"
-            self.update_cursor(direction)
-
+        if controller.down:
+            self.update_cursor("DOWN")
+        elif controller.up:
+            self.update_cursor("UP")
+        elif controller.left:
+            self.update_cursor("LEFT")
+        elif controller.right:
+            self.update_cursor("RIGHT")
+            
         elif controller.cross:
             self.game.close_inventory()
-        
+
     
     def update_cursor(self, direction):
-        print("cursor before = %d" % self.cursor)
         if direction == "DOWN":
             if self.cursor + self.nb_items_per_row > self.max_items:
-                self.cursor = self.cursor % self.nb_items_per_row
+                self.cursor = self.cursor % self.nb_items_per_row 
             else:
                 self.cursor = self.cursor + self.nb_items_per_row
 
         elif direction == "UP":
             if self.cursor < self.nb_items_per_row:
-                self.cursor = (self.max_items - self.nb_items_per_row) + self.cursor + 1
+                self.cursor = (self.max_items - self.nb_items_per_row) + self.cursor
             else:
                 self.cursor = self.cursor - self.nb_items_per_row
 
@@ -82,7 +66,6 @@ class InventoryDisplay(Display):
                 self.cursor = self.cursor + 1 - self.nb_items_per_row
             else:
                 self.cursor = self.cursor + 1
-        print("      cursor after = %d" % self.cursor)
 
     def draw(self):
         ## Draw background
@@ -140,5 +123,3 @@ class InventoryDisplay(Display):
                 pos_x += 36
             index += 1
 
-        ## Add the selected item
-        #self.screen.blit(self.item_selected, 0, 0, 32, 32, pos_x, pos_y, True)

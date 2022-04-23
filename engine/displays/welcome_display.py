@@ -25,11 +25,10 @@ class WelcomeDisplay(Display):
         self.text = text
 
 
-    def update(self):
+    def update(self, controller):
         if not self.is_ready:
             return
         ## The update method is called only for active displays
-        controller = psp2d.Controller()
         if controller.circle:
             self.game.set_active_display(self.menu_display)
             

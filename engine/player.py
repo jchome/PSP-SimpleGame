@@ -64,27 +64,26 @@ class Player(Agent):
         self.controls_widget = None
         self.bonus = 0
         self.debug = False
-        self.controller = None
         self.inventory = Inventory()
 
-    def compute_new_position(self):
+    def compute_new_position(self, controller):
         (dx, dy) = (0, 0)
-        if self.controller.down:
+        if controller.down:
             dy = 1 * self.velocity
             self.direction = "DOWN"
-        elif self.controller.up:
+        elif controller.up:
             dy = -1 * self.velocity
             self.direction = "UP"
-        elif self.controller.left:
+        elif controller.left:
             dx = -1 * self.velocity
             self.direction = "LEFT"
-        elif self.controller.right:
+        elif controller.right:
             dx = 1 * self.velocity
             self.direction = "RIGHT"
         else:
             pass
-            """dx = (self.controller.analogX / 127) * self.velocity
-            dy = (self.controller.analogY / 127) * self.velocity
+            """dx = (controller.analogX / 127) * self.velocity
+            dy = (controller.analogY / 127) * self.velocity
             if dx == 0 and dy == 0:
                 self.animation_flow = 0
             else:
@@ -120,14 +119,12 @@ class Player(Agent):
     """
     agents is a dict of agent.name -> agent object
     """
-    def update(self, agents, walls):
+    def update(self, agents, walls, controller):
         if not self.is_visible:
             return
-        self.controller = psp2d.Controller()
 
         ## Capture the START key, to display the main menu
-        #controller = psp2d.Controller()
-        if self.controller.start:
+        if controller.start:
             self.current_board.game.set_active_display("MainMenu")
             return
         
@@ -137,7 +134,7 @@ class Player(Agent):
             self.is_running = False
             return
 
-        (new_pos_x, new_pos_y) = self.compute_new_position()
+        (new_pos_x, new_pos_y) = self.compute_new_position(controller)
 
         collisioned_agents = self.detect_collision(agents.values(), walls, 
                                      new_pos_x, 

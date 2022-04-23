@@ -103,6 +103,40 @@ Convert a color as String
 def str_color(color):
     return "Color(%d,%d,%d, %d)" % (color.red, color.green, color.blue, color.alpha)
 
+"""
+Return the name of the keydown.
+"""
+def convert_keydown(controller):
+    keys = []
+    if controller.down:
+        keys.append("DOWN")
+    elif controller.up:
+        keys.append("UP")
+    elif controller.left:
+        keys.append("LEFT")
+    elif controller.right:
+        keys.append("RIGHT")
+    elif controller.cross:
+        keys.append("CROSS")
+    elif controller.circle:
+        keys.append("CIRCLE")
+    elif controller.triangle:
+        keys.append("TRIANGLE")
+    elif controller.square:
+        keys.append("SQAURE")
+    elif controller.l:
+        keys.append("L")
+    elif controller.r:
+        keys.append("R")
+    elif controller.start:
+        keys.append("START")
+    elif controller.select:
+        keys.append("SELECT")
+        
+    return keys
+
+def intersect(list1, list2):
+    return [item for item in list1 if item not in list2]
 
 ## test
 if __name__ == "__main__":

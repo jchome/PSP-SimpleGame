@@ -147,7 +147,7 @@ class Agent(object):
     Update the visibility of the instance.
     agents is a dict of agent.name -> agent object
     """
-    def update(self, agents, walls):
+    def update(self, agents, walls, controller):
         if self.is_animated:
             # One more step of the animation
             self.animation_flow += self.animation_velocity

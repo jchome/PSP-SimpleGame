@@ -11,6 +11,7 @@ class Display:
         self.game = None
         self.active = False
         self.debug = False
+        self.first_display = True
 
 
     def exit(self):
@@ -19,7 +20,7 @@ class Display:
         if self.game is not None:
             self.game.is_finished = True
 
-    def update(self):
+    def update(self, controller):
         pass
 
 
