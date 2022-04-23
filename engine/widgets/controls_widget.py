@@ -37,20 +37,19 @@ class ControlsWidget(Widget):
             for action in self.agent.actions.all_actions:
                 self.labels[action.button] = action.label
 
-    def update(self):
+    def update(self, controller):
         ## Listen to inputs
-        pad = self.player.controller
 
-        if pad.triangle and self.labels[Button.TRIANGLE] is not None:
+        if controller.triangle and self.labels[Button.TRIANGLE] is not None:
             self.do_action_on_agent(self.labels[Button.TRIANGLE])
 
-        if pad.circle and self.labels[Button.CIRCLE] is not None:
+        if controller.circle and self.labels[Button.CIRCLE] is not None:
             self.do_action_on_agent(self.labels[Button.CIRCLE])
 
-        if pad.cross and self.labels[Button.CROSS] is not None:
+        if controller.cross and self.labels[Button.CROSS] is not None:
             self.do_action_on_agent(self.labels[Button.CROSS])
 
-        if pad.square and self.labels[Button.SQUARE] is not None:
+        if controller.square and self.labels[Button.SQUARE] is not None:
             self.do_action_on_agent(self.labels[Button.SQUARE])
 
     def draw(self):
