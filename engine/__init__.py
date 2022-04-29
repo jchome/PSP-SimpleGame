@@ -9,6 +9,9 @@ from player import Player
 from widget import Widget
 from engine.agent_actions_reader import AgentActionsReader
 
+from formula import *
+
 from engine.displays import *
 
 from widgets import *
+

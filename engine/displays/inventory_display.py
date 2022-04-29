@@ -25,6 +25,8 @@ class InventoryDisplay(SelectionDisplay):
         ## Cache assets of inventory
         self.cached_assets = []
         self.assets_loaded = False
+
+        self.craft_selection = []
         
 
     def update_for_selection(self, controller):
@@ -37,6 +39,9 @@ class InventoryDisplay(SelectionDisplay):
             self.update_cursor("LEFT")
         elif controller.right:
             self.update_cursor("RIGHT")
+
+        elif controller.triangle:
+            self.select_for_crafting()
             
         elif controller.cross:
             self.game.close_inventory()
@@ -71,6 +76,13 @@ class InventoryDisplay(SelectionDisplay):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
 
+        self.draw_inventory()
+        self.draw_crafting()
+
+    """
+    Draw the list of items of the inventory in the left part of the screen
+    """
+    def draw_inventory(self):
         ## Get items collected by the player
         ## Top left position of the first item
         (pos_x, pos_y) = (4, 38)
@@ -95,16 +107,10 @@ class InventoryDisplay(SelectionDisplay):
 
             if index < len(self.game.player.inventory.all_items):
                 item = self.game.player.inventory.all_items[index]
-                agent_metadata = item.metadata
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
                 ## Display the sprite of the agent
                 asset = self.cached_assets[index]
-                (width, height) = (agent_metadata.width, agent_metadata.height)
-                center_offset_x = (self.item_size - width) / 2
-                center_offset_y = (self.item_size - height) / 2
-                self.screen.blit(asset, 0, 0, width, height, 
-                    pos_x + center_offset_x, 
-                    pos_y + center_offset_y, True)
+                self.draw_asset(asset, pos_x, pos_y, item.metadata)
 
                 ## Display the counter of item
                 text_x = pos_x + 23
@@ -123,3 +129,43 @@ class InventoryDisplay(SelectionDisplay):
                 pos_x += 36
             index += 1
 
+    def draw_asset(self, asset, pos_x, pos_y, agent_metadata):
+        #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
+        ## Display the sprite of the agent
+        (width, height) = (agent_metadata.width, agent_metadata.height)
+        center_offset_x = (self.item_size - width) / 2
+        center_offset_y = (self.item_size - height) / 2
+        self.screen.blit(asset, 0, 0, width, height, 
+            pos_x + center_offset_x, 
+            pos_y + center_offset_y, True)
+
+    """
+    Draw the selection for crafting in the right part of the screen
+    """
+    def draw_crafting(self):
+        (pos_x, pos_y) = (244, 38)
+        index = 0
+        for cursor in self.craft_selection:
+            ## Display the background of the item
+            self.screen.blit(self.item_background, 0, 0, self.item_size, self.item_size,
+                pos_x, pos_y, True)
+
+            item = self.game.player.inventory.all_items[cursor]
+            #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
+            ## Display the sprite of the agent
+            asset = self.cached_assets[cursor]
+            self.draw_asset(asset, pos_x, pos_y, item.metadata)
+
+            ## Prepare next item
+            if (index + 1) % self.nb_items_per_row == 0:
+                pos_y += 36
+                pos_x = 244
+            else:
+                pos_x += 36
+            index += 1
+
+    def select_for_crafting(self):
+        if self.cursor in self.craft_selection:
+            self.craft_selection.remove(self.cursor)
+        else:
+            self.craft_selection.append(self.cursor)
