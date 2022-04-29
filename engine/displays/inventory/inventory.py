@@ -5,19 +5,15 @@ from engine.displays.inventory.inventory_item import InventoryItem
 
 class Inventory:
     def __init__(self):
-        self.all_items = []
+        self.all_items = {}
 
     def add_item(self, agent):
-        items_matching = self.find_item(agent)
-        if len(items_matching) == 0:
+        if agent.metadata.name not in self.all_items:
             item = InventoryItem(agent)
-            self.all_items.append(item)
+            self.all_items[agent.metadata.name] = item
         else:
-            item = items_matching[0]
+            item = self.all_items[agent.metadata.name]
             item.increment_counter()
-
-    def find_item(self, agent):
-        return [i for i in self.all_items if i.match_with(agent)]
         
     def size(self):
         total_size = 0

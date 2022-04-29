@@ -5,6 +5,7 @@ import psp2d
 from engine.displays.selection_display import SelectionDisplay
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
+from engine.formula import Formula
 
 
 class InventoryDisplay(SelectionDisplay):
@@ -22,11 +23,11 @@ class InventoryDisplay(SelectionDisplay):
         self.nb_items_per_row = 6
         self.max_items = 36
 
-        ## Cache assets of inventory
-        self.cached_assets = []
+        ## Cache assets of inventory (key = name, value = sprite)
+        self.cached_assets = {}
         self.assets_loaded = False
 
-        self.craft_selection = []
+        self.craft_formula = Formula()
         
 
     def update_for_selection(self, controller):
@@ -41,10 +42,31 @@ class InventoryDisplay(SelectionDisplay):
             self.update_cursor("RIGHT")
 
         elif controller.triangle:
-            self.select_for_crafting()
+            self.add_to_crafting()
+        elif controller.circle:
+            self.remove_from_crafting()
+
+        #elif controller.square:
+        #    self.start_crafting()
             
         elif controller.cross:
             self.game.close_inventory()
+
+    def start_crafting(self, formula):
+        ## Check that the crafting is possible
+        #for component in formula.ingredients.:
+        #    ## Get the selection of the user
+        #    component_is_available = False
+        #    for cursor in self.craft_formula.ingredients:
+        #        inventory_item = self.game.player.inventory.all_items[cursor]
+        #        if (inventory_item.metadata.name == component.name and
+        #            inventory_item.count == component.count
+        #        ):
+        #            component_is_available = True
+        #    if not component_is_available:
+        #        return False
+        ## All components are available, with the right count
+        pass
 
     
     def update_cursor(self, direction):
@@ -76,6 +98,9 @@ class InventoryDisplay(SelectionDisplay):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
 
+        ## Draw the help keys
+        self.font.drawText(self.screen, 4, 250, "Triangle=Add, Circle=Remove, Square=Craft, Cross=Close")
+
         self.draw_inventory()
         self.draw_crafting()
 
@@ -88,9 +113,9 @@ class InventoryDisplay(SelectionDisplay):
         (pos_x, pos_y) = (4, 38)
 
         if not self.assets_loaded:
-            for item in self.game.player.inventory.all_items:
+            for (item_name, item) in self.game.player.inventory.all_items.items():
                 asset = psp2d.Image(item.metadata.sprite_file)
-                self.cached_assets.append(asset)
+                self.cached_assets[item_name] = asset
             self.assets_loaded = True
 
         index = 0
@@ -106,20 +131,12 @@ class InventoryDisplay(SelectionDisplay):
                     pos_x, pos_y, True)
 
             if index < len(self.game.player.inventory.all_items):
-                item = self.game.player.inventory.all_items[index]
+                item = self.game.player.inventory.all_items.values()[index]
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
                 ## Display the sprite of the agent
-                asset = self.cached_assets[index]
-                self.draw_asset(asset, pos_x, pos_y, item.metadata)
+                asset = self.cached_assets[item.metadata.name]
+                self.draw_asset(asset, pos_x, pos_y, item.metadata, item.count)
 
-                ## Display the counter of item
-                text_x = pos_x + 23
-                text_y = pos_y + 18
-                if item.count > 10 :
-                    text_y += self.font.textWidth("0")
-                if item.count > 100 :
-                    text_y += self.font.textWidth("0")
-                self.font.drawText(self.screen, text_x, text_y, str(item.count))
             
             ## Prepare next item
             if (index + 1) % self.nb_items_per_row == 0:
@@ -129,7 +146,7 @@ class InventoryDisplay(SelectionDisplay):
                 pos_x += 36
             index += 1
 
-    def draw_asset(self, asset, pos_x, pos_y, agent_metadata):
+    def draw_asset(self, asset, pos_x, pos_y, agent_metadata, count):
         #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
         ## Display the sprite of the agent
         (width, height) = (agent_metadata.width, agent_metadata.height)
@@ -138,6 +155,14 @@ class InventoryDisplay(SelectionDisplay):
         self.screen.blit(asset, 0, 0, width, height, 
             pos_x + center_offset_x, 
             pos_y + center_offset_y, True)
+        ## Display the counter of item
+        text_x = pos_x + 23
+        text_y = pos_y + 18
+        if count >= 10 :
+            text_x -= self.font.textWidth("0")
+        if count >= 100 :
+            text_x -= self.font.textWidth("0")
+        self.font.drawText(self.screen, text_x, text_y, str(count))
 
     """
     Draw the selection for crafting in the right part of the screen
@@ -145,16 +170,16 @@ class InventoryDisplay(SelectionDisplay):
     def draw_crafting(self):
         (pos_x, pos_y) = (244, 38)
         index = 0
-        for cursor in self.craft_selection:
+        for (name, count) in self.craft_formula.ingredients.items():
             ## Display the background of the item
             self.screen.blit(self.item_background, 0, 0, self.item_size, self.item_size,
                 pos_x, pos_y, True)
 
-            item = self.game.player.inventory.all_items[cursor]
+            item = self.game.player.inventory.all_items[name]
             #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
             ## Display the sprite of the agent
-            asset = self.cached_assets[cursor]
-            self.draw_asset(asset, pos_x, pos_y, item.metadata)
+            asset = self.cached_assets[item.metadata.name]
+            self.draw_asset(asset, pos_x, pos_y, item.metadata, count)
 
             ## Prepare next item
             if (index + 1) % self.nb_items_per_row == 0:
@@ -164,8 +189,23 @@ class InventoryDisplay(SelectionDisplay):
                 pos_x += 36
             index += 1
 
-    def select_for_crafting(self):
-        if self.cursor in self.craft_selection:
-            self.craft_selection.remove(self.cursor)
+    def add_to_crafting(self):
+        item = self.game.player.inventory.all_items.values()[self.cursor]
+
+        if item.metadata.name in self.craft_formula.ingredients:
+            count = self.craft_formula.ingredients[item.metadata.name] + 1
+            if item.count < count:
+                ## Not enougth resource
+                return
         else:
-            self.craft_selection.append(self.cursor)
+            count = 1
+        
+        self.craft_formula.ingredients[item.metadata.name] = count
+
+    def remove_from_crafting(self):
+        item = self.game.player.inventory.all_items.values()[self.cursor]
+        if item.metadata.name in self.craft_formula.ingredients:
+            count = self.craft_formula.ingredients[item.metadata.name] - 1
+            self.craft_formula.ingredients[item.metadata.name] = count
+            if count == 0:
+                del(self.craft_formula.ingredients[item.metadata.name])

@@ -5,9 +5,6 @@ class InventoryItem:
         self.count = 1
         self.metadata = agent.metadata
 
-    def match_with(self, agent):
-        return self.metadata.name == agent.metadata.name
-
     def increment_counter(self):
         self.count += 1
 
