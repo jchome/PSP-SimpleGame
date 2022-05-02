@@ -46,27 +46,21 @@ class InventoryDisplay(SelectionDisplay):
         elif controller.circle:
             self.remove_from_crafting()
 
-        #elif controller.square:
-        #    self.start_crafting()
+        elif controller.square:
+            self.start_crafting()
             
         elif controller.cross:
             self.game.close_inventory()
 
-    def start_crafting(self, formula):
-        ## Check that the crafting is possible
-        #for component in formula.ingredients.:
-        #    ## Get the selection of the user
-        #    component_is_available = False
-        #    for cursor in self.craft_formula.ingredients:
-        #        inventory_item = self.game.player.inventory.all_items[cursor]
-        #        if (inventory_item.metadata.name == component.name and
-        #            inventory_item.count == component.count
-        #        ):
-        #            component_is_available = True
-        #    if not component_is_available:
-        #        return False
-        ## All components are available, with the right count
+    """
+    Craft something with ingredients
+    """
+    def start_crafting(self):
         pass
+        ## Check that the crafting is possible
+        #if not self.craft_formula.match(xxx):
+        ## All components are available, with the right count
+        #    return False
 
     
     def update_cursor(self, direction):
@@ -94,6 +88,7 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.cursor = self.cursor + 1
 
+
     def draw(self):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
@@ -103,6 +98,7 @@ class InventoryDisplay(SelectionDisplay):
 
         self.draw_inventory()
         self.draw_crafting()
+
 
     """
     Draw the list of items of the inventory in the left part of the screen
@@ -146,6 +142,9 @@ class InventoryDisplay(SelectionDisplay):
                 pos_x += 36
             index += 1
 
+    """
+    Draw the asset of an ingredient
+    """
     def draw_asset(self, asset, pos_x, pos_y, agent_metadata, count):
         #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
         ## Display the sprite of the agent
@@ -163,6 +162,7 @@ class InventoryDisplay(SelectionDisplay):
         if count >= 100 :
             text_x -= self.font.textWidth("0")
         self.font.drawText(self.screen, text_x, text_y, str(count))
+
 
     """
     Draw the selection for crafting in the right part of the screen
@@ -189,23 +189,32 @@ class InventoryDisplay(SelectionDisplay):
                 pos_x += 36
             index += 1
 
+    """
+    The user wants to add an ingedrient in the carft formula
+    """
     def add_to_crafting(self):
         item = self.game.player.inventory.all_items.values()[self.cursor]
 
         if item.metadata.name in self.craft_formula.ingredients:
-            count = self.craft_formula.ingredients[item.metadata.name] + 1
-            if item.count < count:
+            quantity = self.craft_formula.ingredients[item.metadata.name] + 1
+            if item.count < quantity:
                 ## Not enougth resource
                 return
         else:
-            count = 1
+            quantity = 1
         
-        self.craft_formula.ingredients[item.metadata.name] = count
+        self.craft_formula.ingredients[item.metadata.name] = quantity
 
+
+    """
+    Remove an ingredient of the craft formula
+    """
     def remove_from_crafting(self):
         item = self.game.player.inventory.all_items.values()[self.cursor]
         if item.metadata.name in self.craft_formula.ingredients:
-            count = self.craft_formula.ingredients[item.metadata.name] - 1
-            self.craft_formula.ingredients[item.metadata.name] = count
-            if count == 0:
+            quantity = self.craft_formula.ingredients[item.metadata.name] - 1
+            if quantity == 0:
                 del(self.craft_formula.ingredients[item.metadata.name])
+            else:
+                self.craft_formula.ingredients[item.metadata.name] = quantity
+
