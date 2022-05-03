@@ -93,7 +93,9 @@ class Game():
             inventory_display = InventoryDisplay(inventory_display_name)
         else:
             inventory_display = self.displays[inventory_display_name]
-
+            
+        ## Force the relad of assets
+        inventory_display.assets_loaded = False
         self.previous_display = self.active_display
         self.add_display(inventory_display)
         self.set_active_display(inventory_display_name)

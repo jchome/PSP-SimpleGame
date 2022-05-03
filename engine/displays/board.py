@@ -12,7 +12,7 @@ from engine.interaction_object import InteractionObject
 
 """
 Main class of the game.
-Every item is resistered in this container.
+Every item is persistered in this container.
 """
 class Board(Display):
     def __init__(self, config_file):

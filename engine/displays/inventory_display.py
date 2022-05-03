@@ -193,6 +193,8 @@ class InventoryDisplay(SelectionDisplay):
     The user wants to add an ingedrient in the carft formula
     """
     def add_to_crafting(self):
+        if not self.cursor in self.game.player.inventory.all_items.values():
+            return
         item = self.game.player.inventory.all_items.values()[self.cursor]
 
         if item.metadata.name in self.craft_formula.ingredients:
@@ -210,6 +212,8 @@ class InventoryDisplay(SelectionDisplay):
     Remove an ingredient of the craft formula
     """
     def remove_from_crafting(self):
+        if not self.cursor in self.game.player.inventory.all_items.values():
+            return
         item = self.game.player.inventory.all_items.values()[self.cursor]
         if item.metadata.name in self.craft_formula.ingredients:
             quantity = self.craft_formula.ingredients[item.metadata.name] - 1

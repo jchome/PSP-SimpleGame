@@ -17,6 +17,6 @@ class Inventory:
         
     def size(self):
         total_size = 0
-        for item in self.all_items:
+        for item in self.all_items.values():
             total_size += item.count
         return total_size
