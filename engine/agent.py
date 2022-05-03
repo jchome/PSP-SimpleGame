@@ -63,12 +63,14 @@ class Agent(object):
         config = ConfigParser()
         config.read(config_file)
         self.metadata.name = config.get("ASSET", "name")
-        if config.has_option("ASSET", "label"):
-            self.metadata.label = config.get("ASSET", "label")
-        else:
-            self.metadata.label = self.metadata.name
         self.metadata.sprite_file = config.get("ASSET", "source")
         self.source = psp2d.Image(self.metadata.sprite_file)
+
+        if config.has_section('LABEL'):
+            self.metadata.label = dict(config.items('LABEL'))
+        if config.has_section('DESCRIPTION'):
+            self.metadata.description = dict(config.items('DESCRIPTION'))
+
         sprites_definition = config.get("ASSET", "sprites")
         self.sprites = {}
         for item in sprites_definition.split("\n"):

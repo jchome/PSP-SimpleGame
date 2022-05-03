@@ -91,14 +91,6 @@ translations_dict = {
     "inventory.widget.objects-count": {
         "fr": "objets",
         "en": "items"
-    },
-    "object.label.knife": {
-        "fr": "couteau",
-        "en": "knife"
-    },
-    "object.label.palm-01": {
-        "fr": "palmier",
-        "en": "palm tree"
     }
     
 }

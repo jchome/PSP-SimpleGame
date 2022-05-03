@@ -56,7 +56,7 @@ class ControlsWidget(Widget):
         self.screen.blit(self.sprite, 0, 0, self.width, self.height, self.pos_x, self.pos_y, True)
         
         ## Draw title of the widget
-        title_translated = _("action.on_simple_object.title", self.language) + _(self.agent.metadata.label, self.language)
+        title_translated = _("action.on_simple_object.title", self.language) + self.agent.metadata.label[self.language]
         width_of_title = self.font.textWidth(title_translated)
         title_pos = Point(self.pos_x - (width_of_title / 2) + 25, self.pos_y - 17)
         self.draw_text(title_pos, title_translated)

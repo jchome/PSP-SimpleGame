@@ -97,8 +97,7 @@ class InventoryDisplay(SelectionDisplay):
         self.font.drawText(self.screen, 4, 250, "Triangle=Add, Circle=Remove, Square=Craft, Cross=Close")
 
         self.draw_inventory()
-        self.draw_crafting()
-
+        self.draw_detail()
 
     """
     Draw the list of items of the inventory in the left part of the screen
@@ -141,6 +140,17 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 pos_x += 36
             index += 1
+
+    """
+    Draw the detail of the item (an agent)
+    """
+    def draw_detail(self):
+        (pos_x, pos_y) = ((MAX_WIDTH / 2) + 4, 38)
+        if self.cursor >= len(self.game.player.inventory.all_items):
+            self.font.drawText(self.screen, pos_x, pos_y, "Nothing selected...")
+            return
+        item = self.game.player.inventory.all_items.values()[self.cursor]
+        self.font.drawText(self.screen, pos_x, pos_y, item.metadata.label[self.game.current_language])
 
     """
     Draw the asset of an ingredient
@@ -190,7 +200,7 @@ class InventoryDisplay(SelectionDisplay):
             index += 1
 
     """
-    The user wants to add an ingedrient in the carft formula
+    The user wants to add an ingredrient in the carft formula
     """
     def add_to_crafting(self):
         if not self.cursor in self.game.player.inventory.all_items.values():
