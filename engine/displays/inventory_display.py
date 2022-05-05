@@ -7,6 +7,9 @@ from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
 from engine.formula import Formula
 
+IMAGEINDEX_SMALL = 0
+IMAGEINDEX_DETAILED = 1
+
 
 class InventoryDisplay(SelectionDisplay):
 
@@ -23,7 +26,7 @@ class InventoryDisplay(SelectionDisplay):
         self.nb_items_per_row = 6
         self.max_items = 36
 
-        ## Cache assets of inventory (key = name, value = sprite)
+        ## Cache assets of inventory (key = name, value = [image, detailed_image])
         self.cached_assets = {}
         self.assets_loaded = False
 
@@ -108,9 +111,12 @@ class InventoryDisplay(SelectionDisplay):
         (pos_x, pos_y) = (4, 38)
 
         if not self.assets_loaded:
+            self.cached_assets = {}
             for (item_name, item) in self.game.player.inventory.all_items.items():
                 asset = psp2d.Image(item.metadata.sprite_file)
-                self.cached_assets[item_name] = asset
+                detail_asset = psp2d.Image(item.metadata.fullscreen_source)
+                ## Use ImageIndex enum
+                self.cached_assets[item_name] = [asset, detail_asset]
             self.assets_loaded = True
 
         index = 0
@@ -129,7 +135,7 @@ class InventoryDisplay(SelectionDisplay):
                 item = self.game.player.inventory.all_items.values()[index]
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
                 ## Display the sprite of the agent
-                asset = self.cached_assets[item.metadata.name]
+                asset = self.cached_assets[item.metadata.name][IMAGEINDEX_SMALL]
                 self.draw_asset(asset, pos_x, pos_y, item.metadata, item.count)
 
             
@@ -151,6 +157,15 @@ class InventoryDisplay(SelectionDisplay):
             return
         item = self.game.player.inventory.all_items.values()[self.cursor]
         self.font.drawText(self.screen, pos_x, pos_y, item.metadata.label[self.game.current_language])
+        
+        ## Draw the asset of the detail view, if exists. Its size is 150x150
+        asset = self.cached_assets[item.metadata.name][IMAGEINDEX_DETAILED]
+
+        self.screen.blit(asset, 0, 0, 150, 150, 
+            (MAX_WIDTH * 3 / 4) - 75, 
+            (MAX_HEIGHT / 2) - 75, True)
+        ## Draw the description
+        #self.font.drawText(self.screen, pos_x, pos_y, item.metadata.label[self.game.current_language])
 
     """
     Draw the asset of an ingredient
@@ -188,7 +203,7 @@ class InventoryDisplay(SelectionDisplay):
             item = self.game.player.inventory.all_items[name]
             #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
             ## Display the sprite of the agent
-            asset = self.cached_assets[item.metadata.name]
+            asset = self.cached_assets[item.metadata.name][IMAGEINDEX_SMALL]
             self.draw_asset(asset, pos_x, pos_y, item.metadata, count)
 
             ## Prepare next item

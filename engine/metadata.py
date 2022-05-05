@@ -8,6 +8,7 @@ class Metadata:
         self.width = 0
         self.height = 0
         self.name = ""
+        self.fullscreen_source = None
         ## Dict of <lang> -> <text translated>
         self.label = {}
         self.description = {}

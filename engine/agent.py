@@ -65,7 +65,8 @@ class Agent(object):
         self.metadata.name = config.get("ASSET", "name")
         self.metadata.sprite_file = config.get("ASSET", "source")
         self.source = psp2d.Image(self.metadata.sprite_file)
-
+        if config.has_option("ASSET", "fullscreen_source"):
+            self.metadata.fullscreen_source = config.get("ASSET", "fullscreen_source")
         if config.has_section('LABEL'):
             self.metadata.label = dict(config.items('LABEL'))
         if config.has_section('DESCRIPTION'):
