@@ -2,6 +2,7 @@
 
 import psp2d
 
+from engine.widgets.controls_widget import Button
 from engine.displays.selection_display import SelectionDisplay
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 import engine.helper as helper
@@ -31,6 +32,11 @@ class InventoryDisplay(SelectionDisplay):
         self.assets_loaded = False
 
         self.craft_formula = Formula()
+        self.controls_assets = {}
+        self.controls_assets[Button.TRIANGLE] = psp2d.Image("assets/control-triangle.png")
+        self.controls_assets[Button.SQUARE] = psp2d.Image("assets/control-square.png")
+        self.controls_assets[Button.CIRCLE] = psp2d.Image("assets/control-circle.png")
+        self.controls_assets[Button.CROSS] = psp2d.Image("assets/control-cross.png")
         
 
     def update_for_selection(self, controller):
@@ -97,7 +103,8 @@ class InventoryDisplay(SelectionDisplay):
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
 
         ## Draw the help keys
-        self.font.drawText(self.screen, 4, 250, "Triangle=Add, Circle=Remove, Square=Craft, Cross=Close")
+        self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, 4, 252, True)
+        self.font.drawText(self.screen, 20, 252, "Add")
 
         self.draw_inventory()
         self.draw_detail()
@@ -165,7 +172,10 @@ class InventoryDisplay(SelectionDisplay):
             (MAX_WIDTH * 3 / 4) - 75, 
             (MAX_HEIGHT / 2) - 75, True)
         ## Draw the description
-        #self.font.drawText(self.screen, pos_x, pos_y, item.metadata.label[self.game.current_language])
+        description = item.metadata.description[self.game.current_language]
+        pos_y = 240
+        pos_x = (MAX_WIDTH * 3 / 4) - (self.font.textWidth(description) / 2)
+        self.font.drawText(self.screen, pos_x, pos_y, description)
 
     """
     Draw the asset of an ingredient
