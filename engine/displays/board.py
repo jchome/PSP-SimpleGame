@@ -6,7 +6,7 @@ from configparser import ConfigParser
 
 import engine.helper as helper
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
-from engine.displays.conf_board import ConfBoard
+from engine.conf_board import ConfBoard
 from engine.displays.display import Display
 from engine.interaction_object import InteractionObject
 

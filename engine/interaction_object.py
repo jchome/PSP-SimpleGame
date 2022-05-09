@@ -1,6 +1,5 @@
 # -*- coding: iso-8859-1 -*-
 
-import psp2d
 from agent import Agent
 
 """

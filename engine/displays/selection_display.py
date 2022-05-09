@@ -21,6 +21,10 @@ class SelectionDisplay(Display):
     SelectionDisplay.update(self, controller) in the subclass
     """
     def update(self, controller):
+        if not self.active:
+            print("This display is not active.")
+            return
+
         if (time() - self.last_update < 0.01):
             return
 
@@ -34,7 +38,6 @@ class SelectionDisplay(Display):
             
         self.last_keydown = keydown
         self.last_update = time()
-
         self.update_for_selection(controller)
 
     """

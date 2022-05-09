@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
-from engine.widget import Widget
 
 import psp2d
+from engine.widget import Widget
 
 """
 Add this widget in the game to display some debug text

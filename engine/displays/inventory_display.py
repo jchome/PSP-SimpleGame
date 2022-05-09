@@ -2,11 +2,11 @@
 
 import psp2d
 
-from engine.widgets.controls_widget import Button
+#import engine.helper as helper
+#from engine.widgets.controls_widget import Button
 from engine.displays.selection_display import SelectionDisplay
-from engine.constants import MAX_HEIGHT, MAX_WIDTH
-import engine.helper as helper
-from engine.formula import Formula
+#from engine.constants import MAX_HEIGHT, MAX_WIDTH
+#from engine.formula import Formula
 
 IMAGEINDEX_SMALL = 0
 IMAGEINDEX_DETAILED = 1
@@ -121,7 +121,9 @@ class InventoryDisplay(SelectionDisplay):
             self.cached_assets = {}
             for (item_name, item) in self.game.player.inventory.all_items.items():
                 asset = psp2d.Image(item.metadata.sprite_file)
-                detail_asset = psp2d.Image(item.metadata.fullscreen_source)
+                detail_asset = None
+                if item.metadata.fullscreen_source:
+                    detail_asset = psp2d.Image(item.metadata.fullscreen_source)
                 ## Use ImageIndex enum
                 self.cached_assets[item_name] = [asset, detail_asset]
             self.assets_loaded = True
@@ -163,16 +165,21 @@ class InventoryDisplay(SelectionDisplay):
             self.font.drawText(self.screen, pos_x, pos_y, "Nothing selected...")
             return
         item = self.game.player.inventory.all_items.values()[self.cursor]
-        self.font.drawText(self.screen, pos_x, pos_y, item.metadata.label[self.game.current_language])
+        label = item.metadata.name + ".metadata.label"
+        if self.game.current_language in item.metadata.label:
+            label = item.metadata.label[self.game.current_language]
+        self.font.drawText(self.screen, pos_x, pos_y, label)
         
         ## Draw the asset of the detail view, if exists. Its size is 150x150
         asset = self.cached_assets[item.metadata.name][IMAGEINDEX_DETAILED]
-
-        self.screen.blit(asset, 0, 0, 150, 150, 
-            (MAX_WIDTH * 3 / 4) - 75, 
-            (MAX_HEIGHT / 2) - 75, True)
+        if asset is not None:
+            self.screen.blit(asset, 0, 0, 150, 150, 
+                (MAX_WIDTH * 3 / 4) - 75, 
+                (MAX_HEIGHT / 2) - 75, True)
         ## Draw the description
-        description = item.metadata.description[self.game.current_language]
+        description = item.metadata.name + ".metadata.description"
+        if self.game.current_language in item.metadata.description:
+            description = item.metadata.description[self.game.current_language]
         pos_y = 240
         pos_x = (MAX_WIDTH * 3 / 4) - (self.font.textWidth(description) / 2)
         self.font.drawText(self.screen, pos_x, pos_y, description)

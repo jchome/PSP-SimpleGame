@@ -1,8 +1,5 @@
 # -*- coding: iso-8859-1 -*-
 from engine.helper import Point
-from engine.widgets import actions_on_agent
-import psp2d
-
 from engine.widget import Widget
 
 import engine.translation

@@ -1,13 +1,12 @@
 # -*- coding: iso-8859-1 -*-
 
 import psp2d
-from time import time
-import math
+#import math
 from configparser import ConfigParser
 
-from engine.displays.conf_board import ConfBoard
+from engine.conf_board import ConfBoard
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
-from engine.helper import Point, color_not_alpha_0, match_colors, str_color
+from engine.helper import Point, str_color
 from engine.interaction_object import InteractionObject
 from engine.agent import Agent
 from engine.displays.board import Board
@@ -65,6 +64,7 @@ class Player(Agent):
         self.bonus = 0
         self.debug = False
         self.inventory = Inventory()
+
 
     def compute_new_position(self, controller):
         (dx, dy) = (0, 0)
@@ -199,6 +199,7 @@ class Player(Agent):
             self.pos_x = int(new_pos_x)
             self.pos_y = int(new_pos_y)
             
+
     def get_new_position_in_new_board(self, board_conf):
         point_to_new_board = board_conf.position_in_board.copy()
 
@@ -210,6 +211,7 @@ class Player(Agent):
             point_to_new_board.y = self.pos_y
 
         return point_to_new_board
+
 
     def go_to_board(self, board_conf):
         #print("Going to display %s" % board_conf)
@@ -225,6 +227,7 @@ class Player(Agent):
         #print(" ... at position %s" % str(point_to_new_board))
 
         return point_to_new_board
+
 
     def draw(self, screen):
         if not self.is_visible:
@@ -258,8 +261,10 @@ class Player(Agent):
         self.controls_widget.set_agent(agent)
         self.current_board.game.add_widget(self.controls_widget)
 
+
     def close_controls_widget(self):
         self.controls_widget = None
+
 
     def add_to_inventory(self, agent):
         self.inventory.add_item(agent)

@@ -1,8 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
 import re
-import engine.helper as helper
-import psp2d
 
 class AgentActionsReader(object):
 

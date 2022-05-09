@@ -73,7 +73,8 @@ class Menu(SelectionDisplay):
         pass
 
 
-    def update_for_selection(self, controller):
+    def update_for_selection(self, controller0):
+        controller = psp2d.Controller()
         ## Slow down the update
         if self.first_display:
             self.first_display = False

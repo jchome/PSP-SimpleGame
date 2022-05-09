@@ -8,7 +8,6 @@ from time import time
 from engine.displays.board import Board
 from engine.displays.menu import Menu
 from engine.displays.inventory_display import InventoryDisplay
-from engine.displays.display import Display
 
 class Game():
     def __init__(self):

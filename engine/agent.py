@@ -6,7 +6,7 @@ from configparser import ConfigParser
 
 import engine.helper as helper
 from engine.metadata import Metadata
-from engine.displays.conf_board import ConfBoard
+from engine.conf_board import ConfBoard
 from engine.agent_actions_reader import AgentActionsReader
 
 

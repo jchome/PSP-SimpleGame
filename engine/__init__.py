@@ -1,17 +1,20 @@
+# -*- coding: iso-8859-1 -*-
+
+## engine init
 
 from constants import *
-#from agent import *
-from game import Game
 from helper import *
 from translation import *
-from interaction_object import InteractionObject
-from player import Player
-from widget import Widget
-from engine.agent_actions_reader import AgentActionsReader
+#from widget import Widget
+#from formula import Formula
+#from conf_board import ConfBoard
+#from interaction_object import InteractionObject
+#from engine.agent_actions_reader import AgentActionsReader
 
-from formula import *
+#from engine.displays import *
+#from engine.widgets import *
 
-from engine.displays import *
+#from game import Game
+#from player import Player
 
-from widgets import *
 
