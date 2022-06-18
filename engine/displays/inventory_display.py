@@ -2,11 +2,12 @@
 
 import psp2d
 
-#import engine.helper as helper
-#from engine.widgets.controls_widget import Button
+import engine.helper as helper
 from engine.displays.selection_display import SelectionDisplay
-#from engine.constants import MAX_HEIGHT, MAX_WIDTH
-#from engine.formula import Formula
+
+from engine.widgets.controls_widget import Button
+from engine.constants import MAX_HEIGHT, MAX_WIDTH
+from engine.formula import Formula
 
 IMAGEINDEX_SMALL = 0
 IMAGEINDEX_DETAILED = 1
@@ -103,8 +104,15 @@ class InventoryDisplay(SelectionDisplay):
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
 
         ## Draw the help keys
-        self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, 4, 252, True)
-        self.font.drawText(self.screen, 20, 252, "Add")
+        pos_x = 4
+        self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
+        pos_x += 16
+        self.font.drawText(self.screen, pos_x, 253, "Add")
+        pos_x += self.font.textWidth("Add ")
+        
+        self.screen.blit(self.controls_assets[Button.CROSS], 0, 0, 16, 16, pos_x, 252, True)
+        pos_x += 16
+        self.font.drawText(self.screen, pos_x, 253, "Exit")
 
         self.draw_inventory()
         self.draw_detail()

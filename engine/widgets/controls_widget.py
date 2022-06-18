@@ -26,7 +26,7 @@ class ControlsWidget(Widget):
         self.agent = None
         self.player = player
         self.language = player.current_board.game.current_language
-        print("current_language : %s" % player.current_board.game.current_language)
+        #print("current_language : %s" % player.current_board.game.current_language)
 
     def set_agent(self, agent):
         self.agent = agent
