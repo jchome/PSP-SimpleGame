@@ -89,8 +89,8 @@ class Menu(SelectionDisplay):
             self.update_selection( (self.user_choice_index - 1) % len(self.items) )
         
         #print("self.user_choice: %d" % self.user_choice)
-        ## Choice is done with the CIRCLE button
-        elif controller.circle:
+        ## Choice is done with the CROSS button
+        elif controller.cross:
             self.on_select(self.items[self.user_choice_index].label)
     
     def update_selection(self, item_number):

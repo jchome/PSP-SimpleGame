@@ -19,5 +19,5 @@ class ActionsOnTree(ActionsOnAgent):
         
     def cancel(self, player, action, agent):
         player.close_controls_widget()
-        player.current_board.exit()
+        #player.current_board.exit()
 

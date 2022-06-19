@@ -53,13 +53,13 @@ class InventoryDisplay(SelectionDisplay):
 
         elif controller.triangle:
             self.add_to_crafting()
-        elif controller.circle:
+        elif controller.cross:
             self.remove_from_crafting()
 
         elif controller.square:
             self.start_crafting()
             
-        elif controller.cross:
+        elif controller.circle:
             self.game.close_inventory()
 
     """
@@ -110,7 +110,7 @@ class InventoryDisplay(SelectionDisplay):
         self.font.drawText(self.screen, pos_x, 253, "Add")
         pos_x += self.font.textWidth("Add ")
         
-        self.screen.blit(self.controls_assets[Button.CROSS], 0, 0, 16, 16, pos_x, 252, True)
+        self.screen.blit(self.controls_assets[Button.CIRCLE], 0, 0, 16, 16, pos_x, 252, True)
         pos_x += 16
         self.font.drawText(self.screen, pos_x, 253, "Exit")
 
