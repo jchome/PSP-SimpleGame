@@ -9,6 +9,9 @@ from engine.widgets.controls_widget import Button
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.formula import Formula
 
+import engine.translation
+_ = engine.translation.translate
+
 IMAGEINDEX_SMALL = 0
 IMAGEINDEX_DETAILED = 1
 
@@ -102,17 +105,22 @@ class InventoryDisplay(SelectionDisplay):
     def draw(self):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
+        pos_x = 4
 
         ## Draw the help keys
-        pos_x = 4
+
+        ## TODO: Enable or not this button
         self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
         pos_x += 16
-        self.font.drawText(self.screen, pos_x, 253, "Add")
-        pos_x += self.font.textWidth("Add ")
+        text_interaction = _("inventory.action.interaction", self.game.current_language)
+        self.font.drawText(self.screen, pos_x, 253, text_interaction)
+        pos_x += self.font.textWidth(text_interaction) + 10
         
+        ## Exit button
         self.screen.blit(self.controls_assets[Button.CIRCLE], 0, 0, 16, 16, pos_x, 252, True)
         pos_x += 16
-        self.font.drawText(self.screen, pos_x, 253, "Exit")
+        text_exit = _("inventory.action.exit", self.game.current_language)
+        self.font.drawText(self.screen, pos_x, 253, text_exit)
 
         self.draw_inventory()
         self.draw_detail()

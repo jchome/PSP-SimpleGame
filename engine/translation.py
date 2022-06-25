@@ -91,6 +91,13 @@ translations_dict = {
     "inventory.widget.objects-count": {
         "fr": "objets",
         "en": "items"
+    },
+    "inventory.action.interaction": {
+        "fr": "Interagir",
+        "en": "Interact"
+    },
+    "inventory.action.exit": {
+        "fr": "Quitter",
+        "en": "Exit"
     }
-    
 }

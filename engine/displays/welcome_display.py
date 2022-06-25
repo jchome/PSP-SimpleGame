@@ -19,6 +19,7 @@ class WelcomeDisplay(Display):
 
         (self.background, _) = helper.load_sprite("assets/displays/welcome.png", 
             MAX_WIDTH, MAX_HEIGHT)
+        self.button_CROSS_asset = psp2d.Image("assets/control-cross.png")
 
 
     def set_text(self, text):
@@ -36,8 +37,18 @@ class WelcomeDisplay(Display):
     def draw(self):
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         #self.screen.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT, psp2d.Color(0,0,0,255))
-        if self.is_ready:
-            self.debug_font.drawText(self.screen, 130, 240, "Press cross to start")
 
-        self.screen.fillRect(0, 0, 250, 16, psp2d.Color(0,0,0,128))
-        self.debug_font.drawText(self.screen, 0, 0, self.text)
+        ## Draw the current debug text
+        pos_y = 200
+        self.screen.fillRect(100, pos_y, MAX_WIDTH - 200, 16, psp2d.Color(0,0,0,128))
+        text_width = self.debug_font.textWidth(self.text)
+        pos_x = (MAX_WIDTH - text_width) / 2
+        self.debug_font.drawText(self.screen, pos_x, pos_y, self.text)
+        
+        if self.is_ready:
+            pos_y = 220
+            pos_x = (MAX_WIDTH - self.debug_font.textWidth("Start")) / 2
+            self.screen.blit(self.button_CROSS_asset, 0, 0, 16, 16, pos_x, pos_y, True)
+            pos_x += 16
+            self.debug_font.drawText(self.screen, pos_x, pos_y + 1, "Start")
+
