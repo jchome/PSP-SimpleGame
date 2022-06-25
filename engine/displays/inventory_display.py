@@ -24,10 +24,11 @@ class InventoryDisplay(SelectionDisplay):
         (self.background, _) = helper.load_sprite("assets/displays/inventory.png", 
             MAX_WIDTH, MAX_HEIGHT)
         self.item_size = 32
-        (self.item_background, self.item_selected) = helper.load_sprite("assets/displays/inventory-item.png", 
+        (self.asset_item_background, self.asset_item_selected) = helper.load_sprite("assets/displays/inventory-item.png", 
             self.item_size, self.item_size)
 
         self.cursor = 0
+        self.current_item = None
         self.nb_items_per_row = 6
         self.max_items = 36
 
@@ -101,6 +102,11 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.cursor = self.cursor + 1
 
+        if self.cursor >= len(self.game.player.inventory.all_items):
+            self.current_item = None
+        else:
+            self.current_item = self.game.player.inventory.all_items.values()[self.cursor]
+
 
     def draw(self):
         ## Draw background
@@ -109,19 +115,22 @@ class InventoryDisplay(SelectionDisplay):
 
         ## Draw the help keys
 
-        ## TODO: Enable or not this button
-        self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
-        pos_x += 16
-        text_interaction = _("inventory.action.interaction", self.game.current_language)
-        self.font.drawText(self.screen, pos_x, 253, text_interaction)
-        pos_x += self.font.textWidth(text_interaction) + 10
-        
         ## Exit button
         self.screen.blit(self.controls_assets[Button.CIRCLE], 0, 0, 16, 16, pos_x, 252, True)
         pos_x += 16
         text_exit = _("inventory.action.exit", self.game.current_language)
         self.font.drawText(self.screen, pos_x, 253, text_exit)
+        pos_x += self.font.textWidth(text_exit) + 10
 
+
+        ## Interaction button
+        if self.current_item is not None and self.current_item.metadata.name == "FORMULA":
+            self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
+            pos_x += 16
+            text_interaction = _("inventory.action.interaction", self.game.current_language)
+            self.font.drawText(self.screen, pos_x, 253, text_interaction)
+            pos_x += self.font.textWidth(text_interaction) + 10
+        
         self.draw_inventory()
         self.draw_detail()
 
@@ -145,15 +154,14 @@ class InventoryDisplay(SelectionDisplay):
             self.assets_loaded = True
 
         index = 0
-        #for item in self.game.player.inventory.all_items:
         for index in range(0, self.max_items):
             if index == self.cursor:
                 ## Display the selection image of the item
-                self.screen.blit(self.item_selected, 0, 0, self.item_size, self.item_size,
+                self.screen.blit(self.asset_item_selected, 0, 0, self.item_size, self.item_size,
                     pos_x, pos_y, True)
             else:
                 ## Display the background of the item
-                self.screen.blit(self.item_background, 0, 0, self.item_size, self.item_size,
+                self.screen.blit(self.asset_item_background, 0, 0, self.item_size, self.item_size,
                     pos_x, pos_y, True)
 
             if index < len(self.game.player.inventory.all_items):
@@ -177,25 +185,27 @@ class InventoryDisplay(SelectionDisplay):
     """
     def draw_detail(self):
         (pos_x, pos_y) = ((MAX_WIDTH / 2) + 4, 38)
-        if self.cursor >= len(self.game.player.inventory.all_items):
+        if self.current_item is None:
             self.font.drawText(self.screen, pos_x, pos_y, "Nothing selected...")
             return
-        item = self.game.player.inventory.all_items.values()[self.cursor]
-        label = item.metadata.name + ".metadata.label"
-        if self.game.current_language in item.metadata.label:
-            label = item.metadata.label[self.game.current_language]
+
+        #item = self.game.player.inventory.all_items.values()[self.cursor]
+
+        label = self.current_item.metadata.name + ".metadata.label"
+        if self.game.current_language in self.current_item.metadata.label:
+            label = self.current_item.metadata.label[self.game.current_language]
         self.font.drawText(self.screen, pos_x, pos_y, label)
         
         ## Draw the asset of the detail view, if exists. Its size is 150x150
-        asset = self.cached_assets[item.metadata.name][IMAGEINDEX_DETAILED]
+        asset = self.cached_assets[self.current_item.metadata.name][IMAGEINDEX_DETAILED]
         if asset is not None:
             self.screen.blit(asset, 0, 0, 150, 150, 
                 (MAX_WIDTH * 3 / 4) - 75, 
                 (MAX_HEIGHT / 2) - 75, True)
         ## Draw the description
-        description = item.metadata.name + ".metadata.description"
-        if self.game.current_language in item.metadata.description:
-            description = item.metadata.description[self.game.current_language]
+        description = self.current_item.metadata.name + ".metadata.description"
+        if self.game.current_language in self.current_item.metadata.description:
+            description = self.current_item.metadata.description[self.game.current_language]
         pos_y = 240
         pos_x = (MAX_WIDTH * 3 / 4) - (self.font.textWidth(description) / 2)
         self.font.drawText(self.screen, pos_x, pos_y, description)
@@ -230,7 +240,7 @@ class InventoryDisplay(SelectionDisplay):
         index = 0
         for (name, count) in self.craft_formula.ingredients.items():
             ## Display the background of the item
-            self.screen.blit(self.item_background, 0, 0, self.item_size, self.item_size,
+            self.screen.blit(self.asset_item_background, 0, 0, self.item_size, self.item_size,
                 pos_x, pos_y, True)
 
             item = self.game.player.inventory.all_items[name]
