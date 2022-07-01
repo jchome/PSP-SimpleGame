@@ -20,7 +20,8 @@ class InventoryDisplay(SelectionDisplay):
 
     def __init__(self, name):
         SelectionDisplay.__init__(self, name)
-        self.font = psp2d.Font('font.png')
+        self.font = psp2d.Font('assets/font-white.png')
+        self.font_black = psp2d.Font('assets/font-black.png')
         (self.background, _) = helper.load_sprite("assets/displays/inventory.png", 
             MAX_WIDTH, MAX_HEIGHT)
         self.item_size = 32
@@ -106,6 +107,7 @@ class InventoryDisplay(SelectionDisplay):
             self.current_item = None
         else:
             self.current_item = self.game.player.inventory.all_items.values()[self.cursor]
+
 
 
     def draw(self):
@@ -198,10 +200,11 @@ class InventoryDisplay(SelectionDisplay):
         
         ## Draw the asset of the detail view, if exists. Its size is 150x150
         asset = self.cached_assets[self.current_item.metadata.name][IMAGEINDEX_DETAILED]
+        img_pos = helper.Point((MAX_WIDTH * 3 / 4) - 75, (MAX_HEIGHT / 2) - 75)
         if asset is not None:
             self.screen.blit(asset, 0, 0, 150, 150, 
-                (MAX_WIDTH * 3 / 4) - 75, 
-                (MAX_HEIGHT / 2) - 75, True)
+                img_pos.x, 
+                img_pos.y, True)
         ## Draw the description
         description = self.current_item.metadata.name + ".metadata.description"
         if self.game.current_language in self.current_item.metadata.description:
@@ -209,6 +212,13 @@ class InventoryDisplay(SelectionDisplay):
         pos_y = 240
         pos_x = (MAX_WIDTH * 3 / 4) - (self.font.textWidth(description) / 2)
         self.font.drawText(self.screen, pos_x, pos_y, description)
+
+        ##TODO: category of agent
+        if self.current_item.metadata.name == "FORMULA":
+            formula = self.current_item.metadata.production_plan
+            formula.draw_ingredients(self.screen, img_pos, 
+                self.font_black, self.game.current_language)
+
 
     """
     Draw the asset of an ingredient

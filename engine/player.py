@@ -15,7 +15,7 @@ from engine.widgets.controls_widget import Button, ControlsWidget
 from engine.displays.inventory.inventory import Inventory
 
 
-font = psp2d.Font('font.png')
+
 
 class Player(Agent):
     def __init__(self):
@@ -242,7 +242,8 @@ class Player(Agent):
         if self.debug:
             screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
                 self.shadow_width, self.shadow_height, psp2d.Color(0,0,255,128))
-            font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
+            #font = psp2d.Font('assets/font-white.png')
+            #font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
 
         if self.is_running:
             # One more step of the animation

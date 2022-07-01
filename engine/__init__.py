@@ -5,6 +5,7 @@
 from constants import *
 from helper import *
 from translation import *
+from metadata import *
 #from widget import Widget
 #from formula import Formula
 #from conf_board import ConfBoard

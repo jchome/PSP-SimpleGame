@@ -5,7 +5,7 @@ import psp2d
 class Widget:
 
     def __init__(self, sprite_path, pos_x, pos_y):
-        self.font = psp2d.Font('font.png')
+        self.font = psp2d.Font('assets/font-white.png')
         (self.pos_x, self.pos_y) = (pos_x, pos_y)
         ## Set default width and height
         (self.width, self.height) = (50,50)

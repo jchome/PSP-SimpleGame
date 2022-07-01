@@ -8,6 +8,7 @@ import engine.helper as helper
 from engine.metadata import Metadata
 from engine.conf_board import ConfBoard
 from engine.agent_actions_reader import AgentActionsReader
+from engine.formula import Formula
 
 
 """
@@ -32,8 +33,6 @@ class Agent(object):
 
         self.metadata = Metadata()
         self.metadata.sprite_file = sprite_file
-        self.metadata.width = 32
-        self.metadata.height = 32
 
         self.pos_x = 0
         self.pos_y = 0
@@ -44,6 +43,8 @@ class Agent(object):
         self.conf_boards = None
         self.debug = False
         self.id = "String defined by the board"
+        ## For formulas
+        self.production_plan = None
 
     def get_rectangle(self):
         return helper.Rect(self.pos_x, self.pos_y, self.metadata.width, self.metadata.height)
@@ -62,20 +63,13 @@ class Agent(object):
 
         config = ConfigParser()
         config.read(config_file)
-        self.metadata.name = config.get("ASSET", "name")
-        self.metadata.sprite_file = config.get("ASSET", "source")
+        self.metadata.load_config(config)
         try:
             self.source = psp2d.Image(self.metadata.sprite_file)
         except:
             print("Cannot open file --%s--" % self.metadata.sprite_file)
             
-        if config.has_option("ASSET", "fullscreen_source"):
-            self.metadata.fullscreen_source = config.get("ASSET", "fullscreen_source")
-        if config.has_section('LABEL'):
-            self.metadata.label = dict(config.items('LABEL'))
-        if config.has_section('DESCRIPTION'):
-            self.metadata.description = dict(config.items('DESCRIPTION'))
-
+        
         sprites_definition = config.get("ASSET", "sprites")
         self.sprites = {}
         for item in sprites_definition.split("\n"):
@@ -88,9 +82,6 @@ class Agent(object):
         
         self.is_animated = len(self.sprites) > 0
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
-
-        self.metadata.width = config.getint("DIMENSION", "width")
-        self.metadata.height = config.getint("DIMENSION", "height")
 
         self.shadow_type = config.get("SHADOW", "shadow_type")
         if self.shadow_type == "RECT":
@@ -129,6 +120,13 @@ class Agent(object):
         if config.has_option("COLLISION", "open_inventory"):
             self.inventory_open_color = config.get("COLLISION", "open_inventory")
 
+        if config.has_option("CRAFT", "formula"):
+            formula_config_file = config.get("CRAFT", "formula").strip()
+            ## remove first and last quote
+            if formula_config_file[0] in '\'"':
+                formula_config_file = formula_config_file[1:-1]
+            self.metadata.production_plan = Formula(formula_config_file)
+            
         self.load_custom_config(config)
         
     """
