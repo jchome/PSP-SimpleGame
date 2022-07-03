@@ -37,7 +37,6 @@ class InventoryDisplay(SelectionDisplay):
         self.cached_assets = {}
         self.assets_loaded = False
 
-        self.craft_formula = Formula()
         self.controls_assets = {}
         self.controls_assets[Button.TRIANGLE] = psp2d.Image("assets/control-triangle.png")
         self.controls_assets[Button.SQUARE] = psp2d.Image("assets/control-square.png")
@@ -57,9 +56,7 @@ class InventoryDisplay(SelectionDisplay):
             self.update_cursor("RIGHT")
 
         elif controller.triangle:
-            self.add_to_crafting()
-        elif controller.cross:
-            self.remove_from_crafting()
+            self.start_crafting()
 
         elif controller.square:
             self.start_crafting()
@@ -71,11 +68,13 @@ class InventoryDisplay(SelectionDisplay):
     Craft something with ingredients
     """
     def start_crafting(self):
-        pass
-        ## Check that the crafting is possible
-        #if not self.craft_formula.match(xxx):
-        ## All components are available, with the right count
-        #    return False
+        if self.current_item is not None and self.current_item.metadata.name == "FORMULA":
+            formula = self.current_item.metadata.production_plan
+            formula.check_ingredients_availability(self.game.player.inventory)
+            if formula.all_ingredients_available:
+                ## Add the result, remove each ingredient of the inventory
+                formula.craft(self.game.player.inventory)
+                
 
     
     def update_cursor(self, direction):
@@ -139,6 +138,14 @@ class InventoryDisplay(SelectionDisplay):
         self.draw_inventory()
         self.draw_detail()
 
+    def load_asset(self, item):
+        asset = psp2d.Image(item.metadata.sprite_file)
+        detail_asset = None
+        if item.metadata.fullscreen_source:
+            detail_asset = psp2d.Image(item.metadata.fullscreen_source)
+        ## Use ImageIndex enum
+        self.cached_assets[item.metadata.name] = [asset, detail_asset]
+
     """
     Draw the list of items of the inventory in the left part of the screen
     """
@@ -150,12 +157,7 @@ class InventoryDisplay(SelectionDisplay):
         if not self.assets_loaded:
             self.cached_assets = {}
             for (item_name, item) in self.game.player.inventory.all_items.items():
-                asset = psp2d.Image(item.metadata.sprite_file)
-                detail_asset = None
-                if item.metadata.fullscreen_source:
-                    detail_asset = psp2d.Image(item.metadata.fullscreen_source)
-                ## Use ImageIndex enum
-                self.cached_assets[item_name] = [asset, detail_asset]
+                self.load_asset(item)
             self.assets_loaded = True
 
         index = 0
@@ -172,8 +174,10 @@ class InventoryDisplay(SelectionDisplay):
             if index < len(self.game.player.inventory.all_items):
                 item = self.game.player.inventory.all_items.values()[index]
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
-                ## Display the sprite of the agent
+                if item.metadata.name not in self.cached_assets:
+                    self.load_asset(item)
                 asset = self.cached_assets[item.metadata.name][IMAGEINDEX_SMALL]
+                ## Display the sprite of the agent
                 self.draw_asset(asset, pos_x, pos_y, item.metadata, item.count)
 
             

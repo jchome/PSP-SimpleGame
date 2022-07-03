@@ -29,3 +29,11 @@ class Inventory:
             return False
         item = self.all_items[item_name]
         return item.count >= item_counter
+
+    def remove_item(self, item):
+        if item.metadata.name not in self.all_items:
+            return
+        item_of_inventory = self.all_items[item.metadata.name]
+        item_of_inventory.count -= item.count
+        if item_of_inventory.count == 0:
+            del(self.all_items[item.metadata.name])

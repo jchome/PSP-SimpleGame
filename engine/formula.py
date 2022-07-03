@@ -68,12 +68,20 @@ class Formula(object):
 
     def check_ingredients_availability(self, player_inventory):
         self.all_ingredients_available = False
-        for inventoryItem in self.ingredients:
-            inventoryItem.enough_in_inventory = player_inventory.contains(inventoryItem.metadata.name, inventoryItem.count)
-            if not inventoryItem.enough_in_inventory:
-                return False
-        self.all_ingredients_available = True
+        availability_successed = True
+        for inventory_item in self.ingredients:
+            inventory_item.enough_in_inventory = player_inventory.contains(inventory_item.metadata.name, inventory_item.count)
+            if not inventory_item.enough_in_inventory:
+                availability_successed = False
+        
+        self.all_ingredients_available = availability_successed
     
+    def craft(self, player_inventory):
+        for inventory_item in self.ingredients:
+            player_inventory.remove_item(inventory_item)
+        for inventory_item in self.results:
+            player_inventory.add_item(inventory_item)
+        self.check_ingredients_availability(player_inventory)
 
     """
     Remove an ingredient
