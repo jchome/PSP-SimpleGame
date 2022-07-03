@@ -2,6 +2,8 @@
 
 import os
 import re
+from engine import constants
+from engine.displays.inventory.inventory_item_formula import InventoryItemFormula
 import psp2d
 from configparser import ConfigParser
 
@@ -14,6 +16,11 @@ class Formula(object):
         self.ingredients = [] ## Array of InventoryItem
         self.results = [] ## Array of InventoryItem
         self.cached_assets = {}
+        self.cached_assets["CKECK-ICON"] = psp2d.Image("assets/inventory-check.png")
+        self.cached_assets["ARROW-ICON"] = psp2d.Image("assets/inventory-arrow.png")
+
+        ## If craft is possible, the player needs to have all required ingredients
+        self.all_ingredients_available = False
         if config_file is None:
             return
 
@@ -35,7 +42,7 @@ class Formula(object):
     """
     Update the formula with the line of the configuration file
     """
-    def read_components(self, listOfInventoryItems, parameters):
+    def read_components(self, list_of_inventory_items, parameters):
         config = ConfigParser()
         for raw_parameter in parameters.split("\n"):
             #print("raw_parameter = %s" % raw_parameter)
@@ -43,20 +50,30 @@ class Formula(object):
             if not conf:
                 print("Conf not readable as excpected: --%s--" % raw_parameter.strip())
                 continue
-            item = InventoryItem()
-            item.counter = int(conf.group(1))
+            metadata_of_component = Metadata()
             config.read(conf.group(2))
-            item.metadata = Metadata()
-            item.metadata.load_config(config)
-            listOfInventoryItems.append(item)
+            metadata_of_component.load_config(config)
+
+            item = InventoryItemFormula(metadata_of_component)
+            item.count = int(conf.group(1))
+
+            list_of_inventory_items.append(item)
 
             ## Cache the asset of the item
-            if item.metadata.name not in self.cached_assets:
+            if metadata_of_component.name not in self.cached_assets:
                 try:
-                    self.cached_assets[item.metadata.name] = psp2d.Image(item.metadata.sprite_file)
+                    self.cached_assets[metadata_of_component.name] = psp2d.Image(metadata_of_component.sprite_file)
                 except:
-                    print("Cannot open file --%s--" % item.metadata.sprite_file)
+                    print("Cannot open file --%s--" % metadata_of_component.sprite_file)
 
+    def check_ingredients_availability(self, player_inventory):
+        self.all_ingredients_available = False
+        for inventoryItem in self.ingredients:
+            inventoryItem.enough_in_inventory = player_inventory.contains(inventoryItem.metadata.name, inventoryItem.count)
+            if not inventoryItem.enough_in_inventory:
+                return False
+        self.all_ingredients_available = True
+    
 
     """
     Remove an ingredient
@@ -82,30 +99,40 @@ class Formula(object):
     def draw_ingredients(self, screen, img_pos, font, lang):
         img_pos.x += 4
         img_pos.y += 6
-        for inventoryItem in self.ingredients:
-            text_to_draw = "%dx " % inventoryItem.count
+        
+        for inventory_item in self.ingredients:
+            text_to_draw = "%dx " % inventory_item.count
             font.drawText(screen, img_pos.x, img_pos.y, text_to_draw)
-            screen.blit(self.cached_assets[inventoryItem.metadata.name], 
-                0, 0, inventoryItem.metadata.width, inventoryItem.metadata.height, 
+            screen.blit(self.cached_assets[inventory_item.metadata.name], 
+                0, 0, inventory_item.metadata.width, inventory_item.metadata.height, 
                 img_pos.x + font.textWidth(text_to_draw), img_pos.y - 4, 
                 True)
             font.drawText(screen, 
-                img_pos.x + font.textWidth(text_to_draw) + inventoryItem.metadata.width + 2, 
-                img_pos.y, inventoryItem.metadata.label[lang])
+                img_pos.x + font.textWidth(text_to_draw) + inventory_item.metadata.width + 2, 
+                img_pos.y, inventory_item.metadata.label[lang])
+
+            ## Display the check asset if there is enough item
+            if inventory_item.enough_in_inventory:
+                screen.blit(self.cached_assets["CKECK-ICON"], 
+                    0, 0, 24, 24, 
+                    410, img_pos.y - 4, 
+                    True)
             img_pos.y += 24
 
-        img_pos.y += 12
-        font.drawText(screen, img_pos.x, img_pos.y, "==>")
-        img_pos.y += 24
+        screen.blit(self.cached_assets["ARROW-ICON"], 
+                    0, 0, 24, 24, 
+                    img_pos.x + 32, img_pos.y, 
+                    True)
+        img_pos.y += 32
 
-        for inventoryItem in self.results:
-            text_to_draw = "%dx " % inventoryItem.count
+        for inventory_item in self.results:
+            text_to_draw = "%dx " % inventory_item.count
             font.drawText(screen, img_pos.x, img_pos.y, text_to_draw)
-            screen.blit(self.cached_assets[inventoryItem.metadata.name], 
-                0, 0, inventoryItem.metadata.width, inventoryItem.metadata.height, 
+            screen.blit(self.cached_assets[inventory_item.metadata.name], 
+                0, 0, inventory_item.metadata.width, inventory_item.metadata.height, 
                 img_pos.x + font.textWidth(text_to_draw), img_pos.y - 4, 
                 True)
             font.drawText(screen, 
-                img_pos.x + font.textWidth(text_to_draw) + inventoryItem.metadata.width + 2, 
-                img_pos.y, inventoryItem.metadata.label[lang])
+                img_pos.x + font.textWidth(text_to_draw) + inventory_item.metadata.width + 2, 
+                img_pos.y, inventory_item.metadata.label[lang])
             img_pos.y += 24

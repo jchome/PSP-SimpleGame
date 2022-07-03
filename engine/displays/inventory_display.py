@@ -103,14 +103,14 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.cursor = self.cursor + 1
 
+
+    def draw(self):
+        ## Set the current_item with the cursor value
         if self.cursor >= len(self.game.player.inventory.all_items):
             self.current_item = None
         else:
             self.current_item = self.game.player.inventory.all_items.values()[self.cursor]
 
-
-
-    def draw(self):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         pos_x = 4
@@ -127,11 +127,14 @@ class InventoryDisplay(SelectionDisplay):
 
         ## Interaction button
         if self.current_item is not None and self.current_item.metadata.name == "FORMULA":
-            self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
-            pos_x += 16
-            text_interaction = _("inventory.action.interaction", self.game.current_language)
-            self.font.drawText(self.screen, pos_x, 253, text_interaction)
-            pos_x += self.font.textWidth(text_interaction) + 10
+            formula = self.current_item.metadata.production_plan
+            formula.check_ingredients_availability(self.game.player.inventory)
+            if formula.all_ingredients_available:
+                self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
+                pos_x += 16
+                text_interaction = _("inventory.action.interaction", self.game.current_language)
+                self.font.drawText(self.screen, pos_x, 253, text_interaction)
+                pos_x += self.font.textWidth(text_interaction) + 10
         
         self.draw_inventory()
         self.draw_detail()
@@ -216,6 +219,7 @@ class InventoryDisplay(SelectionDisplay):
         ##TODO: category of agent
         if self.current_item.metadata.name == "FORMULA":
             formula = self.current_item.metadata.production_plan
+            formula.check_ingredients_availability(self.game.player.inventory)
             formula.draw_ingredients(self.screen, img_pos, 
                 self.font_black, self.game.current_language)
 
