@@ -31,9 +31,12 @@ class SelectionDisplay(Display):
         ## Step by step key
         keydown = helper.convert_keydown(controller)
         if len(keydown) == 0:
+            self.update_nothing_happens()
             return
         if keydown == self.last_keydown and (time() - self.last_update < 0.15):
             ## The key is continuously pressed
+            self.update_for_key_pressed(keydown)
+            self.last_update = time()
             return
             
         self.last_keydown = keydown
@@ -44,4 +47,16 @@ class SelectionDisplay(Display):
     Overrride this method to update the display
     """
     def update_for_selection(self, controller):
+        pass
+
+
+    """
+    Overrride this method to update the display
+    """
+    def update_for_key_pressed(self, key):
+        pass
+    """
+    Overrride this method to update the display
+    """
+    def update_nothing_happens(self):
         pass

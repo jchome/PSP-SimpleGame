@@ -52,3 +52,5 @@ class WelcomeDisplay(Display):
             pos_x += 16
             self.debug_font.drawText(self.screen, pos_x, pos_y + 1, "Start")
 
+        
+

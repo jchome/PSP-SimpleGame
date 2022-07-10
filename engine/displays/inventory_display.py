@@ -42,7 +42,26 @@ class InventoryDisplay(SelectionDisplay):
         self.controls_assets[Button.SQUARE] = psp2d.Image("assets/control-square.png")
         self.controls_assets[Button.CIRCLE] = psp2d.Image("assets/control-circle.png")
         self.controls_assets[Button.CROSS] = psp2d.Image("assets/control-cross.png")
+        self.allowed_to_craft = False
+        self.timer = -1
+        self.round_anim = psp2d.Image("assets/round-anim-green.png")
         
+    def update_nothing_happens(self):
+        self.timer = -1
+        
+        self.get_current_item(force_check_allowed_to_craft = True)
+
+
+    def update_for_key_pressed(self, keys_pressed):
+        if "TRIANGLE" in keys_pressed:
+            if self.timer == -1:
+                self.timer = 0
+            else:
+                self.timer += 0.25
+        
+        if self.timer >= 19:
+            self.start_crafting()
+            
 
     def update_for_selection(self, controller):
         ## The update method is called only for active displays
@@ -54,30 +73,38 @@ class InventoryDisplay(SelectionDisplay):
             self.update_cursor("LEFT")
         elif controller.right:
             self.update_cursor("RIGHT")
-
-        elif controller.triangle:
-            self.start_crafting()
-
-        elif controller.square:
-            self.start_crafting()
             
         elif controller.circle:
             self.game.close_inventory()
+        
 
-    """
-    Craft something with ingredients
-    """
-    def start_crafting(self):
-        if self.current_item is not None and self.current_item.metadata.name == "FORMULA":
-            formula = self.current_item.metadata.production_plan
-            formula.check_ingredients_availability(self.game.player.inventory)
-            if formula.all_ingredients_available:
-                ## Add the result, remove each ingredient of the inventory
-                formula.craft(self.game.player.inventory)
-                
+    def get_current_item(self, force_check_allowed_to_craft):
+        if not force_check_allowed_to_craft:
+            ## Nothing changed
+            return
+
+        ## Set the current_item with the cursor value
+        self.allowed_to_craft = False
+        if self.cursor >= len(self.game.player.inventory.all_items):
+            self.current_item = None
+        else:
+            self.current_item = self.game.player.inventory.all_items.values()[self.cursor]
+
+            if self.current_item is None or self.current_item.metadata.name != "FORMULA":
+                ## This is not a formula
+                self.allowed_to_craft = False
+            else:
+                formula = self.current_item.metadata.production_plan
+                formula.check_ingredients_availability(self.game.player.inventory)
+                if not formula.all_ingredients_available:
+                    ## All ingredients are not available
+                    self.allowed_to_craft = False
+                else:
+                    self.allowed_to_craft = True
 
     
     def update_cursor(self, direction):
+        previous_cursor_position = self.cursor
         if direction == "DOWN":
             if self.cursor + self.nb_items_per_row > self.max_items:
                 self.cursor = self.cursor % self.nb_items_per_row 
@@ -102,14 +129,25 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.cursor = self.cursor + 1
 
+        self.get_current_item(previous_cursor_position == self.cursor)
+
+
+    """
+    Craft something with ingredients
+    """
+    def start_crafting(self):
+        print("self.allowed_to_craft = %s" % self.allowed_to_craft)
+        if not self.allowed_to_craft:
+            return
+
+        formula = self.current_item.metadata.production_plan
+
+        ## End of crafting, add the result, remove each ingredient of the inventory
+        formula.craft(self.game.player.inventory)
+        self.timer = -1
+
 
     def draw(self):
-        ## Set the current_item with the cursor value
-        if self.cursor >= len(self.game.player.inventory.all_items):
-            self.current_item = None
-        else:
-            self.current_item = self.game.player.inventory.all_items.values()[self.cursor]
-
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
         pos_x = 4
@@ -129,10 +167,17 @@ class InventoryDisplay(SelectionDisplay):
             formula = self.current_item.metadata.production_plan
             formula.check_ingredients_availability(self.game.player.inventory)
             if formula.all_ingredients_available:
-                self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, 252, True)
+                pos_x = MAX_WIDTH / 2
+                pos_y = 252
+
+                if self.timer > -1:
+                    dx = int(self.timer) * 20
+                    self.screen.blit(self.round_anim, int(dx), 0, 20, 20, pos_x-2, pos_y-1, True)
+
+                self.screen.blit(self.controls_assets[Button.TRIANGLE], 0, 0, 16, 16, pos_x, pos_y, True)
                 pos_x += 16
                 text_interaction = _("inventory.action.interaction", self.game.current_language)
-                self.font.drawText(self.screen, pos_x, 253, text_interaction)
+                self.font.drawText(self.screen, pos_x + 8, 253, text_interaction)
                 pos_x += self.font.textWidth(text_interaction) + 10
         
         self.draw_inventory()
