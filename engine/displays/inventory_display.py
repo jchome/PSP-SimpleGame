@@ -59,7 +59,7 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.timer += 0.25
         
-        if self.timer >= 19:
+        if self.timer >= 20:
             self.start_crafting()
             
 
