@@ -124,18 +124,13 @@ class Player(Agent):
         if not self.is_visible:
             return
 
-        ## Capture the START key, to display the main menu
-        if controller.start:
-            self.current_board.game.set_active_display("MainMenu")
-            return
-        
-
         if self.controls_widget is not None:
             ## Don't allow to move when the controls-widget is present
             self.is_running = False
             return
 
         (new_pos_x, new_pos_y) = self.compute_new_position(controller)
+        self.compute_exhaustion(new_pos_x, new_pos_y)
 
         collisioned_agents = self.detect_collision(agents.values(), walls, 
                                      new_pos_x, 
@@ -200,6 +195,17 @@ class Player(Agent):
             self.pos_x = int(new_pos_x)
             self.pos_y = int(new_pos_y)
             
+    def compute_exhaustion(self, new_pos_x, new_pos_y):
+        distance = Point(self.pos_x, self.pos_y).distance_to(Point(new_pos_x, new_pos_y))
+        if distance == 0:
+            return
+        #print("distance = %f" % distance)
+        ## Make this ratios dépend on self.current_board
+        exhaustion_drink_ratio = 0.01
+        exhaustion_food_ratio = 0.005
+        engery_loss = Energy(0 - distance * exhaustion_drink_ratio, 0 - distance * exhaustion_food_ratio)
+        #print(engery_loss)
+        self.life.apply_energy(engery_loss)
 
     def get_new_position_in_new_board(self, board_conf):
         point_to_new_board = board_conf.position_in_board.copy()

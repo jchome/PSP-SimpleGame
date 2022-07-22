@@ -4,6 +4,7 @@
 Functions that helps doing image manipulation, etc.
 """
 
+from math import sqrt
 from psp2d import Image, Color
 
 class Point(object):
@@ -19,6 +20,11 @@ class Point(object):
 
     def __str__(self):
         return "Point(%d, %d)" % (self.x, self.y)
+
+    def distance_to(self, another_point):
+        dx2 = abs(self.x - another_point.x) ** 2
+        dy2 = abs(self.y - another_point.y) ** 2
+        return sqrt(dx2 + dy2)
 
 class Rect(Point):
     def __init__(self, x, y, w, h):

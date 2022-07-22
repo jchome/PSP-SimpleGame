@@ -116,8 +116,13 @@ class Game():
 
             controller = psp2d.Controller()
 
+            ## Open the main menu, when the user press SELECT
             if controller.select:
-                ## Open the main menu, when the user press SELECT
+                self.set_active_display("MainMenu")
+                continue
+
+            ## Capture the START key, to display the main menu
+            if controller.start:
                 self.set_active_display("MainMenu")
                 continue
 
