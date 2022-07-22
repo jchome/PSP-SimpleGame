@@ -9,10 +9,9 @@ _ = engine.translation.translate
 
 class InventoryWidget(Widget):
     def __init__(self, player):
-        self.pos_x, self.pos_y = (11,2)
-        Widget.__init__(self, "assets/inventory.png", self.pos_x, self.pos_y)
-        (self.width, self.height) = (25,27)
+        Widget.__init__(self, 11, 2, 25, 27)
         self.player = player
+        self.sprite = psp2d.Image("assets/inventory.png")
         self.triangle_button = psp2d.Image("assets/control-triangle.png")
 
     """

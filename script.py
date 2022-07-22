@@ -47,6 +47,11 @@ def load_assets(game, welcome_display):
     inventory.is_visible = False
     game.add_widget(inventory)
 
+    from engine.widgets.player_life_widget import PlayerLifeWidget
+    players_life = PlayerLifeWidget(player)
+    players_life.is_visible = False
+    game.add_widget(players_life)
+
     welcome_display.set_text(_("welcome.loading.done", game.current_language))
     welcome_display.is_ready = True
 

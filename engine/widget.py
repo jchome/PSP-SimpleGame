@@ -2,15 +2,15 @@
 
 import psp2d
 
+from engine.helper import Point
+
 class Widget:
 
-    def __init__(self, sprite_path, pos_x, pos_y):
+    def __init__(self, pos_x, pos_y, width, height):
+        self.screen = psp2d.Screen()
         self.font = psp2d.Font('assets/font-white.png')
         (self.pos_x, self.pos_y) = (pos_x, pos_y)
-        ## Set default width and height
-        (self.width, self.height) = (50,50)
-        self.sprite = psp2d.Image(sprite_path)
-        self.screen = psp2d.Screen()
+        (self.width, self.height) = (width, height)
         self.is_visible = True
     
 
@@ -24,6 +24,7 @@ class Widget:
         pass
 
     def draw(self):
-        ## Default drawing
-        self.screen.blit(self.sprite, 0, 0, self.width, self.height, self.pos_x, self.pos_y, True)
+        ## Override this method
+        if self.is_visible:
+            self.draw_text(Point(self.pos_x, self.pos_y), "Override the method Widget#draw")
         

@@ -10,6 +10,7 @@ from engine.helper import Point, str_color
 from engine.interaction_object import InteractionObject
 from engine.agent import Agent
 from engine.displays.board import Board
+from engine.energy import Energy
 
 from engine.widgets.controls_widget import Button, ControlsWidget
 from engine.displays.inventory.inventory import Inventory
@@ -61,7 +62,7 @@ class Player(Agent):
 
         self.player_interact_with_agent = None
         self.controls_widget = None
-        self.bonus = 0
+        self.life = Energy()
         self.debug = False
         self.inventory = Inventory()
 
@@ -159,7 +160,7 @@ class Player(Agent):
                     if agent.bonus is not None:
                         ## Take the bonus
                         player_is_blocked = False
-                        self.bonus += agent.bonus
+                        self.life.take_bonus(agent.bonus)
                         self.current_board.remove_agent(agent)
                     else:
                         ## Collision with InteractionObject having a conf_boards

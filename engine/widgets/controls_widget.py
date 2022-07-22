@@ -1,4 +1,6 @@
 # -*- coding: iso-8859-1 -*-
+import psp2d
+
 from engine.helper import Point
 from engine.widget import Widget
 
@@ -14,8 +16,8 @@ class Button:
 
 class ControlsWidget(Widget):
     def __init__(self, player, pos_x, pos_y):
-        Widget.__init__(self, "assets/controls.png", pos_x, pos_y)
-        (self.width, self.height) = (50,50)
+        Widget.__init__(self, pos_x, pos_y, 50, 50)
+        self.sprite = psp2d.Image("assets/controls.png")
         self.labels = {
             Button.TRIANGLE: None,
             Button.CIRCLE: None,
