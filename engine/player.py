@@ -62,7 +62,8 @@ class Player(Agent):
 
         self.player_interact_with_agent = None
         self.controls_widget = None
-        self.life = Energy()
+        ## Energy at start
+        self.life = Energy(50, 50)
         self.debug = False
         self.inventory = Inventory()
 
@@ -152,32 +153,26 @@ class Player(Agent):
             elif color.alpha != 0:
                 #print(">>>>> collision with color %d,%d,%d, %d" % (color.red, color.green, color.blue, color.alpha))
                 if isinstance(agent, InteractionObject):
-                    if agent.bonus is not None:
-                        ## Take the bonus
-                        player_is_blocked = False
-                        self.life.take_bonus(agent.bonus)
-                        self.current_board.remove_agent(agent)
+                    ## Collision with InteractionObject having a conf_boards
+                    board_conf = agent.get_conf_board(color)
+                    if board_conf is not None :
+                        #print("agent.conf_boards")
+                        #print(agent.conf_boards)
+                        ## Open a new board
+                        ## Get the game to update the board
+                        new_position = self.go_to_board(board_conf)
+                        #print("new_position: %s" % new_position)
+                        new_pos_x = new_position.x
+                        new_pos_y = new_position.y
+                        break
+                    elif agent.inventory_open_color is not None:
+                        player_is_blocked = True
+                        self.current_board.game.open_inventory()
+                        break
                     else:
-                        ## Collision with InteractionObject having a conf_boards
-                        board_conf = agent.get_conf_board(color)
-                        if board_conf is not None :
-                            #print("agent.conf_boards")
-                            #print(agent.conf_boards)
-                            ## Open a new board
-                            ## Get the game to update the board
-                            new_position = self.go_to_board(board_conf)
-                            #print("new_position: %s" % new_position)
-                            new_pos_x = new_position.x
-                            new_pos_y = new_position.y
-                            break
-                        elif agent.inventory_open_color is not None:
-                            player_is_blocked = True
-                            self.current_board.game.open_inventory()
-                            break
-                        else:
-                            player_is_blocked = True
-                            self.set_controls_widget_from_agent(agent)
-                            break
+                        player_is_blocked = True
+                        self.set_controls_widget_from_agent(agent)
+                        break
                         
                         
                 ## The player goes into a new zone
@@ -201,9 +196,9 @@ class Player(Agent):
             return
         #print("distance = %f" % distance)
         ## Make this ratios dépend on self.current_board
-        exhaustion_drink_ratio = 0.01
+        exhaustion_water_ratio = 0.01
         exhaustion_food_ratio = 0.005
-        engery_loss = Energy(0 - distance * exhaustion_drink_ratio, 0 - distance * exhaustion_food_ratio)
+        engery_loss = Energy(0 - distance * exhaustion_water_ratio, 0 - distance * exhaustion_food_ratio)
         #print(engery_loss)
         self.life.apply_energy(engery_loss)
 

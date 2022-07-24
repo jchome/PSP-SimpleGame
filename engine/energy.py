@@ -3,18 +3,18 @@
 
 class Energy():
 
-    def __init__(self, drink = 100, food = 100):
-        self.drink = drink
+    def __init__(self, water = 0, food = 0):
+        self.water = water
         self.food = food
 
     def apply_energy(self, energy):
-        self.drink += energy.drink
+        self.water += energy.water
         self.food += energy.food
 
-        if self.drink < 0:
-            self.drink = 0
-        if self.drink > 100:
-            self.drink = 100
+        if self.water < 0:
+            self.water = 0
+        if self.water > 100:
+            self.water = 100
 
         if self.food < 0:
             self.food = 0
@@ -22,7 +22,7 @@ class Energy():
             self.food = 100
 
     def __str__(self):
-        return "Energy(drink = %f, food = %f)" % (self.drink, self.food)
+        return "Energy(water = %f, food = %f)" % (self.water, self.food)
 
 
         

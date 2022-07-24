@@ -27,6 +27,6 @@ class PlayerLifeWidget(Widget):
     def draw(self):
         self.screen.blit(self.sprite, 0, 0, self.width, self.height, self.pos_x, self.pos_y, True)
         
-        self.screen.fillRect(self.pos_x + 1, self.pos_y+1, int(self.player.life.drink), 8, psp2d.Color(0,0,255,128))
+        self.screen.fillRect(self.pos_x + 1, self.pos_y+1, int(self.player.life.water), 8, psp2d.Color(0,0,255,128))
         self.screen.fillRect(self.pos_x + 1, self.pos_y+10, int(self.player.life.food), 8, psp2d.Color(0,255,0,128))
         

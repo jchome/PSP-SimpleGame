@@ -84,6 +84,10 @@ translations_dict = {
         "fr": "Ramasser",
         "en": "Take"
     },
+    "action.on_bonus.take": {
+        "fr": "Boire/Manger",
+        "en": "Drink/Eat"
+    },
     "action.on_simple_object.cancel": {
         "fr": "Annuler",
         "en": "Cancel"
