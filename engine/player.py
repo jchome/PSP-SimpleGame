@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+import re
 import psp2d
 #import math
 from configparser import ConfigParser
@@ -21,17 +22,15 @@ from engine.displays.inventory.inventory import Inventory
 class Player(Agent):
     def __init__(self):
         config = ConfigParser()
+        self.is_visible = True
         config.read('conf/player.ini')
         Agent.__init__(self, config.get("ASSET", "source") )
         self.metadata.name = config.get("ASSET", "name")
-        sprite_directions = config.get("ASSET", "sprite_directions")
-
         self.velocity = config.getfloat("ASSET", "velocity")
         self.animation_velocity = config.getfloat("ASSET", "animation_velocity")
 
         ## By default, the player is visible
-        self.is_visible = True
-        
+        sprite_directions = config.get("ASSET", "sprite_directions")
         self.sprites = {}
         for item in sprite_directions.split("\n"):
             if len(item.strip()) == 0:
@@ -40,6 +39,19 @@ class Player(Agent):
             key = data[0].strip()
             positions = eval(data[1].strip())
             self.sprites[key] = positions
+
+        death_data = config.get("ASSET", "death")
+        self.is_dead = False
+        self.death_step = 0
+        self.death_sprites = {}
+        self.death_dimensions = eval(config.get("ASSET", "death_size"))
+        for item in death_data.split("\n"):
+            if len(item.strip()) == 0:
+                continue
+            data = item.strip().split("=")
+            key = data[0].strip()
+            positions = eval(data[1].strip())
+            self.death_sprites[key] = positions
 
         self.metadata.width = config.getint("DIMENSION", "width")
         self.metadata.height = config.getint("DIMENSION", "height")
@@ -63,7 +75,7 @@ class Player(Agent):
         self.player_interact_with_agent = None
         self.controls_widget = None
         ## Energy at start
-        self.life = Energy(50, 50)
+        self.life = Energy(5, 5)
         self.debug = False
         self.inventory = Inventory()
 
@@ -123,6 +135,12 @@ class Player(Agent):
     """
     def update(self, agents, walls, controller):
         if not self.is_visible:
+            return
+
+        if self.life.water == 0 or self.life.water == 0:
+            self.is_dead = True
+            if self.direction in ["UP", "DOWN"] :
+                self.direction = "LEFT"
             return
 
         if self.controls_widget is not None:
@@ -235,11 +253,33 @@ class Player(Agent):
         if not self.is_visible:
             return
 
-        image_bank = self.sprites[self.direction][int(self.animation_flow)]
-        top = image_bank[0]
-        left = image_bank[1]
-        
-        screen.blit(self.sprite, top, left, self.metadata.width, self.metadata.height, self.pos_x, self.pos_y, True)
+        if self.is_dead:
+            image_bank = self.death_sprites[self.direction][int(self.animation_flow)]
+            top = image_bank[0]
+            left = image_bank[1]
+            width = self.death_dimensions[0]
+            height = self.death_dimensions[1]
+            screen.blit(self.sprite, top, left, width, pheight, self.pos_x, self.pos_y, True)
+            if self.is_running:
+                # One more step of the animation
+                self.animation_flow = self.animation_flow + self.animation_velocity
+                if self.animation_flow > len(self.death_sprites[self.direction])-1:
+                    # Restart the animation from the beginning
+                    self.is_running = False
+        else:
+
+            image_bank = self.sprites[self.direction][int(self.animation_flow)]
+            top = image_bank[0]
+            left = image_bank[1]
+            
+            screen.blit(self.sprite, top, left, self.metadata.width, self.metadata.height, self.pos_x, self.pos_y, True)
+
+            if self.is_running:
+                # One more step of the animation
+                self.animation_flow = self.animation_flow + self.animation_velocity
+                if self.animation_flow > len(self.sprites[self.direction])-1:
+                    # Restart the animation from the beginning
+                    self.animation_flow = 0
 
         if self.debug:
             screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
@@ -247,12 +287,6 @@ class Player(Agent):
             #font = psp2d.Font('assets/font-white.png')
             #font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
 
-        if self.is_running:
-            # One more step of the animation
-            self.animation_flow = self.animation_flow + self.animation_velocity
-            if self.animation_flow > len(self.sprites[self.direction])-1:
-                # Restart the animation from the beginning
-                self.animation_flow = 0
 
 
     def set_controls_widget_from_agent(self, agent):
