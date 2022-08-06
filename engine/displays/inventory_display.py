@@ -17,6 +17,9 @@ IMAGEINDEX_DETAILED = 1
 
 
 class InventoryDisplay(SelectionDisplay):
+    """
+    Screen displayed when the user want to show the player's inventory 
+    """
 
     def __init__(self, name):
         SelectionDisplay.__init__(self, name)
@@ -24,6 +27,7 @@ class InventoryDisplay(SelectionDisplay):
         self.font_black = psp2d.Font('assets/font-black.png')
         (self.background, _) = helper.load_sprite("assets/displays/inventory.png", 
             MAX_WIDTH, MAX_HEIGHT)
+        ## Width, height of the item
         self.item_size = 32
         (self.asset_item_background, self.asset_item_selected) = helper.load_sprite("assets/displays/inventory-item.png", 
             self.item_size, self.item_size)
@@ -48,6 +52,15 @@ class InventoryDisplay(SelectionDisplay):
         
     def update_nothing_happens(self):
         self.timer = -1
+
+        ## Get the current inventory size, during the first update method
+        if self.game.player.inventory.limit_size < self.nb_items_per_row:
+            self.nb_items_per_row = self.game.player.inventory.limit_size
+            self.max_items = self.game.player.inventory.limit_size
+        else:
+            self.nb_items_per_row = 6
+            if self.game.player.inventory.limit_size < self.max_items:
+                self.max_items = self.game.player.inventory.limit_size
         
         self.get_current_item(force_check_allowed_to_craft = True)
 
@@ -85,6 +98,8 @@ class InventoryDisplay(SelectionDisplay):
 
         ## Set the current_item with the cursor value
         self.allowed_to_craft = False
+        print("self.cursor: %d" % self.cursor)
+        print("len(self.game.player.inventory.all_items): %d" %  len(self.game.player.inventory.all_items))
         if self.cursor >= len(self.game.player.inventory.all_items):
             self.current_item = None
         else:
@@ -105,6 +120,7 @@ class InventoryDisplay(SelectionDisplay):
     
     def update_cursor(self, direction):
         previous_cursor_position = self.cursor
+
         if direction == "DOWN":
             if self.cursor + self.nb_items_per_row > self.max_items:
                 self.cursor = self.cursor % self.nb_items_per_row 
@@ -129,13 +145,17 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.cursor = self.cursor + 1
 
+        if self.cursor < 0:
+            self.cursor = 0
+        if self.cursor >= self.game.player.inventory.limit_size:
+            self.cursor = self.game.player.inventory.limit_size-1
         self.get_current_item(previous_cursor_position == self.cursor)
 
 
     """
     Craft something with ingredients
     """
-    def start_crafting(self):
+    def __start_crafting(self):
         print("self.allowed_to_craft = %s" % self.allowed_to_craft)
         if not self.allowed_to_craft:
             return
@@ -206,7 +226,7 @@ class InventoryDisplay(SelectionDisplay):
             self.assets_loaded = True
 
         index = 0
-        for index in range(0, self.max_items):
+        for index in range(0, self.game.player.inventory.limit_size):
             if index == self.cursor:
                 ## Display the selection image of the item
                 self.screen.blit(self.asset_item_selected, 0, 0, self.item_size, self.item_size,
@@ -216,6 +236,7 @@ class InventoryDisplay(SelectionDisplay):
                 self.screen.blit(self.asset_item_background, 0, 0, self.item_size, self.item_size,
                     pos_x, pos_y, True)
 
+            ## Draw the item of the player's inventory
             if index < len(self.game.player.inventory.all_items):
                 item = self.game.player.inventory.all_items.values()[index]
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
@@ -323,7 +344,7 @@ class InventoryDisplay(SelectionDisplay):
     """
     The user wants to add an ingredrient in the carft formula
     """
-    def add_to_crafting(self):
+    def __add_to_crafting(self):
         if not self.cursor in self.game.player.inventory.all_items.values():
             return
         item = self.game.player.inventory.all_items.values()[self.cursor]
@@ -342,7 +363,7 @@ class InventoryDisplay(SelectionDisplay):
     """
     Remove an ingredient of the craft formula
     """
-    def remove_from_crafting(self):
+    def __remove_from_crafting(self):
         if not self.cursor in self.game.player.inventory.all_items.values():
             return
         item = self.game.player.inventory.all_items.values()[self.cursor]

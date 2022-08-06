@@ -4,11 +4,15 @@ from engine.displays.inventory.inventory_item import InventoryItem
 # -*- coding: iso-8859-1 -*-
 
 class Inventory:
+    """
+    Inventory of the player, always used during the gameplay
+    """
+
     def __init__(self):
-        ## all_items is a dict of
-        ##  key = agent.metadata.name
-        ##  value = InventoryItem instance
         self.all_items = {}
+
+        ## Default size
+        self.limit_size = 4
 
     def add_item(self, agent):
         if agent.metadata.name not in self.all_items:

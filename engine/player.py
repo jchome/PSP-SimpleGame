@@ -259,7 +259,7 @@ class Player(Agent):
             left = image_bank[1]
             width = self.death_dimensions[0]
             height = self.death_dimensions[1]
-            screen.blit(self.sprite, top, left, width, pheight, self.pos_x, self.pos_y, True)
+            screen.blit(self.sprite, top, left, width, height, self.pos_x, self.pos_y, True)
             if self.is_running:
                 # One more step of the animation
                 self.animation_flow = self.animation_flow + self.animation_velocity
