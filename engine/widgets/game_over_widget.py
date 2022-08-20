@@ -12,8 +12,8 @@ class GameOverWidget(Widget):
 
     def __init__(self, game):
         Widget.__init__(self, 0, 0, MAX_WIDTH, MAX_HEIGHT)
-        self.font = psp2d.Font('fonts/font-Karumbi-46-black.png')
-        self.small_font = psp2d.Font('assets/font-white.png')
+        self.font = psp2d.Font('assets/fonts/font-Karumbi-46-black.png')
+        self.small_font = psp2d.Font('assets/fonts/font-white.png')
         self.game = game
         self.is_visible = False
         (self.menu_bg, _) = helper.load_sprite("assets/displays/parchment.png", 
@@ -42,9 +42,9 @@ class GameOverWidget(Widget):
         pos_y = (MAX_HEIGHT - self.font.textHeight(label)) / 2
         self.font.drawText(self.screen, pos_x, pos_y + 8, label)
 
-        label = " Restart"
+        label = "Restart"
         pos_x = (MAX_WIDTH - self.small_font.textWidth(label)) / 2
         pos_y = ( (MAX_HEIGHT - GameOverWidget.MENU_ITEM_HEIGHT) / 2 ) + (GameOverWidget.MENU_ITEM_HEIGHT + 1.5)
-        self.screen.blit(self.button_CROSS_asset, 0, 0, 16, 16, pos_x, pos_y, True)
+        self.screen.blit(self.button_CROSS_asset, 0, 0, 16, 16, int(pos_x), int(pos_y), True)
         pos_x += 16
-        self.small_font.drawText(self.screen, pos_x, pos_y + 1, label)
+        self.small_font.drawText(self.screen, int(pos_x), int(pos_y) + 3, label)

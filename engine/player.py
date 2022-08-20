@@ -78,7 +78,7 @@ class Player(Agent):
         self.player_interact_with_agent = None
         self.controls_widget = None
         ## Energy at start
-        self.life = Energy(5, 5)
+        self.life = Energy(50, 50)
         self.debug = False
         self.inventory = Inventory()
 
@@ -287,7 +287,7 @@ class Player(Agent):
         if self.debug:
             screen.fillRect(self.pos_x + self.shadow_left, self.pos_y + self.shadow_top, 
                 self.shadow_width, self.shadow_height, psp2d.Color(0,0,255,128))
-            #font = psp2d.Font('assets/font-white.png')
+            #font = psp2d.Font('assets/fonts/font-white.png')
             #font.drawText(screen, 0, 0, "(%d,%d) - Press O to exit" % (self.pos_x, self.pos_y))
 
 

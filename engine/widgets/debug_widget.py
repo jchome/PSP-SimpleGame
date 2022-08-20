@@ -16,7 +16,7 @@ class DebugWidget(Widget):
     def __init__(self):
         Widget.__init__(self, 0, 0, 10, 10)
         self.text = "DEBUG"
-        self.font = psp2d.Font('assets/font-white.png')
+        self.font = psp2d.Font('assets/fonts/font-white.png')
         
     def update(self, controller):
         pass

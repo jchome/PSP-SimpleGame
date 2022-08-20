@@ -8,7 +8,7 @@ class Widget:
 
     def __init__(self, pos_x, pos_y, width, height):
         self.screen = psp2d.Screen()
-        self.font = psp2d.Font('assets/font-white.png')
+        self.font = psp2d.Font('assets/fonts/font-white.png')
         (self.pos_x, self.pos_y) = (pos_x, pos_y)
         (self.width, self.height) = (width, height)
         self.is_visible = True

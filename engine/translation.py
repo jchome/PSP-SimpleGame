@@ -96,6 +96,10 @@ translations_dict = {
         "fr": "objets",
         "en": "items"
     },
+    "inventory.title": {
+        "fr": "Inventaire",
+        "en": "Inventory"
+    },
     "inventory.action.interaction": {
         "fr": "Interagir",
         "en": "Interact"
@@ -103,5 +107,11 @@ translations_dict = {
     "inventory.action.exit": {
         "fr": "Quitter",
         "en": "Exit"
+    },
+    "inventory.nothing_selected": {
+        "fr": "Aucune selection...",
+        "en": "Nothing selected..."
     }
+
+    
 }

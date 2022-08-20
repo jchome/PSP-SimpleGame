@@ -12,7 +12,7 @@ class WelcomeDisplay(Display):
 
     def __init__(self):
         Display.__init__(self, "Welcome")
-        self.debug_font = psp2d.Font('assets/font-white.png')
+        self.debug_font = psp2d.Font('assets/fonts/font-white.png')
         self.text = ""
         self.is_ready = False
         self.menu_display = None

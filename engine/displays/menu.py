@@ -49,7 +49,7 @@ class Menu(SelectionDisplay):
             item = MenuItem(option)
             self.items.append(item)
 
-        menu_font = psp2d.Font('fonts/font-Karumbi-46-black.png')
+        menu_font = psp2d.Font('assets/fonts/font-Karumbi-46-black.png')
         text_height = menu_font.textHeight("Sample Text")
         pos_y = (MAX_HEIGHT - text_height) / (len(self.items) + 1)
         ## Keep the same instance for all items

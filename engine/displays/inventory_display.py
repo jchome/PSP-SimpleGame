@@ -23,8 +23,9 @@ class InventoryDisplay(SelectionDisplay):
 
     def __init__(self, name):
         SelectionDisplay.__init__(self, name)
-        self.font = psp2d.Font('assets/font-white.png')
-        self.font_black = psp2d.Font('assets/font-black.png')
+        self.font = psp2d.Font('assets/fonts/font-white.png')
+        self.title_font = psp2d.Font('assets/fonts/font-Karumbi-46-white.png')
+        self.font_black = psp2d.Font('assets/fonts/font-black.png')
         (self.background, _) = helper.load_sprite("assets/displays/inventory.png", 
             MAX_WIDTH, MAX_HEIGHT)
         ## Width, height of the item
@@ -155,8 +156,8 @@ class InventoryDisplay(SelectionDisplay):
     """
     Craft something with ingredients
     """
-    def __start_crafting(self):
-        print("self.allowed_to_craft = %s" % self.allowed_to_craft)
+    def start_crafting(self):
+        #print("self.allowed_to_craft = %s" % self.allowed_to_craft)
         if not self.allowed_to_craft:
             return
 
@@ -170,6 +171,11 @@ class InventoryDisplay(SelectionDisplay):
     def draw(self):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
+        title = _("inventory.title", self.game.current_language)
+        pos_x = (MAX_WIDTH - self.title_font.textWidth(title)) / 2
+        pos_y = -10
+        self.title_font.drawText(self.screen, pos_x, pos_y, title)
+
         pos_x = 4
 
         ## Draw the help keys
@@ -261,7 +267,8 @@ class InventoryDisplay(SelectionDisplay):
     def draw_detail(self):
         (pos_x, pos_y) = ((MAX_WIDTH / 2) + 4, 38)
         if self.current_item is None:
-            self.font.drawText(self.screen, pos_x, pos_y, "Nothing selected...")
+            nothing_selected = _("inventory.nothing_selected", self.game.current_language)
+            self.font.drawText(self.screen, pos_x, pos_y, nothing_selected)
             return
 
         #item = self.game.player.inventory.all_items.values()[self.cursor]
