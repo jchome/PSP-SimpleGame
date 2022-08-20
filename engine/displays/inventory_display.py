@@ -98,8 +98,8 @@ class InventoryDisplay(SelectionDisplay):
 
         ## Set the current_item with the cursor value
         self.allowed_to_craft = False
-        print("self.cursor: %d" % self.cursor)
-        print("len(self.game.player.inventory.all_items): %d" %  len(self.game.player.inventory.all_items))
+        #print("self.cursor: %d" % self.cursor)
+        #print("len(self.game.player.inventory.all_items): %d" %  len(self.game.player.inventory.all_items))
         if self.cursor >= len(self.game.player.inventory.all_items):
             self.current_item = None
         else:
