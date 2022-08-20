@@ -33,27 +33,37 @@ def load_assets(game, welcome_display):
 
     ## Create the boards object
     welcome_display.set_text(_("welcome.loading.1st-board", game.current_language))
-    meadow_001 = Board("conf/boards/meadow-001.ini")
+    game.create_environment(menu)
 
-    from engine.player import Player
-    player = Player()
-    meadow_001.add_agent(player)
-    menu.play_board = meadow_001
-    game.player = player
-
+    ## Inventory Widget
     from engine.widgets.inventory_widget import InventoryWidget
     welcome_display.set_text(_("welcome.loading.widgets", game.current_language))
-    inventory = InventoryWidget(player)
+    inventory = InventoryWidget(game.player)
     inventory.is_visible = False
     game.add_widget(inventory)
-
+    
+    ## Player's life Widget
     from engine.widgets.player_life_widget import PlayerLifeWidget
-    players_life = PlayerLifeWidget(player)
+    players_life = PlayerLifeWidget(game.player)
     players_life.is_visible = False
     game.add_widget(players_life)
 
+    ## Game Over Widget
+    from engine.widgets.game_over_widget import GameOverWidget
+    game.game_over_widget = GameOverWidget(game)
+    
+    ## Inventory Display
+    from engine.displays.inventory_display import InventoryDisplay
+    inventory_display_name = "InventoryDisplay"
+    if inventory_display_name not in game.displays:
+        inventory_display = InventoryDisplay(inventory_display_name)
+        game.add_display(inventory_display)
+
+    ## Everything is ready
     welcome_display.set_text(_("welcome.loading.done", game.current_language))
     welcome_display.is_ready = True
+
+    
 
 def test_inventory(game, welcome_display):
     import engine.interaction_object

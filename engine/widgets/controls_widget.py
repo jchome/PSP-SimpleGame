@@ -87,6 +87,7 @@ class ControlsWidget(Widget):
             print("No action reference found for agent %s and action <%s>" % (self.agent.name, action_label))
             return
         callback(self.player, action_label, self.agent)
-        ## Close this controls widget
+        
+        ## Remove this controls widget
         self.player.current_board.game.remove_widget(self)
         

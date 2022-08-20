@@ -5,10 +5,10 @@ from time import time
 from engine.displays.display import Display
 import engine.helper as helper
 
-"""
-This display is for user-interaction, with arrow keys and selection 
-"""
 class SelectionDisplay(Display):
+    """
+    This display is for user-interaction, with arrow keys and selection 
+    """
 
     def __init__(self, name):
         Display.__init__(self, name)
@@ -16,11 +16,11 @@ class SelectionDisplay(Display):
         self.last_update = time()
         self.last_keydown = []
 
-    """
-    Do not overrride this method in subclasses, or call
-    SelectionDisplay.update(self, controller) in the subclass
-    """
     def update(self, controller):
+        """
+        Do not override this method in subclasses, or call
+        SelectionDisplay.update(self, controller) in the subclass
+        """
         if not self.active:
             print("This display is not active.")
             return
@@ -43,20 +43,20 @@ class SelectionDisplay(Display):
         self.last_update = time()
         self.update_for_selection(controller)
 
-    """
-    Overrride this method to update the display
-    """
     def update_for_selection(self, controller):
+        """
+        Override this method to update the display
+        """
         pass
 
-
-    """
-    Overrride this method to update the display
-    """
     def update_for_key_pressed(self, key):
+        """
+        Override this method to update the display
+        """
         pass
-    """
-    Overrride this method to update the display
-    """
+
     def update_nothing_happens(self):
+        """
+        Override this method to update the display
+        """
         pass

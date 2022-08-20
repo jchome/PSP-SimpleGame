@@ -5,6 +5,9 @@ Store some information about the agent
 
 
 class Metadata:
+    """
+    Meta data for agent object
+    """
     def __init__(self):
         self.sprite_file = None
         self.width = 32
@@ -16,10 +19,13 @@ class Metadata:
         self.description = {}
         self.production_plan = None
 
-    """
-    Read .INI file and update the properties of the instance
-    """
     def load_config(self, config):
+        """
+        Read .INI file and update the properties of the instance
+        """
+        if not config.has_option("ASSET", "name"):
+            raise Exception("The config file %s has no option [ASSET]name" % config)
+
         self.name = config.get("ASSET", "name")
         self.sprite_file = config.get("ASSET", "source")
 

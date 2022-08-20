@@ -51,8 +51,11 @@ class Formula(object):
                 print("Conf not readable as excpected: --%s--" % raw_parameter.strip())
                 continue
             metadata_of_component = Metadata()
-            config.read(conf.group(2))
-            metadata_of_component.load_config(config)
+            try:
+                config.read(conf.group(2))
+                metadata_of_component.load_config(config)
+            except:
+                print("Error while reading config file %s" % conf.group(2))
 
             item = InventoryItemFormula(metadata_of_component)
             item.count = int(conf.group(1))

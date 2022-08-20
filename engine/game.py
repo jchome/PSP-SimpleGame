@@ -7,7 +7,6 @@ from time import time
 
 from engine.displays.board import Board
 from engine.displays.menu import Menu
-from engine.displays.inventory_display import InventoryDisplay
 
 class Game():
     def __init__(self):
@@ -16,6 +15,7 @@ class Game():
         self.is_finished = False
         self.player = None
         self.widgets = []
+        self.game_over_widget = None
         self.lastPad = time()
         self.previous_display = None
         ## Default language is English
@@ -52,7 +52,25 @@ class Game():
             ## Hide widgets
             self.show_widgets(False)
         #print("self.active_display : %s" % display.name)
+        return display
 
+    def create_environment(self, menu):
+        meadow_001 = Board("conf/boards/meadow-001.ini")
+        del self.player
+        self.player = None
+
+        from engine.player import Player
+        self.player = Player()
+        meadow_001.add_agent(self.player)
+        menu.play_board = meadow_001
+        ## Set the new instance of the player in the widgets
+        for widget in self.widgets:
+            widget.player = self.player
+
+    def restart_game(self):
+        menu = self.set_active_display("MainMenu")
+        ## Reset player's preferences
+        self.create_environment(menu)
 
     def start_to_play_with(self, board):
         self.set_active_display(board)
@@ -88,10 +106,7 @@ class Game():
         self.show_widgets(False)
 
         inventory_display_name = "InventoryDisplay"
-        if inventory_display_name not in self.displays:
-            inventory_display = InventoryDisplay(inventory_display_name)
-        else:
-            inventory_display = self.displays[inventory_display_name]
+        inventory_display = self.displays[inventory_display_name]
             
         ## Force the relad of assets
         inventory_display.assets_loaded = False
@@ -115,6 +130,10 @@ class Game():
                 return
 
             controller = psp2d.Controller()
+
+            ## Show the Game over widget
+            if self.player is not None and self.player.is_dead and not self.player.is_running :
+                self.game_over_widget.is_visible = True
 
             ## Open the main menu, when the user press SELECT
             if controller.select:
@@ -145,6 +164,12 @@ class Game():
             for widget in self.widgets:
                 if widget.is_visible:
                     widget.draw()
+
+            ## After all widgets, draw the Game over widget, if necessary
+            if self.game_over_widget is not None:
+                self.game_over_widget.update(controller)
+                if self.game_over_widget.is_visible:
+                    self.game_over_widget.draw()
 
             ## Everything is draw
             self.active_display.screen.swap()

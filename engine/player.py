@@ -21,6 +21,9 @@ from engine.displays.inventory.inventory import Inventory
 
 class Player(Agent):
     def __init__(self):
+        self.initialize()
+
+    def initialize(self):
         config = ConfigParser()
         self.is_visible = True
         config.read('conf/player.ini')
