@@ -13,6 +13,8 @@ class Button:
     CIRCLE = 2
     CROSS = 3
     SQUARE = 4
+    L = 5
+    R = 6
 
 class ControlsWidget(Widget):
     def __init__(self, player, pos_x, pos_y):

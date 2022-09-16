@@ -7,6 +7,14 @@ Functions that helps doing image manipulation, etc.
 from math import sqrt
 from psp2d import Image, Color
 
+def debug(str_message, reset = False):
+    flag = 'a'
+    if reset:
+        flag = 'w'
+    outFile = open('pytrace.txt', flag)
+    outFile.write("%s\n" % str_message)
+    outFile.close()
+
 class Point(object):
     def __init__(self, x, y):
         self.x = int(x)

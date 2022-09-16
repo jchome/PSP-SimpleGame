@@ -17,8 +17,6 @@ from engine.widgets.controls_widget import Button, ControlsWidget
 from engine.displays.inventory.inventory import Inventory
 
 
-
-
 class Player(Agent):
     def __init__(self):
         self.initialize()
@@ -74,7 +72,7 @@ class Player(Agent):
             self.sort_position = config.getint("DIMENSION", "sort_position")
         else:
             self.sort_position = int(self.shadow_height / 2)
-
+        
         self.player_interact_with_agent = None
         self.controls_widget = None
         ## Energy at start

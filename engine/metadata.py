@@ -5,8 +5,8 @@ Store some information about the agent
 """
 
 class Metadata:
-    CATEGORY_OBJECT = 1
-    CATEGORY_CRAFT = 2
+    CATEGORY_OBJECT = "object"
+    CATEGORY_CRAFT = "craft"
 
     """
     Meta data for agent object

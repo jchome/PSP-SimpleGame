@@ -38,7 +38,6 @@ class InventoryDisplay(SelectionDisplay):
         self.current_item = None
         self.nb_items_per_row = 6
         self.max_items = 36
-        self.category = "OBJECT"
 
         ## Cache assets of inventory (key = name, value = [image, detailed_image])
         self.cached_assets = {}
@@ -49,9 +48,13 @@ class InventoryDisplay(SelectionDisplay):
         self.controls_assets[Button.SQUARE] = psp2d.Image("assets/control-square.png")
         self.controls_assets[Button.CIRCLE] = psp2d.Image("assets/control-circle.png")
         self.controls_assets[Button.CROSS] = psp2d.Image("assets/control-cross.png")
+        self.controls_assets[Button.L] = psp2d.Image("assets/control-L.png")
+        self.controls_assets[Button.R] = psp2d.Image("assets/control-R.png")
         self.allowed_to_craft = False
         self.timer = -1
         self.round_anim = psp2d.Image("assets/round-anim-green.png")
+
+        self.current_category = Metadata.CATEGORY_OBJECT
         
     def update_nothing_happens(self):
         """
@@ -61,13 +64,14 @@ class InventoryDisplay(SelectionDisplay):
         self.timer = -1
 
         ## Get the current inventory size, during the first update method
-        if self.game.player.inventory.limit_size < self.nb_items_per_row:
-            self.nb_items_per_row = self.game.player.inventory.limit_size
-            self.max_items = self.game.player.inventory.limit_size
+        limit = self.game.player.inventory.limit_size[self.current_category]
+        if limit < self.nb_items_per_row:
+            self.nb_items_per_row = limit
+            self.max_items = limit
         else:
             self.nb_items_per_row = 6
-            if self.game.player.inventory.limit_size < self.max_items:
-                self.max_items = self.game.player.inventory.limit_size
+            if limit < self.max_items:
+                self.max_items = limit
         
         self.get_current_item(force_check_allowed_to_craft = True)
 
@@ -86,6 +90,21 @@ class InventoryDisplay(SelectionDisplay):
         ## Start the crafting
         if self.timer >= 20:
             self.start_crafting()
+
+        if "R" in keys_pressed:
+            ## Wait the key is pressed long enough
+            if self.timer == -1:
+                self.timer = 0
+            else:
+                self.timer += 0.25
+
+            if self.timer >= 5:
+                self.timer = 0
+                if self.current_category == Metadata.CATEGORY_OBJECT:
+                    self.current_category = Metadata.CATEGORY_CRAFT
+                else:
+                    self.current_category = Metadata.CATEGORY_OBJECT
+                self.cursor = 0
             
 
     def update_for_selection(self, controller):
@@ -111,14 +130,14 @@ class InventoryDisplay(SelectionDisplay):
         ## Set the current_item with the cursor value
         self.allowed_to_craft = False
         #print("self.cursor: %d" % self.cursor)
-        #print("len(self.game.player.inventory.objects): %d" %  len(self.game.player.inventory.objects))
-        if self.category == Metadata.CATEGORY_OBJECT:
-            if self.cursor >= len(self.game.player.inventory.objects):
-                self.current_item = None
-            else:
-                self.current_item = self.game.player.inventory.objects.values()[self.cursor]
+        #print("len(self.game.player.inventory.all_items[Metadata.CATEGORY_OBJECT]): %d" %  len(self.game.player.inventory.all_items[Metadata.CATEGORY_OBJECT]))
+        if self.cursor >= len(self.game.player.inventory.all_items[self.current_category]):
+            self.current_item = None
+            return
+        else:
+            self.current_item = self.game.player.inventory.all_items[self.current_category].values()[self.cursor]
 
-        elif self.category == Metadata.CATEGORY_CRAFT:
+        if self.current_category == Metadata.CATEGORY_CRAFT:
             formula = self.current_item.metadata.production_plan
             formula.check_ingredients_availability(self.game.player.inventory)
             if not formula.all_ingredients_available:
@@ -127,30 +146,19 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 self.allowed_to_craft = True
         
-
-
-
     
     def update_cursor(self, direction):
         previous_cursor_position = self.cursor
 
         if direction == "DOWN":
             if self.cursor + self.nb_items_per_row > self.max_items:
-                #self.cursor = self.cursor % self.nb_items_per_row 
-                if self.category == Metadata.CATEGORY_OBJECT:
-                    self.category = Metadata.CATEGORY_CRAFT
-                else:
-                    self.category = Metadata.CATEGORY_OBJECT
+                self.cursor = self.cursor % self.nb_items_per_row 
             else:
                 self.cursor = self.cursor + self.nb_items_per_row
 
         elif direction == "UP":
             if self.cursor < self.nb_items_per_row:
-                #self.cursor = (self.max_items - self.nb_items_per_row) + self.cursor
-                if self.category == Metadata.CATEGORY_OBJECT:
-                    self.category = Metadata.CATEGORY_CRAFT
-                else:
-                    self.category = Metadata.CATEGORY_OBJECT
+                self.cursor = (self.max_items - self.nb_items_per_row) + self.cursor
             else:
                 self.cursor = self.cursor - self.nb_items_per_row
 
@@ -168,8 +176,8 @@ class InventoryDisplay(SelectionDisplay):
 
         if self.cursor < 0:
             self.cursor = 0
-        if self.cursor >= self.game.player.inventory.limit_size:
-            self.cursor = self.game.player.inventory.limit_size-1
+        if self.cursor >= self.game.player.inventory.limit_size[self.current_category]:
+            self.cursor = self.game.player.inventory.limit_size[self.current_category]-1
         self.get_current_item(previous_cursor_position == self.cursor)
 
 
@@ -191,16 +199,26 @@ class InventoryDisplay(SelectionDisplay):
     def draw(self):
         ## Draw background
         self.screen.blit(self.background, 0, 0, MAX_WIDTH, MAX_HEIGHT, 0, 0, True)
-        title = _("inventory.title", self.game.current_language)
-        pos_x = (MAX_WIDTH - self.title_font.textWidth(title)) / 2
+        category = _("category.title.%s" % self.current_category, self.game.current_language)
+        title = _("inventory.title", self.game.current_language) + " - " + category
+
+        pos_x = 10 #(MAX_WIDTH - self.title_font.textWidth(title)) / 2
         pos_y = -10
         self.title_font.drawText(self.screen, pos_x, pos_y, title)
 
-        pos_x = 4
-
         ## Draw the help keys
+        ## Go to RIGHT
+        pos_x = MAX_WIDTH - 44
+        self.screen.blit(self.controls_assets[Button.R], 0, 0, 44, 16, pos_x, 0, True)
+        if self.current_category == Metadata.CATEGORY_OBJECT:
+            text_left = _("category.title.%s" % Metadata.CATEGORY_CRAFT, self.game.current_language)
+        else:
+            text_left = _("category.title.%s" % Metadata.CATEGORY_OBJECT, self.game.current_language)
+        pos_x -= self.font.textWidth(text_left) - 4
+        self.font.drawText(self.screen, pos_x, 0, text_left)
 
         ## Exit button
+        pos_x = 4
         self.screen.blit(self.controls_assets[Button.CIRCLE], 0, 0, 16, 16, pos_x, 252, True)
         pos_x += 16
         text_exit = _("inventory.action.exit", self.game.current_language)
@@ -245,14 +263,15 @@ class InventoryDisplay(SelectionDisplay):
         ## Top left position of the first item
         (pos_x, pos_y) = (4, 38)
 
+        things_to_draw = self.game.player.inventory.all_items[self.current_category]
         if not self.assets_loaded:
             self.cached_assets = {}
-            for (item_name, item) in self.game.player.inventory.objects.items():
+            for (item_name, item) in things_to_draw.items():
                 self.load_asset(item)
             self.assets_loaded = True
 
         index = 0
-        for index in range(0, self.game.player.inventory.limit_size):
+        for index in range(0, self.game.player.inventory.limit_size[self.current_category]):
             if index == self.cursor:
                 ## Display the selection image of the item
                 self.screen.blit(self.asset_item_selected, 0, 0, self.item_size, self.item_size,
@@ -263,8 +282,8 @@ class InventoryDisplay(SelectionDisplay):
                     pos_x, pos_y, True)
 
             ## Draw the item of the player's inventory
-            if index < len(self.game.player.inventory.objects):
-                item = self.game.player.inventory.objects.values()[index]
+            if index < len(things_to_draw):
+                item = things_to_draw.values()[index]
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
                 if item.metadata.name not in self.cached_assets:
                     self.load_asset(item)
@@ -291,8 +310,6 @@ class InventoryDisplay(SelectionDisplay):
             self.font.drawText(self.screen, pos_x, pos_y, nothing_selected)
             return
 
-        #item = self.game.player.inventory.objects.values()[self.cursor]
-
         label = self.current_item.metadata.name + ".metadata.label"
         if self.game.current_language in self.current_item.metadata.label:
             label = self.current_item.metadata.label[self.game.current_language]
@@ -313,7 +330,7 @@ class InventoryDisplay(SelectionDisplay):
         pos_x = (MAX_WIDTH * 3 / 4) - (self.font.textWidth(description) / 2)
         self.font.drawText(self.screen, pos_x, pos_y, description)
 
-        if self.current_item.metadata.category == "CRAFT":
+        if self.current_item.metadata.category == Metadata.CATEGORY_CRAFT:
             formula = self.current_item.metadata.production_plan
             formula.check_ingredients_availability(self.game.player.inventory)
             formula.draw_ingredients(self.screen, img_pos, 
@@ -353,7 +370,7 @@ class InventoryDisplay(SelectionDisplay):
             self.screen.blit(self.asset_item_background, 0, 0, self.item_size, self.item_size,
                 pos_x, pos_y, True)
 
-            item = self.game.player.inventory.objects[name]
+            item = self.game.player.inventory.all_items[Metadata.CATEGORY_OBJECT][name]
             #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
             ## Display the sprite of the agent
             asset = self.cached_assets[item.metadata.name][IMAGEINDEX_SMALL]

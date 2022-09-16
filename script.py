@@ -13,6 +13,7 @@ sys.path.insert(0,'./python')
 from engine.displays.welcome_display import WelcomeDisplay
 from engine.game import Game
 from engine.displays.board import Board
+from engine.helper import debug
 
 import engine.translation
 _ = engine.translation.translate
@@ -83,7 +84,7 @@ def test_inventory(game, welcome_display):
 
     game.open_inventory()
 
-
+debug("-" * 50, True)
 game = Game()
 
 welcome = WelcomeDisplay()

@@ -2,12 +2,12 @@
 
 import os
 import re
-from engine import constants
-from engine.displays.inventory.inventory_item_formula import InventoryItemFormula
 import psp2d
 from configparser import ConfigParser
 
+from engine import constants
 from engine.displays.inventory.inventory_item import InventoryItem
+from engine.displays.inventory.inventory_item_formula import InventoryItemFormula
 from engine.metadata import Metadata
 
 class Formula(object):

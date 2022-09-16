@@ -111,6 +111,14 @@ translations_dict = {
     "inventory.nothing_selected": {
         "fr": "Aucune selection...",
         "en": "Nothing selected..."
+    },
+    "category.title.object":{
+        "fr": "Objets",
+        "en": "Objects"
+    },
+    "category.title.craft":{
+        "fr": "Connaissance",
+        "en": "Knowledge"
     }
 
     
