@@ -1,10 +1,13 @@
+# -*- coding: iso-8859-1 -*-
 
 """
 Store some information about the agent
 """
 
-
 class Metadata:
+    CATEGORY_OBJECT = 1
+    CATEGORY_CRAFT = 2
+
     """
     Meta data for agent object
     """
@@ -17,6 +20,7 @@ class Metadata:
         ## Dict of <lang> -> <text translated>
         self.label = {}
         self.description = {}
+        self.category = Metadata.CATEGORY_OBJECT
         self.production_plan = None
 
     def load_config(self, config):
@@ -24,7 +28,7 @@ class Metadata:
         Read .INI file and update the properties of the instance
         """
         if not config.has_option("ASSET", "name"):
-            raise Exception("The config file %s has no option [ASSET]name" % config)
+            raise Exception("The config file %s has no option [ASSET]/name" % config)
 
         self.name = config.get("ASSET", "name")
         self.sprite_file = config.get("ASSET", "source")

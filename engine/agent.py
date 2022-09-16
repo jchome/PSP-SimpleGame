@@ -43,8 +43,6 @@ class Agent(object):
         self.conf_boards = None
         self.debug = False
         self.id = "String defined by the board"
-        ## For formulas
-        self.production_plan = None
 
     def get_rectangle(self):
         return helper.Rect(self.pos_x, self.pos_y, self.metadata.width, self.metadata.height)
@@ -126,6 +124,7 @@ class Agent(object):
             if formula_config_file[0] in '\'"':
                 formula_config_file = formula_config_file[1:-1]
             self.metadata.production_plan = Formula(formula_config_file)
+            self.metadata.category = Metadata.CATEGORY_CRAFT
             
         self.load_custom_config(config)
         

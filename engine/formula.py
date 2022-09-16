@@ -31,8 +31,8 @@ class Formula(object):
         config = ConfigParser()
         config.read(config_file)
 
-        in_parameters = config.get("FORMULA", "in").strip()
-        out_parameters = config.get("FORMULA", "out").strip()
+        in_parameters = config.get("CRAFT", "in").strip()
+        out_parameters = config.get("CRAFT", "out").strip()
         
         self.read_components(self.ingredients, in_parameters)
         self.read_components(self.results, out_parameters)
@@ -80,10 +80,15 @@ class Formula(object):
         self.all_ingredients_available = availability_successed
     
     def craft(self, player_inventory):
+        """
+        Remove ingredients and add the result
+        """
         for inventory_item in self.ingredients:
             player_inventory.remove_item(inventory_item)
+
         for inventory_item in self.results:
             player_inventory.add_item(inventory_item)
+
         self.check_ingredients_availability(player_inventory)
 
     """
@@ -94,10 +99,10 @@ class Formula(object):
             self.ingredients.remove(ingredient_name)
             return
 
-    """
-    Check that the current formula has the same ingredients and same quantities
-    """
     def match(self, another_formula):
+        """
+        Check that the current formula has the same ingredients and same quantities
+        """
         for (quantity, component) in self.ingredients:
             if not component in another_formula.ingredients:
                 ## The ingredient is not present

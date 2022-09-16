@@ -8,6 +8,7 @@ from engine.displays.selection_display import SelectionDisplay
 from engine.widgets.controls_widget import Button
 from engine.constants import MAX_HEIGHT, MAX_WIDTH
 from engine.formula import Formula
+from engine.metadata import Metadata
 
 import engine.translation
 _ = engine.translation.translate
@@ -37,6 +38,7 @@ class InventoryDisplay(SelectionDisplay):
         self.current_item = None
         self.nb_items_per_row = 6
         self.max_items = 36
+        self.category = "OBJECT"
 
         ## Cache assets of inventory (key = name, value = [image, detailed_image])
         self.cached_assets = {}
@@ -52,6 +54,10 @@ class InventoryDisplay(SelectionDisplay):
         self.round_anim = psp2d.Image("assets/round-anim-green.png")
         
     def update_nothing_happens(self):
+        """
+        Update when the player does nothing. 
+        """
+        ## Prepare the timer
         self.timer = -1
 
         ## Get the current inventory size, during the first update method
@@ -67,12 +73,17 @@ class InventoryDisplay(SelectionDisplay):
 
 
     def update_for_key_pressed(self, keys_pressed):
+        """
+        Update method when the user press a key.
+        """
+        ## For the triangle button, start the craft
         if "TRIANGLE" in keys_pressed:
             if self.timer == -1:
                 self.timer = 0
             else:
                 self.timer += 0.25
         
+        ## Start the crafting
         if self.timer >= 20:
             self.start_crafting()
             
@@ -100,23 +111,24 @@ class InventoryDisplay(SelectionDisplay):
         ## Set the current_item with the cursor value
         self.allowed_to_craft = False
         #print("self.cursor: %d" % self.cursor)
-        #print("len(self.game.player.inventory.all_items): %d" %  len(self.game.player.inventory.all_items))
-        if self.cursor >= len(self.game.player.inventory.all_items):
-            self.current_item = None
-        else:
-            self.current_item = self.game.player.inventory.all_items.values()[self.cursor]
+        #print("len(self.game.player.inventory.objects): %d" %  len(self.game.player.inventory.objects))
+        if self.category == Metadata.CATEGORY_OBJECT:
+            if self.cursor >= len(self.game.player.inventory.objects):
+                self.current_item = None
+            else:
+                self.current_item = self.game.player.inventory.objects.values()[self.cursor]
 
-            if self.current_item is None or self.current_item.metadata.name != "FORMULA":
-                ## This is not a formula
+        elif self.category == Metadata.CATEGORY_CRAFT:
+            formula = self.current_item.metadata.production_plan
+            formula.check_ingredients_availability(self.game.player.inventory)
+            if not formula.all_ingredients_available:
+                ## All ingredients are not available
                 self.allowed_to_craft = False
             else:
-                formula = self.current_item.metadata.production_plan
-                formula.check_ingredients_availability(self.game.player.inventory)
-                if not formula.all_ingredients_available:
-                    ## All ingredients are not available
-                    self.allowed_to_craft = False
-                else:
-                    self.allowed_to_craft = True
+                self.allowed_to_craft = True
+        
+
+
 
     
     def update_cursor(self, direction):
@@ -124,13 +136,21 @@ class InventoryDisplay(SelectionDisplay):
 
         if direction == "DOWN":
             if self.cursor + self.nb_items_per_row > self.max_items:
-                self.cursor = self.cursor % self.nb_items_per_row 
+                #self.cursor = self.cursor % self.nb_items_per_row 
+                if self.category == Metadata.CATEGORY_OBJECT:
+                    self.category = Metadata.CATEGORY_CRAFT
+                else:
+                    self.category = Metadata.CATEGORY_OBJECT
             else:
                 self.cursor = self.cursor + self.nb_items_per_row
 
         elif direction == "UP":
             if self.cursor < self.nb_items_per_row:
-                self.cursor = (self.max_items - self.nb_items_per_row) + self.cursor
+                #self.cursor = (self.max_items - self.nb_items_per_row) + self.cursor
+                if self.category == Metadata.CATEGORY_OBJECT:
+                    self.category = Metadata.CATEGORY_CRAFT
+                else:
+                    self.category = Metadata.CATEGORY_OBJECT
             else:
                 self.cursor = self.cursor - self.nb_items_per_row
 
@@ -153,10 +173,10 @@ class InventoryDisplay(SelectionDisplay):
         self.get_current_item(previous_cursor_position == self.cursor)
 
 
-    """
-    Craft something with ingredients
-    """
     def start_crafting(self):
+        """
+        Craft something with ingredients
+        """
         #print("self.allowed_to_craft = %s" % self.allowed_to_craft)
         if not self.allowed_to_craft:
             return
@@ -227,7 +247,7 @@ class InventoryDisplay(SelectionDisplay):
 
         if not self.assets_loaded:
             self.cached_assets = {}
-            for (item_name, item) in self.game.player.inventory.all_items.items():
+            for (item_name, item) in self.game.player.inventory.objects.items():
                 self.load_asset(item)
             self.assets_loaded = True
 
@@ -243,8 +263,8 @@ class InventoryDisplay(SelectionDisplay):
                     pos_x, pos_y, True)
 
             ## Draw the item of the player's inventory
-            if index < len(self.game.player.inventory.all_items):
-                item = self.game.player.inventory.all_items.values()[index]
+            if index < len(self.game.player.inventory.objects):
+                item = self.game.player.inventory.objects.values()[index]
                 #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
                 if item.metadata.name not in self.cached_assets:
                     self.load_asset(item)
@@ -271,7 +291,7 @@ class InventoryDisplay(SelectionDisplay):
             self.font.drawText(self.screen, pos_x, pos_y, nothing_selected)
             return
 
-        #item = self.game.player.inventory.all_items.values()[self.cursor]
+        #item = self.game.player.inventory.objects.values()[self.cursor]
 
         label = self.current_item.metadata.name + ".metadata.label"
         if self.game.current_language in self.current_item.metadata.label:
@@ -293,8 +313,7 @@ class InventoryDisplay(SelectionDisplay):
         pos_x = (MAX_WIDTH * 3 / 4) - (self.font.textWidth(description) / 2)
         self.font.drawText(self.screen, pos_x, pos_y, description)
 
-        ##TODO: category of agent
-        if self.current_item.metadata.name == "FORMULA":
+        if self.current_item.metadata.category == "CRAFT":
             formula = self.current_item.metadata.production_plan
             formula.check_ingredients_availability(self.game.player.inventory)
             formula.draw_ingredients(self.screen, img_pos, 
@@ -334,7 +353,7 @@ class InventoryDisplay(SelectionDisplay):
             self.screen.blit(self.asset_item_background, 0, 0, self.item_size, self.item_size,
                 pos_x, pos_y, True)
 
-            item = self.game.player.inventory.all_items[name]
+            item = self.game.player.inventory.objects[name]
             #print("agent_metadata.sprite_file: %s" % agent_metadata.sprite_file)
             ## Display the sprite of the agent
             asset = self.cached_assets[item.metadata.name][IMAGEINDEX_SMALL]
@@ -347,37 +366,4 @@ class InventoryDisplay(SelectionDisplay):
             else:
                 pos_x += 36
             index += 1
-
-    """
-    The user wants to add an ingredrient in the carft formula
-    """
-    def __add_to_crafting(self):
-        if not self.cursor in self.game.player.inventory.all_items.values():
-            return
-        item = self.game.player.inventory.all_items.values()[self.cursor]
-
-        if item.metadata.name in self.craft_formula.ingredients:
-            quantity = self.craft_formula.ingredients[item.metadata.name] + 1
-            if item.count < quantity:
-                ## Not enougth resource
-                return
-        else:
-            quantity = 1
-        
-        self.craft_formula.ingredients[item.metadata.name] = quantity
-
-
-    """
-    Remove an ingredient of the craft formula
-    """
-    def __remove_from_crafting(self):
-        if not self.cursor in self.game.player.inventory.all_items.values():
-            return
-        item = self.game.player.inventory.all_items.values()[self.cursor]
-        if item.metadata.name in self.craft_formula.ingredients:
-            quantity = self.craft_formula.ingredients[item.metadata.name] - 1
-            if quantity == 0:
-                del(self.craft_formula.ingredients[item.metadata.name])
-            else:
-                self.craft_formula.ingredients[item.metadata.name] = quantity
 
