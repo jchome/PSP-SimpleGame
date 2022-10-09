@@ -75,6 +75,15 @@ class InventoryDisplay(SelectionDisplay):
         
         self.get_current_item(force_check_allowed_to_craft = True)
 
+    def update_for_key_released(self, keys_released):
+        #print("Key released: %s" % keys_released)
+        if "R" in keys_released:
+            if self.current_category == Metadata.CATEGORY_OBJECT:
+                self.current_category = Metadata.CATEGORY_CRAFT
+            else:
+                self.current_category = Metadata.CATEGORY_OBJECT
+            self.cursor = 0
+            self.current_item = None
 
     def update_for_key_pressed(self, keys_pressed):
         """
@@ -91,21 +100,6 @@ class InventoryDisplay(SelectionDisplay):
         if self.timer >= 20:
             self.start_crafting()
 
-        if "R" in keys_pressed:
-            ## Wait the key is pressed long enough
-            if self.timer == -1:
-                self.timer = 0
-            else:
-                self.timer += 0.25
-
-            if self.timer >= 5:
-                self.timer = 0
-                if self.current_category == Metadata.CATEGORY_OBJECT:
-                    self.current_category = Metadata.CATEGORY_CRAFT
-                else:
-                    self.current_category = Metadata.CATEGORY_OBJECT
-                self.cursor = 0
-            
 
     def update_for_selection(self, controller):
         ## The update method is called only for active displays
@@ -227,7 +221,8 @@ class InventoryDisplay(SelectionDisplay):
 
 
         ## Interaction button
-        if self.current_item is not None and self.current_item.metadata.name == "FORMULA":
+        if self.current_item is not None and self.current_category == Metadata.CATEGORY_CRAFT:
+            #print("self.current_item.metadata.name=%s" % self.current_item.metadata.name)
             formula = self.current_item.metadata.production_plan
             formula.check_ingredients_availability(self.game.player.inventory)
             if formula.all_ingredients_available:
@@ -322,6 +317,7 @@ class InventoryDisplay(SelectionDisplay):
             self.screen.blit(asset, 0, 0, 150, 150, 
                 img_pos.x, 
                 img_pos.y, True)
+
         ## Draw the description
         description = self.current_item.metadata.name + ".metadata.description"
         if self.game.current_language in self.current_item.metadata.description:

@@ -57,7 +57,8 @@ class Agent(object):
     def load_config(self, config_file):
         ## Check that config file exists
         if not os.path.isfile(config_file):
-            raise ValueError("File not found: %s" % config_file)
+            print("[ERROR] File not found: %s" % config_file)
+            return
 
         config = ConfigParser()
         config.read(config_file)
@@ -117,13 +118,17 @@ class Agent(object):
         self.inventory_open_color = None
         if config.has_option("COLLISION", "open_inventory"):
             self.inventory_open_color = config.get("COLLISION", "open_inventory")
+        
+        #print("Loading config for %s" % self.metadata.name)
 
         if config.has_option("CRAFT", "formula"):
             formula_config_file = config.get("CRAFT", "formula").strip()
             ## remove first and last quote
             if formula_config_file[0] in '\'"':
                 formula_config_file = formula_config_file[1:-1]
+            #print(">>>> formula_config_file=%s" % formula_config_file)
             self.metadata.production_plan = Formula(formula_config_file)
+            #print(">>>> self.metadata.production_plan=%s" % self.metadata.production_plan)
             self.metadata.category = Metadata.CATEGORY_CRAFT
             
         self.load_custom_config(config)

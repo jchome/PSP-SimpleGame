@@ -62,5 +62,6 @@ class Inventory:
             item_of_inventory = self.all_items[Metadata.CATEGORY_OBJECT][item.metadata.name]
             item_of_inventory.count -= item.count
             if item_of_inventory.count == 0:
-                del(item_of_inventory[item.metadata.name])
+                arrayOfItems = self.all_items[Metadata.CATEGORY_OBJECT]
+                del(arrayOfItems[item.metadata.name])
         
